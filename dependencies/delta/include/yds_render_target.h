@@ -1,0 +1,68 @@
+#ifndef YDS_RENDER_TARGET_H
+#define YDS_RENDER_TARGET_H
+
+#include "yds_context_object.h"
+#include "yds_depth_buffer.h"
+
+class ysRenderingContext;
+class ysRenderTarget : public ysContextObject {
+    friend class ysRenderingContext;
+    friend class ysDevice;
+
+public:
+    enum class Type {
+        OnScreen,
+        OffScreen,
+        Subdivision,
+
+        Undefined
+    };
+
+    enum class Format {
+        RTF_R8G8B8A8_UNORM,
+        RTF_R32G32B32_FLOAT
+    };
+
+public:
+    ysRenderTarget();
+    ysRenderTarget(DEVICE_API API);
+    virtual ~ysRenderTarget();
+
+    int GetWidth() const { return m_width; }
+    int GetHeight() const { return m_height; }
+
+    int GetPosX() const { return m_posX; }
+    int GetPosY() const { return m_posY; }
+
+    Format GetFormat() const { return m_format; }
+    Type GetType() const { return m_type; }
+
+    int GetSampleCount() const { return m_sampleCount; }
+    bool HasDepthBuffer() const { return m_hasDepthBuffer; }
+
+    ysRenderingContext *GetAssociatedContext() { return m_associatedContext; }
+    ysRenderTarget *GetParent() { return m_parent; }
+
+    bool IsDepthTestEnabled() const { return m_depthTestEnabled; }
+    void SetDepthTestEnabled(bool enable) { m_depthTestEnabled = enable; }
+
+protected:
+    int m_posX;
+    int m_posY;
+
+    int m_width;
+    int m_height;
+
+    Type m_type;
+    Format m_format;
+
+    int m_sampleCount;
+    bool m_hasDepthBuffer;
+    bool m_depthTestEnabled;
+
+    ysRenderTarget *m_parent;
+    ysRenderingContext *m_associatedContext;
+    ysDepthBuffer *m_depthBuffer;
+};
+
+#endif /* YDS_RENDER_TARGET_H */
