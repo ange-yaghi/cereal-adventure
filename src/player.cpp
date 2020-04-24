@@ -152,8 +152,8 @@ void c_adv::Player::configureAssets(dbasic::AssetManager *am) {
     AnimLegsIdle = am->GetAction("LegsIdle");
     AnimArmsIdle = am->GetAction("ArmsIdle");
 
-    AnimLegsWalk->SetLength(40.0f);
-    AnimArmsWalk->SetLength(40.0f);
+    AnimLegsWalk->SetLength(39.0f);
+    AnimArmsWalk->SetLength(39.0f);
     AnimLegsIdle->SetLength(100.0f);
     AnimArmsIdle->SetLength(100.0f);
 

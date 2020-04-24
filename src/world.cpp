@@ -93,7 +93,7 @@ c_adv::AABB c_adv::World::getCameraExtents() const {
 void c_adv::World::render() {
     ysVector focusPosition = m_focus->RigidBody.Transform.GetWorldPosition();
     m_engine.SetCameraPosition(ysMath::GetX(focusPosition), ysMath::GetY(focusPosition));
-    m_engine.SetCameraAltitude(20.0f);
+    m_engine.SetCameraAltitude(7.0f);
 
     m_mainRealm->render();
 }
