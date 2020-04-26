@@ -23,7 +23,7 @@ void c_adv::TestObstacle::initialize() {
 void c_adv::TestObstacle::render() {
     const int color[] = { 255, 0, 0 };
     m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
-    //m_world->getEngine().DrawBox(color, 2.0f, 2.0f);
+    m_world->getEngine().DrawBox(color, 2.0f, 2.0f);
 }
 
 void c_adv::TestObstacle::process() {

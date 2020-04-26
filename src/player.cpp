@@ -66,16 +66,19 @@ void c_adv::Player::render() {
     m_world->getEngine().DrawRenderSkeleton(m_renderSkeleton, 1.0f, (int)Layer::Player);
 
     dbasic::Console *console = m_world->getEngine().GetConsole();
-    console->Clear();
     console->MoveToLocation(dbasic::GuiPoint(1, 2));
+    
     console->SetFontForeColor(0, 0, 0, 1.0f);
     console->SetFontBackColor(0, 0, 0, 0.0f);
 
     std::stringstream msg;
     ysVector position = RigidBody.Transform.GetWorldPosition();
-    msg << "Pos " << ysMath::GetX(position) << "/" << ysMath::GetY(position) << "\n";
-    msg << "FPS " << m_world->getEngine().GetAverageFramerate() << "\n";
-    msg << "AO/DO/VI: " << m_realm->getAliveObjectCount() << "/" << m_realm->getDeadObjectCount() << "/" << m_realm->getVisibleObjectCount() << "\n";
+    msg << "Pos " << ysMath::GetX(position) << "/" << ysMath::GetY(position) << "          \n";
+    msg << "FPS " << m_world->getEngine().GetAverageFramerate() << "          \n";
+    msg << "AO/DO/VI: " << 
+        m_realm->getAliveObjectCount() << "/" << 
+        m_realm->getDeadObjectCount() << "/" << 
+        m_realm->getVisibleObjectCount() << "          \n";
     console->DrawGeneralText(msg.str().c_str());
 }
 
