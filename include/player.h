@@ -14,6 +14,8 @@ namespace c_adv {
         virtual void process();
         virtual void render();
 
+        bool isOnSurface();
+
     protected:
         void updateMotion();
         void updateAnimation();

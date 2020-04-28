@@ -1,6 +1,7 @@
 #include "../include/asset_loader.h"
 
 #include "../include/player.h"
+#include "../include/test_obstacle.h"
 
 c_adv::AssetLoader::AssetLoader() {
     /* void */
@@ -50,6 +51,7 @@ void c_adv::AssetLoader::loadAllAssets(const dbasic::Path &assetPath, dbasic::As
 
     /* Connect all assets to classes */
     Player::configureAssets(am);
+    TestObstacle::configureAssets(am);
 }
 
 std::string c_adv::AssetLoader::getPath(const char *path, const dbasic::Path &assetPath) {

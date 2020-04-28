@@ -51,10 +51,22 @@ void c_adv::World::initialSpawn() {
     m_mainRealm->setIndoor(false);
 
     m_focus = m_mainRealm->spawn<Player>();
-    m_focus->RigidBody.Transform.SetPosition(ysMath::LoadVector(0.0f, 0.0f, 0.0f));
+    m_focus->RigidBody.Transform.SetPosition(ysMath::LoadVector(0.0f, 2.0f, 0.0f));
 
     GameObject *testObstacle = m_mainRealm->spawn<TestObstacle>();
-    testObstacle->RigidBody.Transform.SetPosition(ysMath::LoadVector(10.0f, 0.0f, 0.0f));
+    testObstacle->RigidBody.Transform.SetPosition(ysMath::LoadVector(8.0f, -2.0f, 0.0f));
+
+    testObstacle = m_mainRealm->spawn<TestObstacle>();
+    testObstacle->RigidBody.Transform.SetPosition(ysMath::LoadVector(0.0f, -3.0f, 0.0f));
+
+    testObstacle = m_mainRealm->spawn<TestObstacle>();
+    testObstacle->RigidBody.Transform.SetPosition(ysMath::LoadVector(2.0f, -3.0f, 0.0f));
+
+    testObstacle = m_mainRealm->spawn<TestObstacle>();
+    testObstacle->RigidBody.Transform.SetPosition(ysMath::LoadVector(4.0f, -3.0f, 0.0f));
+
+    testObstacle = m_mainRealm->spawn<TestObstacle>();
+    testObstacle->RigidBody.Transform.SetPosition(ysMath::LoadVector(6.0f, -2.5f, 0.0f));
 }
 
 void c_adv::World::run() {
@@ -92,7 +104,7 @@ c_adv::AABB c_adv::World::getCameraExtents() const {
 
 void c_adv::World::render() {
     ysVector focusPosition = m_focus->RigidBody.Transform.GetWorldPosition();
-    m_engine.SetCameraPosition(ysMath::GetX(focusPosition), ysMath::GetY(focusPosition));
+    m_engine.SetCameraPosition(ysMath::GetX(focusPosition), 0.0f);
     m_engine.SetCameraAltitude(7.0f);
 
     m_mainRealm->render();

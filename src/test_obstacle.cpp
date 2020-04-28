@@ -2,6 +2,8 @@
 
 #include "../include/world.h"
 
+dbasic::ModelAsset *c_adv::TestObstacle::m_obstacleMesh = nullptr;
+
 c_adv::TestObstacle::TestObstacle() {
     /* void */
 }
@@ -15,15 +17,18 @@ void c_adv::TestObstacle::initialize() {
     RigidBody.SetInverseMass(0.0f);
 
     dphysics::CollisionObject *bounds;
-    RigidBody.CollisionGeometry.NewCircleObject(&bounds);
+    RigidBody.CollisionGeometry.NewBoxObject(&bounds);
     bounds->SetMode(dphysics::CollisionObject::Mode::Fine);
-    bounds->GetAsCircle()->Radius = 1.0f;
+    bounds->GetAsBox()->HalfHeight = 1.0f;
+    bounds->GetAsBox()->HalfWidth = 1.0f;
+    bounds->GetAsBox()->Orientation = ysMath::Constants::QuatIdentity;
+    bounds->GetAsBox()->Position = ysMath::Constants::Zero;
 }
 
 void c_adv::TestObstacle::render() {
     const int color[] = { 255, 0, 0 };
     m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
-    m_world->getEngine().DrawBox(color, 2.0f, 2.0f);
+    m_world->getEngine().DrawModel(m_obstacleMesh, RigidBody.Transform.GetWorldTransform(), 1.0f, nullptr);
 }
 
 void c_adv::TestObstacle::process() {
@@ -31,5 +36,5 @@ void c_adv::TestObstacle::process() {
 }
 
 void c_adv::TestObstacle::configureAssets(dbasic::AssetManager *am) {
-    /* void */
+    m_obstacleMesh = am->GetModelAsset("TestObstacle");
 }

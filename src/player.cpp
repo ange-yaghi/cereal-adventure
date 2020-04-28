@@ -33,8 +33,8 @@ void c_adv::Player::initialize() {
     dphysics::CollisionObject *bounds;
     RigidBody.CollisionGeometry.NewBoxObject(&bounds);
     bounds->SetMode(dphysics::CollisionObject::Mode::Fine);
-    bounds->GetAsBox()->HalfHeight = 1.0f;
-    bounds->GetAsBox()->HalfWidth = 0.75f;
+    bounds->GetAsBox()->HalfHeight = 1.5f;
+    bounds->GetAsBox()->HalfWidth = 0.2f;
     bounds->GetAsBox()->Orientation = ysMath::Constants::QuatIdentity;
     bounds->GetAsBox()->Position = ysMath::Constants::Zero;
 
@@ -52,6 +52,11 @@ void c_adv::Player::initialize() {
 
 void c_adv::Player::process() {
     GameObject::process();
+
+    RigidBody.ClearAccumulators();
+    RigidBody.AddForceWorldSpace(
+        ysMath::LoadVector(0.0f, -15.0f / RigidBody.GetInverseMass(), 0.0f),
+        RigidBody.Transform.GetWorldPosition());
 
     updateMotion();
     updateAnimation();
@@ -74,6 +79,7 @@ void c_adv::Player::render() {
     std::stringstream msg;
     ysVector position = RigidBody.Transform.GetWorldPosition();
     msg << "Pos " << ysMath::GetX(position) << "/" << ysMath::GetY(position) << "          \n";
+    msg << "V   " << ysMath::GetX(RigidBody.GetVelocity()) << "/" << ysMath::GetY(RigidBody.GetVelocity()) << "             \n";
     msg << "FPS " << m_world->getEngine().GetAverageFramerate() << "          \n";
     msg << "AO/DO/VI: " << 
         m_realm->getAliveObjectCount() << "/" << 
@@ -82,20 +88,63 @@ void c_adv::Player::render() {
     console->DrawGeneralText(msg.str().c_str());
 }
 
+bool c_adv::Player::isOnSurface() {
+    int collisionCount = RigidBody.GetCollisionCount();
+    float closestBoxDistance = 0.0f;
+    GameObject *closestBox = nullptr;
+
+    for (int i = 0; i < collisionCount; ++i) {
+        dphysics::Collision *col = RigidBody.GetCollision(i);
+        dphysics::RigidBody *body = col->m_body1 == &RigidBody
+            ? col->m_body2
+            : col->m_body1;
+
+        if (!col->m_sensor && !col->IsGhost()) {
+            ysVector normal = col->m_normal;
+            if (std::abs(ysMath::GetScalar(ysMath::Dot(normal, ysMath::Constants::YAxis))) > 0.5f) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 void c_adv::Player::updateMotion() {
     dbasic::DeltaEngine &engine = m_world->getEngine();
 
-    if (engine.IsKeyDown(ysKeyboard::KEY_D)) {
-        RigidBody.SetVelocity(ysMath::LoadVector(3.0f, 0.0f, 0.0f));
+    ysVector v = RigidBody.GetVelocity();
+    
+    if (isOnSurface()) {
+        if (engine.ProcessKeyDown(ysKeyboard::KEY_SPACE)) {
+            RigidBody.AddImpulseWorldSpace(ysMath::LoadVector(0.0f, 4.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
+        }
+
+        if (engine.IsKeyDown(ysKeyboard::KEY_D)) {
+            RigidBody.SetVelocity(ysMath::LoadVector(3.0f, ysMath::GetY(v), 0.0f));
+        }
+        else if (std::abs(ysMath::GetX(v)) > 0.01f) {
+            RigidBody.AddForceWorldSpace(ysMath::LoadVector(-ysMath::GetX(v) * 10, 0.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
+        }
+        else {
+            RigidBody.SetVelocity(ysMath::LoadVector(0.0f, ysMath::GetY(v), 0.0f));
+        }
     }
-    else RigidBody.SetVelocity(ysMath::LoadVector(0.0f, 0.0f, 0.0f));
+    else {
+        if (engine.IsKeyDown(ysKeyboard::KEY_D) && ysMath::GetX(v) < 0.5f) {
+            RigidBody.AddForceWorldSpace(ysMath::LoadVector(2.0f, 0.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
+        }
+        else if (engine.IsKeyDown(ysKeyboard::KEY_A) && ysMath::GetX(v) > -0.5f) {
+            RigidBody.AddForceWorldSpace(ysMath::LoadVector(-2.0f, 0.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
+        }
+    }
 }
 
 void c_adv::Player::updateAnimation() {
     ysVector velocity = RigidBody.GetVelocity();
-    float mag = ysMath::GetScalar(ysMath::MagnitudeSquared3(velocity));
+    float hMag = ysMath::GetScalar(ysMath::Dot(velocity, ysMath::Constants::XAxis));
 
-    if (mag > 0.01f) {
+    if (hMag > 1.0f && isOnSurface()) {
         ysAnimationChannel::ActionSettings smooth;
         smooth.FadeIn = 20.0f;
         smooth.Speed = 1.0f;

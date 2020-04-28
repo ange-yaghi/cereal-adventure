@@ -39,19 +39,19 @@ void c_adv::Realm::process() {
     spawnObjects();
     respawnObjects();
 
-    PhysicsSystem.Update(getEngine().GetFrameLength() / 2);
-    PhysicsSystem.Update(getEngine().GetFrameLength() / 2);
-
     for (GameObject *g : m_gameObjects) {
         if (g->getDeletionFlag()) continue;
 
         g->createVisualBounds();
         g->process();
     }
+
+    PhysicsSystem.Update(getEngine().GetFrameLength() / 2);
+    PhysicsSystem.Update(getEngine().GetFrameLength() / 2);
 }
 
 void c_adv::Realm::render() {
-    m_world->getEngine().SetClearColor(0x0, 0x0, 0x0);
+    m_world->getEngine().SetClearColor(0x55, 0x55, 0x55);
 
     ysVector4 sunPosition(10.0f, 1.0f, 2.0f);
 

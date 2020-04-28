@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\asset_loader.cpp" />
     <ClCompile Include="..\..\src\game_object.cpp" />
+    <ClCompile Include="..\..\src\jitter_filter.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\os_utilities.cpp" />
     <ClCompile Include="..\..\src\cereal_adventure_app.cpp" />
@@ -34,6 +35,7 @@
     <ClInclude Include="..\..\include\asset_loader.h" />
     <ClInclude Include="..\..\include\delta.h" />
     <ClInclude Include="..\..\include\game_object.h" />
+    <ClInclude Include="..\..\include\jitter_filter.h" />
     <ClInclude Include="..\..\include\os_utilities.h" />
     <ClInclude Include="..\..\include\cereal_adventure_app.h" />
     <ClInclude Include="..\..\include\player.h" />

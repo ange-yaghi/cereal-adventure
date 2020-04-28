@@ -18,6 +18,9 @@ namespace c_adv {
         // Assets ----
     public:
         static void configureAssets(dbasic::AssetManager *am);
+
+    protected:
+        static dbasic::ModelAsset *m_obstacleMesh;
     };
 
 } /* namespace c_adv */
