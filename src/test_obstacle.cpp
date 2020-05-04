@@ -1,11 +1,12 @@
 #include "../include/test_obstacle.h"
+#include "../include/ledge.h"
 
 #include "../include/world.h"
 
 dbasic::ModelAsset *c_adv::TestObstacle::m_obstacleMesh = nullptr;
 
 c_adv::TestObstacle::TestObstacle() {
-    /* void */
+    m_ledge0 = m_ledge1 = m_ledge2 = m_ledge3 = nullptr;
 }
 
 c_adv::TestObstacle::~TestObstacle() {
@@ -13,6 +14,8 @@ c_adv::TestObstacle::~TestObstacle() {
 }
 
 void c_adv::TestObstacle::initialize() {
+    GameObject::initialize();
+
     RigidBody.SetHint(dphysics::RigidBody::RigidBodyHint::Dynamic);
     RigidBody.SetInverseMass(0.0f);
 
@@ -23,11 +26,33 @@ void c_adv::TestObstacle::initialize() {
     bounds->GetAsBox()->HalfWidth = 1.0f;
     bounds->GetAsBox()->Orientation = ysMath::Constants::QuatIdentity;
     bounds->GetAsBox()->Position = ysMath::Constants::Zero;
+
+    m_ledge0 = m_realm->spawn<Ledge>();
+    m_ledge1 = m_realm->spawn<Ledge>();
+    m_ledge2 = m_realm->spawn<Ledge>();
+    m_ledge3 = m_realm->spawn<Ledge>();
+
+    m_ledge0->RigidBody.Transform.SetPosition(ysMath::LoadVector(1.0f, 1.0f, 0.0f));
+    m_ledge1->RigidBody.Transform.SetPosition(ysMath::LoadVector(-1.0f, 1.0f, 0.0f));
+    m_ledge2->RigidBody.Transform.SetPosition(ysMath::LoadVector(1.0f, -1.0f, 0.0f));
+    m_ledge3->RigidBody.Transform.SetPosition(ysMath::LoadVector(-1.0f, -1.0f, 0.0f));
+
+    RigidBody.AddChild(&m_ledge0->RigidBody);
+    RigidBody.AddChild(&m_ledge1->RigidBody);
+    RigidBody.AddChild(&m_ledge2->RigidBody);
+    RigidBody.AddChild(&m_ledge3->RigidBody);
+}
+
+void c_adv::TestObstacle::destroy() {
+    m_ledge0->setDeletionFlag();
+    m_ledge1->setDeletionFlag();
+    m_ledge2->setDeletionFlag();
+    m_ledge3->setDeletionFlag();
 }
 
 void c_adv::TestObstacle::render() {
-    const int color[] = { 255, 0, 0 };
     m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
+    m_world->getEngine().SetMultiplyColor(ysVector4(1.0f, 1.0f, 1.0f, 1.0f));
     m_world->getEngine().DrawModel(m_obstacleMesh, RigidBody.Transform.GetWorldTransform(), 1.0f, nullptr);
 }
 

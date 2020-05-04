@@ -16,6 +16,18 @@
     <Filter Include="Header Files\delta-includes">
       <UniqueIdentifier>{da0515bf-2ba6-41b7-862b-d048a192b7f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\game-objects">
+      <UniqueIdentifier>{51b53524-a19a-451e-bcb0-4501da7697a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\game-objects">
+      <UniqueIdentifier>{0254eb56-b044-48a4-ad64-f88346a197f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\utilities">
+      <UniqueIdentifier>{2a10df87-34d3-4bec-acb9-89d7a7602218}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\utilities">
+      <UniqueIdentifier>{fbd25c9b-4c64-4648-aba2-2edaa02d454c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -36,17 +48,26 @@
     <ClCompile Include="..\..\src\realm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\player.cpp">
+    <ClCompile Include="..\..\src\jitter_filter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\game_object.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\game-objects</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\test_obstacle.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\game-objects</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\jitter_filter.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\src\player.cpp">
+      <Filter>Source Files\game-objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ledge.cpp">
+      <Filter>Source Files\game-objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\math_utilities.cpp">
+      <Filter>Source Files\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\cooldown_timer.cpp">
+      <Filter>Source Files\utilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -54,9 +75,6 @@
       <Filter>Header Files\delta-includes</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\os_utilities.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\game_object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\world.h">
@@ -74,14 +92,26 @@
     <ClInclude Include="..\..\include\realm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\player.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\test_obstacle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\jitter_filter.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\game_object.h">
+      <Filter>Header Files\game-objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\player.h">
+      <Filter>Header Files\game-objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\test_obstacle.h">
+      <Filter>Header Files\game-objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ledge.h">
+      <Filter>Header Files\game-objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\math_utilities.h">
+      <Filter>Header Files\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cooldown_timer.h">
+      <Filter>Header Files\utilities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

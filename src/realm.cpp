@@ -46,8 +46,8 @@ void c_adv::Realm::process() {
         g->process();
     }
 
-    PhysicsSystem.Update(getEngine().GetFrameLength() / 2);
-    PhysicsSystem.Update(getEngine().GetFrameLength() / 2);
+    PhysicsSystem.Update(getEngine().GetFrameLength());
+    //PhysicsSystem.Update(getEngine().GetFrameLength() / 2);
 }
 
 void c_adv::Realm::render() {
@@ -70,7 +70,6 @@ void c_adv::Realm::render() {
     backLight.Color.Scale(4.0f);
     backLight.FalloffEnabled = 1;
     //m_world->getEngine().AddLight(backLight);
-    
 
     AABB cameraExtents = m_world->getCameraExtents();
 

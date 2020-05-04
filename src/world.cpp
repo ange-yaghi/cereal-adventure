@@ -51,22 +51,33 @@ void c_adv::World::initialSpawn() {
     m_mainRealm->setIndoor(false);
 
     m_focus = m_mainRealm->spawn<Player>();
-    m_focus->RigidBody.Transform.SetPosition(ysMath::LoadVector(0.0f, 2.0f, 0.0f));
+    m_focus->RigidBody.Transform.SetPosition(ysMath::LoadVector(0.0f, 10.0f, 0.0f));
 
-    GameObject *testObstacle = m_mainRealm->spawn<TestObstacle>();
-    testObstacle->RigidBody.Transform.SetPosition(ysMath::LoadVector(8.0f, -2.0f, 0.0f));
+    GameObject *testObstacle = nullptr;
 
     testObstacle = m_mainRealm->spawn<TestObstacle>();
     testObstacle->RigidBody.Transform.SetPosition(ysMath::LoadVector(0.0f, -3.0f, 0.0f));
 
     testObstacle = m_mainRealm->spawn<TestObstacle>();
-    testObstacle->RigidBody.Transform.SetPosition(ysMath::LoadVector(2.0f, -3.0f, 0.0f));
+    testObstacle->RigidBody.Transform.SetPosition(ysMath::LoadVector(2.0f, 1.0f, 0.0f));
 
     testObstacle = m_mainRealm->spawn<TestObstacle>();
     testObstacle->RigidBody.Transform.SetPosition(ysMath::LoadVector(4.0f, -3.0f, 0.0f));
 
     testObstacle = m_mainRealm->spawn<TestObstacle>();
     testObstacle->RigidBody.Transform.SetPosition(ysMath::LoadVector(6.0f, -2.5f, 0.0f));
+
+    testObstacle = m_mainRealm->spawn<TestObstacle>();
+    testObstacle->RigidBody.Transform.SetPosition(ysMath::LoadVector(8.0f, -1.5f, 0.0f));
+
+    testObstacle = m_mainRealm->spawn<TestObstacle>();
+    testObstacle->RigidBody.Transform.SetPosition(ysMath::LoadVector(10.0f, -0.5f, 0.0f));
+
+    testObstacle = m_mainRealm->spawn<TestObstacle>();
+    testObstacle->RigidBody.Transform.SetPosition(ysMath::LoadVector(12.0f, -2.0f, 0.0f));
+
+    testObstacle = m_mainRealm->spawn<TestObstacle>();
+    testObstacle->RigidBody.Transform.SetPosition(ysMath::LoadVector(18.0f, -2.0f, 0.0f));
 }
 
 void c_adv::World::run() {

@@ -103,6 +103,10 @@ void c_adv::GameObject::initialize() {
     m_real = true;
 }
 
+void c_adv::GameObject::destroy() {
+    /* void */
+}
+
 void c_adv::GameObject::render() {
     /* void */
 }

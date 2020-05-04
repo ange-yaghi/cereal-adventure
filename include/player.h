@@ -3,7 +3,11 @@
 
 #include "game_object.h"
 
+#include "cooldown_timer.h"
+
 namespace c_adv {
+
+    class Ledge;
 
     class Player : public GameObject {
     public:
@@ -15,10 +19,23 @@ namespace c_adv {
         virtual void render();
 
         bool isOnSurface();
+        bool isHanging();
+
+        void updateGrip();
+        void attemptGrip();
+        void releaseGrip();
+
+        ysVector getGripLocationLocal();
+        ysVector getGripLocationWorld();
 
     protected:
         void updateMotion();
         void updateAnimation();
+
+        void processImpactDamage();
+
+    protected:
+        float m_health;
 
     protected:
         ysAnimationActionBinding
@@ -31,6 +48,15 @@ namespace c_adv {
 
         ysAnimationChannel *m_legsChannel;
         ysAnimationChannel *m_armsChannel;
+
+        dphysics::LedgeLink *m_gripLink;
+        GameObject *m_ledge;
+
+        CooldownTimer m_gripCooldown;
+
+        // Movement parameters
+    protected:
+        float m_ledgeGraspDistance;
 
         // Assets ----
     public:

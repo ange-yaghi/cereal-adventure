@@ -1,6 +1,7 @@
 #include "../include/player.h"
 
 #include "../include/world.h"
+#include "../include/math_utilities.h"
 
 #include <sstream>
 
@@ -16,6 +17,11 @@ c_adv::Player::Player() {
     m_armsChannel = nullptr;
     m_legsChannel = nullptr;
     m_renderSkeleton = nullptr;
+    m_gripLink = nullptr;
+    m_ledge = nullptr;
+
+    m_health = 10.0f;
+    m_ledgeGraspDistance = 3.0f;
 }
 
 c_adv::Player::~Player() {
@@ -33,10 +39,12 @@ void c_adv::Player::initialize() {
     dphysics::CollisionObject *bounds;
     RigidBody.CollisionGeometry.NewBoxObject(&bounds);
     bounds->SetMode(dphysics::CollisionObject::Mode::Fine);
-    bounds->GetAsBox()->HalfHeight = 1.5f;
+    bounds->GetAsBox()->HalfHeight = 1.45f;
     bounds->GetAsBox()->HalfWidth = 0.2f;
-    bounds->GetAsBox()->Orientation = ysMath::Constants::QuatIdentity;
-    bounds->GetAsBox()->Position = ysMath::Constants::Zero;
+
+    RigidBody.CollisionGeometry.NewCircleObject(&bounds);
+    bounds->SetMode(dphysics::CollisionObject::Mode::Sensor);
+    bounds->GetAsCircle()->Radius = 4.0f;
 
     m_renderSkeleton = m_world->getAssetManager().BuildRenderSkeleton(
         &RigidBody.Transform, CharacterRoot);
@@ -48,6 +56,8 @@ void c_adv::Player::initialize() {
 
     m_legsChannel = m_renderSkeleton->AnimationMixer.NewChannel();
     m_armsChannel = m_renderSkeleton->AnimationMixer.NewChannel();
+
+    m_gripCooldown.setCooldownPeriod(0.0f);
 }
 
 void c_adv::Player::process() {
@@ -58,8 +68,11 @@ void c_adv::Player::process() {
         ysMath::LoadVector(0.0f, -15.0f / RigidBody.GetInverseMass(), 0.0f),
         RigidBody.Transform.GetWorldPosition());
 
+    processImpactDamage();
     updateMotion();
     updateAnimation();
+
+    m_gripCooldown.update(m_world->getEngine().GetFrameLength());
 }
 
 void c_adv::Player::render() {
@@ -85,19 +98,16 @@ void c_adv::Player::render() {
         m_realm->getAliveObjectCount() << "/" << 
         m_realm->getDeadObjectCount() << "/" << 
         m_realm->getVisibleObjectCount() << "          \n";
+    msg << "Healh " << m_health << "\n";
     console->DrawGeneralText(msg.str().c_str());
 }
 
 bool c_adv::Player::isOnSurface() {
     int collisionCount = RigidBody.GetCollisionCount();
-    float closestBoxDistance = 0.0f;
-    GameObject *closestBox = nullptr;
 
     for (int i = 0; i < collisionCount; ++i) {
         dphysics::Collision *col = RigidBody.GetCollision(i);
-        dphysics::RigidBody *body = col->m_body1 == &RigidBody
-            ? col->m_body2
-            : col->m_body1;
+        if (getCollidingObject(col)->hasTag(Tag::Ledge)) continue;
 
         if (!col->m_sensor && !col->IsGhost()) {
             ysVector normal = col->m_normal;
@@ -110,14 +120,139 @@ bool c_adv::Player::isOnSurface() {
     return false;
 }
 
+bool c_adv::Player::isHanging() {
+    int collisionCount = RigidBody.GetCollisionCount();
+
+    for (int i = 0; i < collisionCount; ++i) {
+        dphysics::Collision *col = RigidBody.GetCollision(i);
+        if (!getCollidingObject(col)->hasTag(Tag::Ledge)) continue;
+
+        if (!col->m_sensor && !col->IsGhost()) {
+            ysVector normal = col->m_normal;
+            if (std::abs(ysMath::GetScalar(ysMath::Dot(normal, ysMath::Constants::YAxis))) > 0.5f) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+void c_adv::Player::updateGrip() {
+    dbasic::DeltaEngine &engine = m_world->getEngine();
+
+    if (m_ledge != nullptr) {
+        if (distance(m_ledge->RigidBody.Transform.GetWorldPosition(), getGripLocationWorld()) > m_ledgeGraspDistance) {
+            releaseGrip();
+        }
+    }
+
+    if (!isOnSurface()) {
+        if (engine.IsKeyDown(ysKeyboard::KEY_SHIFT)) {
+            if (m_gripCooldown.ready()) {
+                m_gripCooldown.trigger();
+                attemptGrip();
+            }
+
+            m_gripCooldown.lock();
+        }
+    }
+
+    if (!engine.IsKeyDown(ysKeyboard::KEY_SHIFT)) {
+        m_gripCooldown.unlock();
+        releaseGrip();
+    }
+}
+
+void c_adv::Player::attemptGrip() {
+    int collisionCount = RigidBody.GetCollisionCount();
+
+    float closestLedgeDistance = m_ledgeGraspDistance;
+    GameObject *closestLedge = nullptr;
+
+    ysVector gripLocation = getGripLocationWorld();
+    float gy = ysMath::GetY(gripLocation);
+
+    for (int i = 0; i < collisionCount; ++i) {
+        dphysics::Collision *col = RigidBody.GetCollision(i);
+        if (!getCollidingObject(col)->hasTag(Tag::Ledge)) continue;
+
+        GameObject *ledge = getCollidingObject(col);
+        if (col->m_sensor && !col->IsGhost()) {
+            ysVector ledgePosition = ledge->RigidBody.Transform.GetWorldPosition();
+            float ly = ysMath::GetY(ledgePosition);
+
+            if (ly < gy) {
+                float d = distance(ledgePosition, gripLocation);
+                if (d < closestLedgeDistance) {
+                    closestLedge = ledge;
+                    closestLedgeDistance = d;
+                }
+            }
+        }
+    }
+
+    if (closestLedge != nullptr) {
+        m_ledge = closestLedge;
+
+        if (m_gripLink != nullptr) {
+            m_gripLink->SetAnchor(closestLedge->RigidBody.Transform.GetWorldPosition());
+        }
+        else {
+            m_gripLink = m_realm->PhysicsSystem.CreateLink<dphysics::LedgeLink>(&this->RigidBody, &closestLedge->RigidBody);
+            m_gripLink->SetAnchor(closestLedge->RigidBody.Transform.GetWorldPosition());
+            m_gripLink->SetGripLocal(getGripLocationLocal());
+        }
+    }
+    else {
+        m_ledge = closestLedge;
+        releaseGrip();
+    }
+}
+
+void c_adv::Player::releaseGrip() {
+    if (m_gripLink != nullptr) {
+        m_realm->PhysicsSystem.DeleteLink(m_gripLink);
+        m_gripLink = nullptr;
+        m_ledge = nullptr;
+    }
+}
+
+ysVector c_adv::Player::getGripLocationLocal() {
+    return ysMath::LoadVector(0.2f, 1.2f, 0.0f);
+}
+
+ysVector c_adv::Player::getGripLocationWorld() {
+    return RigidBody.Transform.LocalToWorldSpace(getGripLocationLocal());
+}
+
+void c_adv::Player::processImpactDamage() {
+    int collisionCount = RigidBody.GetCollisionCount();
+
+    for (int i = 0; i < collisionCount; ++i) {
+        dphysics::Collision *col = RigidBody.GetCollision(i);
+        // TODO: check if hanging or not
+
+        if (!col->m_sensor && !col->IsGhost()) {
+            ysVector closingVelocity = col->GetContactVelocity();
+            float mag = ysMath::GetScalar(ysMath::Magnitude(closingVelocity));
+            if (mag > 10.0f) {
+                m_health -= (mag - 10.0f);
+            }
+        }
+    }
+}
+
 void c_adv::Player::updateMotion() {
     dbasic::DeltaEngine &engine = m_world->getEngine();
+
+    updateGrip();
 
     ysVector v = RigidBody.GetVelocity();
     
     if (isOnSurface()) {
         if (engine.ProcessKeyDown(ysKeyboard::KEY_SPACE)) {
-            RigidBody.AddImpulseWorldSpace(ysMath::LoadVector(0.0f, 4.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
+            RigidBody.AddImpulseWorldSpace(ysMath::LoadVector(0.0f, 8.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
         }
 
         if (engine.IsKeyDown(ysKeyboard::KEY_D)) {
@@ -128,6 +263,11 @@ void c_adv::Player::updateMotion() {
         }
         else {
             RigidBody.SetVelocity(ysMath::LoadVector(0.0f, ysMath::GetY(v), 0.0f));
+        }
+    }
+    else if (isHanging()) {
+        if (engine.ProcessKeyDown(ysKeyboard::KEY_SPACE)) {
+            RigidBody.AddImpulseWorldSpace(ysMath::LoadVector(0.0f, 10.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
         }
     }
     else {

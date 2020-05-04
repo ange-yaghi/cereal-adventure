@@ -29,17 +29,7 @@ namespace c_adv {
         };
 
         enum class Tag {
-            Hole,
-            Wall,
-            Floor,
-            Obstacle,
-            Insect,
-            Player,
-            Carryable,
-            Edible,
-            Container,
-            Beetle,
-            Probe,
+            Ledge,
             Count
         };
 
@@ -53,6 +43,7 @@ namespace c_adv {
         World *getWorld() const { return m_world; }
 
         virtual void initialize();
+        virtual void destroy();
         virtual void render();
         virtual void process();
 
