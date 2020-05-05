@@ -1,14 +1,14 @@
-#ifndef CEREAL_ADVENTURE_LEDGE_H
-#define CEREAL_ADVENTURE_LEDGE_H
+#ifndef CEREAL_ADVENTURE_COUNTER_H
+#define CEREAL_ADVENTURE_COUNTER_H
 
 #include "game_object.h"
 
 namespace c_adv {
 
-    class Ledge : public GameObject {
+    class Counter : public GameObject {
     public:
-        Ledge();
-        ~Ledge();
+        Counter();
+        ~Counter();
 
         virtual void initialize();
 
@@ -20,9 +20,9 @@ namespace c_adv {
         static void configureAssets(dbasic::AssetManager *am);
 
     protected:
-        static dbasic::ModelAsset *m_ledgeAsset;
+        static dbasic::ModelAsset *m_counterAsset;
     };
 
 } /* namespace c_adv */
 
-#endif /* CEREAL_ADVENTURE_LEDGE_H */
+#endif /* CEREAL_ADVENTURE_COUNTER_H */

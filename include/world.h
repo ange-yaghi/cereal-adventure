@@ -28,6 +28,8 @@ namespace c_adv {
         void render();
         void process();
 
+        void generateLevel(dbasic::RenderSkeleton *hierarchy);
+
         template <typename T>
         T *newRealm() {
             void *buffer = _aligned_malloc(sizeof(T), 16);

@@ -4,6 +4,10 @@
 #include "../include/realm.h"
 #include "../include/player.h"
 #include "../include/test_obstacle.h"
+#include "../include/ledge.h"
+#include "../include/counter.h"
+#include "../include/toaster.h"
+#include "../include/shelves.h"
 
 c_adv::World::World() {
     m_focus = nullptr;
@@ -53,31 +57,9 @@ void c_adv::World::initialSpawn() {
     m_focus = m_mainRealm->spawn<Player>();
     m_focus->RigidBody.Transform.SetPosition(ysMath::LoadVector(0.0f, 10.0f, 0.0f));
 
-    GameObject *testObstacle = nullptr;
-
-    testObstacle = m_mainRealm->spawn<TestObstacle>();
-    testObstacle->RigidBody.Transform.SetPosition(ysMath::LoadVector(0.0f, -3.0f, 0.0f));
-
-    testObstacle = m_mainRealm->spawn<TestObstacle>();
-    testObstacle->RigidBody.Transform.SetPosition(ysMath::LoadVector(2.0f, 1.0f, 0.0f));
-
-    testObstacle = m_mainRealm->spawn<TestObstacle>();
-    testObstacle->RigidBody.Transform.SetPosition(ysMath::LoadVector(4.0f, -3.0f, 0.0f));
-
-    testObstacle = m_mainRealm->spawn<TestObstacle>();
-    testObstacle->RigidBody.Transform.SetPosition(ysMath::LoadVector(6.0f, -2.5f, 0.0f));
-
-    testObstacle = m_mainRealm->spawn<TestObstacle>();
-    testObstacle->RigidBody.Transform.SetPosition(ysMath::LoadVector(8.0f, -1.5f, 0.0f));
-
-    testObstacle = m_mainRealm->spawn<TestObstacle>();
-    testObstacle->RigidBody.Transform.SetPosition(ysMath::LoadVector(10.0f, -0.5f, 0.0f));
-
-    testObstacle = m_mainRealm->spawn<TestObstacle>();
-    testObstacle->RigidBody.Transform.SetPosition(ysMath::LoadVector(12.0f, -2.0f, 0.0f));
-
-    testObstacle = m_mainRealm->spawn<TestObstacle>();
-    testObstacle->RigidBody.Transform.SetPosition(ysMath::LoadVector(18.0f, -2.0f, 0.0f));
+    ysTransform root;
+    dbasic::RenderSkeleton *level1 = m_assetManager.BuildRenderSkeleton(&root, m_assetManager.GetSceneObject("Level1"));
+    generateLevel(level1);
 }
 
 void c_adv::World::run() {
@@ -115,7 +97,7 @@ c_adv::AABB c_adv::World::getCameraExtents() const {
 
 void c_adv::World::render() {
     ysVector focusPosition = m_focus->RigidBody.Transform.GetWorldPosition();
-    m_engine.SetCameraPosition(ysMath::GetX(focusPosition), 0.0f);
+    m_engine.SetCameraPosition(ysMath::GetX(focusPosition), 3.0f);
     m_engine.SetCameraAltitude(7.0f);
 
     m_mainRealm->render();
@@ -123,6 +105,33 @@ void c_adv::World::render() {
 
 void c_adv::World::process() {
     m_mainRealm->process();
+}
+
+void c_adv::World::generateLevel(dbasic::RenderSkeleton *hierarchy) {
+    for (int i = 0; i < hierarchy->GetNodeCount(); ++i) {
+        dbasic::RenderNode *node = hierarchy->GetNode(i);
+        dbasic::SceneObjectAsset *sceneAsset = node->GetSceneAsset();
+        if (strcmp(sceneAsset->GetName(), "Ledge") == 0) {
+            ysVector position = node->Transform.GetWorldPosition();
+            Ledge *newLedge = m_mainRealm->spawn<Ledge>();
+            newLedge->RigidBody.Transform.SetPosition(position);
+        }
+        else if (strcmp(sceneAsset->GetName(), "Counter_1") == 0) {
+            ysVector position = node->Transform.GetWorldPosition();
+            Counter *newCounter = m_mainRealm->spawn<Counter>();
+            newCounter->RigidBody.Transform.SetPosition(position);
+        }
+        else if (strcmp(sceneAsset->GetName(), "Toaster") == 0) {
+            ysVector position = node->Transform.GetWorldPosition();
+            Toaster *newToaster = m_mainRealm->spawn<Toaster>();
+            newToaster->RigidBody.Transform.SetPosition(position);
+        }
+        else if (strcmp(sceneAsset->GetName(), "Shelves") == 0) {
+            ysVector position = node->Transform.GetWorldPosition();
+            Shelves *newShelves = m_mainRealm->spawn<Shelves>();
+            newShelves->RigidBody.Transform.SetPosition(position);
+        }
+    }
 }
 
 void c_adv::World::updateRealms() {

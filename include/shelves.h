@@ -1,14 +1,14 @@
-#ifndef CEREAL_ADVENTURE_LEDGE_H
-#define CEREAL_ADVENTURE_LEDGE_H
+#ifndef CEREAL_ADVENTURE_SHELVES_H
+#define CEREAL_ADVENTURE_SHELVES_H
 
 #include "game_object.h"
 
 namespace c_adv {
 
-    class Ledge : public GameObject {
+    class Shelves : public GameObject {
     public:
-        Ledge();
-        ~Ledge();
+        Shelves();
+        ~Shelves();
 
         virtual void initialize();
 
@@ -20,9 +20,9 @@ namespace c_adv {
         static void configureAssets(dbasic::AssetManager *am);
 
     protected:
-        static dbasic::ModelAsset *m_ledgeAsset;
+        static dbasic::ModelAsset *m_shelvesAsset;
     };
 
 } /* namespace c_adv */
 
-#endif /* CEREAL_ADVENTURE_LEDGE_H */
+#endif /* CEREAL_ADVENTURE_SHELVES_H */

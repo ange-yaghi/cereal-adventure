@@ -3,6 +3,9 @@
 #include "../include/player.h"
 #include "../include/test_obstacle.h"
 #include "../include/ledge.h"
+#include "../include/counter.h"
+#include "../include/toaster.h"
+#include "../include/shelves.h"
 
 c_adv::AssetLoader::AssetLoader() {
     /* void */
@@ -54,6 +57,9 @@ void c_adv::AssetLoader::loadAllAssets(const dbasic::Path &assetPath, dbasic::As
     Player::configureAssets(am);
     TestObstacle::configureAssets(am);
     Ledge::configureAssets(am);
+    Counter::configureAssets(am);
+    Toaster::configureAssets(am);
+    Shelves::configureAssets(am);
 }
 
 std::string c_adv::AssetLoader::getPath(const char *path, const dbasic::Path &assetPath) {

@@ -47,21 +47,18 @@ void c_adv::Realm::process() {
     }
 
     PhysicsSystem.Update(getEngine().GetFrameLength());
-    //PhysicsSystem.Update(getEngine().GetFrameLength() / 2);
 }
 
 void c_adv::Realm::render() {
     m_world->getEngine().SetClearColor(0x55, 0x55, 0x55);
 
-    ysVector4 sunPosition(10.0f, 1.0f, 2.0f);
-
     m_world->getEngine().SetAmbientLight(ysVector4(0.0f, 0.0f, 0.1f));
 
     dbasic::Light sun;
-    sun.Position = sunPosition; 
-    sun.Color = ysVector4(255 / 255.0f, 63 / 255.0f, 63 / 255.0f, 0.0f);
-    sun.Color.Scale(8.0f);
-    sun.FalloffEnabled = 1;
+    sun.Position = ysVector4(10.0f, 10.0f, 10.0f);
+    sun.Color = ysVector4(255 / 255.0f, 255 / 255.0f, 255 / 255.0f, 0.0f);
+    sun.Color.Scale(1.0f);
+    sun.FalloffEnabled = 0;
     m_world->getEngine().AddLight(sun);
 
     dbasic::Light backLight;
@@ -69,7 +66,6 @@ void c_adv::Realm::render() {
     backLight.Color = ysVector4(43 / 255.0f, 209 / 255.0f, 252 / 255.0f, 0.0f);
     backLight.Color.Scale(4.0f);
     backLight.FalloffEnabled = 1;
-    //m_world->getEngine().AddLight(backLight);
 
     AABB cameraExtents = m_world->getCameraExtents();
 

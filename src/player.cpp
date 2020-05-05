@@ -6,10 +6,10 @@
 #include <sstream>
 
 ysAnimationAction
-*c_adv::Player::AnimArmsWalk = nullptr,
-*c_adv::Player::AnimLegsWalk = nullptr,
-*c_adv::Player::AnimLegsIdle = nullptr,
-*c_adv::Player::AnimArmsIdle = nullptr;
+    *c_adv::Player::AnimArmsWalk = nullptr,
+    *c_adv::Player::AnimLegsWalk = nullptr,
+    *c_adv::Player::AnimLegsIdle = nullptr,
+    *c_adv::Player::AnimArmsIdle = nullptr;
 
 dbasic::SceneObjectAsset *c_adv::Player::CharacterRoot = nullptr;
 
