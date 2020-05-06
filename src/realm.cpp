@@ -50,14 +50,14 @@ void c_adv::Realm::process() {
 }
 
 void c_adv::Realm::render() {
-    m_world->getEngine().SetClearColor(0x55, 0x55, 0x55);
+    m_world->getEngine().SetClearColor(0x0b, 0x03, 0x2d);
 
-    m_world->getEngine().SetAmbientLight(ysVector4(0.0f, 0.0f, 0.1f));
+    m_world->getEngine().SetAmbientLight(ysVector4(0.7f, 0.7f, 0.7f));
 
     dbasic::Light sun;
     sun.Position = ysVector4(10.0f, 10.0f, 10.0f);
     sun.Color = ysVector4(255 / 255.0f, 255 / 255.0f, 255 / 255.0f, 0.0f);
-    sun.Color.Scale(1.0f);
+    sun.Color.Scale(0.3f);
     sun.FalloffEnabled = 0;
     m_world->getEngine().AddLight(sun);
 
@@ -75,7 +75,7 @@ void c_adv::Realm::render() {
         if (g->getDeletionFlag()) continue;
         AABB extents = g->getVisualBounds();
 
-        if (extents.intersects2d(cameraExtents)) {
+        if (extents.intersects2d(cameraExtents) || true) {
             g->render();
             ++visibleObjects;
         }

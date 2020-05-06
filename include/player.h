@@ -4,12 +4,34 @@
 #include "game_object.h"
 
 #include "cooldown_timer.h"
+#include "spring_connector.h"
 
 namespace c_adv {
 
     class Ledge;
 
     class Player : public GameObject {
+    public:
+        enum class Direction {
+            Forward,
+            Back
+        };
+
+        enum class LegsState {
+            Running,
+            Idle,
+            Falling,
+            Hanging,
+            Undefined
+        };
+
+        enum class ArmsState {
+            Idle,
+            Running,
+            Hanging,
+            Undefined
+        };
+
     public:
         Player();
         ~Player();
@@ -31,6 +53,9 @@ namespace c_adv {
     protected:
         void updateMotion();
         void updateAnimation();
+        void legsAnimationFsm();
+        void rotationAnimationFsm();
+        void armsAnimationFsm();
 
         void processImpactDamage();
 
@@ -42,17 +67,30 @@ namespace c_adv {
             m_animLegsWalk,
             m_animArmsWalk,
             m_animLegsIdle,
-            m_animArmsIdle;
+            m_animArmsIdle,
+            m_animLegsTurnBack,
+            m_animLegsTurnForward,
+            m_animLegsFalling,
+            m_animLegsHanging,
+            m_animArmsHanging;
 
         dbasic::RenderSkeleton *m_renderSkeleton;
+        SpringConnector m_springConnector;
+        ysTransform m_renderTransform;
 
         ysAnimationChannel *m_legsChannel;
         ysAnimationChannel *m_armsChannel;
+        ysAnimationChannel *m_rotationChannel;
 
         dphysics::LedgeLink *m_gripLink;
         GameObject *m_ledge;
 
         CooldownTimer m_gripCooldown;
+
+        Direction m_direction;
+        Direction m_nextDirection;
+        LegsState m_legsState;
+        ArmsState m_armsState;
 
         // Movement parameters
     protected:
@@ -67,7 +105,12 @@ namespace c_adv {
             *AnimLegsWalk,
             *AnimArmsWalk,
             *AnimLegsIdle,
-            *AnimArmsIdle;
+            *AnimArmsIdle,
+            *AnimTurnBack,
+            *AnimTurnForward,
+            *AnimLegsFalling,
+            *AnimLegsHanging,
+            *AnimArmsHanging;
 
         static dbasic::SceneObjectAsset *CharacterRoot;
     };

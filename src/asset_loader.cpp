@@ -34,7 +34,7 @@ void c_adv::AssetLoader::createAllMaterials(dbasic::AssetManager *am) {
 
     dbasic::Material *playerMaterial = am->NewMaterial();
     playerMaterial->SetName("PlayerMaterial");
-    playerMaterial->SetDiffuseColor(ysVector4(1.0f, 1.0f, 1.0f, 1.0f));
+    playerMaterial->SetDiffuseColor(ysVector4(0xff / 255.0f, 0xb9 / 255.0f, 0x97 / 255.0f, 1.0f));
 }
 
 void c_adv::AssetLoader::loadAllTextures(const dbasic::Path &assetPath, dbasic::AssetManager *am) {

@@ -29,7 +29,7 @@ void c_adv::Counter::initialize() {
 
 void c_adv::Counter::render() {
     m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
-    m_world->getEngine().SetMultiplyColor(ysVector4(1.0f, 1.0f, 1.0f, 1.0f));
+    m_world->getEngine().SetMultiplyColor(ysVector4(0x84 / 255.0f, 0x3b / 255.0f, 0x62 / 255.0f, 1.0f));
     m_world->getEngine().DrawModel(m_counterAsset, RigidBody.Transform.GetWorldTransform(), 1.0f, nullptr);
 }
 

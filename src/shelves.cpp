@@ -29,7 +29,7 @@ void c_adv::Shelves::initialize() {
 
 void c_adv::Shelves::render() {
     m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
-    m_world->getEngine().SetMultiplyColor(ysVector4(1.0f, 1.0f, 1.0f, 1.0f));
+    m_world->getEngine().SetMultiplyColor(ysVector4(0xf6 / 255.0f, 0x7e / 255.0f, 0x7d / 255.0f, 1.0f));
     m_world->getEngine().DrawModel(m_shelvesAsset, RigidBody.Transform.GetWorldTransform(), 1.0f, nullptr);
 }
 

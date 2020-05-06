@@ -40,7 +40,7 @@ void c_adv::World::initialize(void *instance, ysContextObject::DEVICE_API api) {
     m_engine.GetConsole()->SetDefaultFontDirectory(enginePath + "/fonts/");
 
     m_engine.CreateGameWindow(
-        "Ant World",
+        "Cereal Adventure // Development Build // " __DATE__,
         instance,
         api,
         (enginePath + "/shaders/").c_str());
@@ -48,6 +48,17 @@ void c_adv::World::initialize(void *instance, ysContextObject::DEVICE_API api) {
     m_assetManager.SetEngine(&m_engine);
 
     AssetLoader::loadAllAssets(dbasic::Path(assetPath), &m_assetManager);
+
+    // Camera settings
+    m_engine.SetCameraMode(dbasic::DeltaEngine::CameraMode::Target);
+
+    m_smoothCamera.setPosition(ysMath::Constants::Zero);
+    m_smoothCamera.setStiffnessTensor(ysMath::LoadVector(200.0f, 50.0f, 0.0f));
+    m_smoothCamera.setDampingTensor(ysMath::LoadVector(0.3f, 0.5f, 0.0f));
+
+    m_smoothTarget.setPosition(ysMath::Constants::Zero);
+    m_smoothTarget.setStiffnessTensor(ysMath::LoadVector(250.0f, 100.0f, 0.0f));
+    m_smoothTarget.setDampingTensor(ysMath::LoadVector(0.3f, 0.5f, 0.0f));
 }
 
 void c_adv::World::initialSpawn() {
@@ -97,14 +108,23 @@ c_adv::AABB c_adv::World::getCameraExtents() const {
 
 void c_adv::World::render() {
     ysVector focusPosition = m_focus->RigidBody.Transform.GetWorldPosition();
-    m_engine.SetCameraPosition(ysMath::GetX(focusPosition), 3.0f);
+    m_smoothCamera.setTarget(focusPosition);
+    m_smoothTarget.setTarget(focusPosition);
+
+    ysVector cameraTarget = m_smoothCamera.getPosition();
+
+    m_engine.SetCameraPosition(ysMath::GetX(cameraTarget), ysMath::GetY(cameraTarget));
     m_engine.SetCameraAltitude(7.0f);
+    m_engine.SetCameraTarget(m_smoothTarget.getPosition());
 
     m_mainRealm->render();
 }
 
 void c_adv::World::process() {
     m_mainRealm->process();
+
+    m_smoothCamera.update(m_engine.GetFrameLength());
+    m_smoothTarget.update(m_engine.GetFrameLength());
 }
 
 void c_adv::World::generateLevel(dbasic::RenderSkeleton *hierarchy) {

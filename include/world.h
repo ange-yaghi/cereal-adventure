@@ -5,6 +5,7 @@
 
 #include "delta.h"
 #include "realm.h"
+#include "spring_connector.h"
 
 #include <vector>
 
@@ -48,6 +49,9 @@ namespace c_adv {
 
         Realm *m_mainRealm;
         GameObject *m_focus;
+
+        SpringConnector m_smoothCamera;
+        SpringConnector m_smoothTarget;
 
     protected:
         dbasic::DeltaEngine m_engine;

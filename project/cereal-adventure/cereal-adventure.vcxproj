@@ -32,6 +32,7 @@
     <ClCompile Include="..\..\src\player.cpp" />
     <ClCompile Include="..\..\src\realm.cpp" />
     <ClCompile Include="..\..\src\shelves.cpp" />
+    <ClCompile Include="..\..\src\spring_connector.cpp" />
     <ClCompile Include="..\..\src\test_obstacle.cpp" />
     <ClCompile Include="..\..\src\toaster.cpp" />
     <ClCompile Include="..\..\src\world.cpp" />
@@ -39,6 +40,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\include\aabb.h" />
     <ClInclude Include="..\..\include\asset_loader.h" />
+    <ClInclude Include="..\..\include\spring_connector.h" />
     <ClInclude Include="..\..\include\cooldown_timer.h" />
     <ClInclude Include="..\..\include\counter.h" />
     <ClInclude Include="..\..\include\delta.h" />

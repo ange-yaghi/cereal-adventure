@@ -78,6 +78,9 @@
     <ClCompile Include="..\..\src\shelves.cpp">
       <Filter>Source Files\game-objects</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\spring_connector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\delta.h">
@@ -130,6 +133,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\shelves.h">
       <Filter>Header Files\game-objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\spring_connector.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

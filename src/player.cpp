@@ -9,19 +9,30 @@ ysAnimationAction
     *c_adv::Player::AnimArmsWalk = nullptr,
     *c_adv::Player::AnimLegsWalk = nullptr,
     *c_adv::Player::AnimLegsIdle = nullptr,
-    *c_adv::Player::AnimArmsIdle = nullptr;
+    *c_adv::Player::AnimArmsIdle = nullptr,
+    *c_adv::Player::AnimTurnBack = nullptr,
+    *c_adv::Player::AnimTurnForward = nullptr,
+    *c_adv::Player::AnimLegsFalling = nullptr,
+    *c_adv::Player::AnimLegsHanging = nullptr,
+    *c_adv::Player::AnimArmsHanging = nullptr;
 
 dbasic::SceneObjectAsset *c_adv::Player::CharacterRoot = nullptr;
 
 c_adv::Player::Player() {
     m_armsChannel = nullptr;
     m_legsChannel = nullptr;
+    m_rotationChannel = nullptr;
     m_renderSkeleton = nullptr;
     m_gripLink = nullptr;
     m_ledge = nullptr;
 
     m_health = 10.0f;
     m_ledgeGraspDistance = 3.0f;
+
+    m_direction = Direction::Forward;
+    m_nextDirection = Direction::Forward;
+    m_legsState = LegsState::Idle;
+    m_armsState = ArmsState::Idle;
 }
 
 c_adv::Player::~Player() {
@@ -36,6 +47,10 @@ void c_adv::Player::initialize() {
     RigidBody.SetAlwaysAwake(true);
     RigidBody.SetRequestsInformation(true);
 
+    m_springConnector.setDampingTensor(ysMath::LoadVector(0.5f, 0.5f, 0.0f));
+    m_springConnector.setStiffnessTensor(ysMath::LoadVector(500.0f, 500.0f, 0.0f));
+    m_springConnector.setPosition(RigidBody.Transform.GetWorldPosition());
+
     dphysics::CollisionObject *bounds;
     RigidBody.CollisionGeometry.NewBoxObject(&bounds);
     bounds->SetMode(dphysics::CollisionObject::Mode::Fine);
@@ -47,15 +62,21 @@ void c_adv::Player::initialize() {
     bounds->GetAsCircle()->Radius = 4.0f;
 
     m_renderSkeleton = m_world->getAssetManager().BuildRenderSkeleton(
-        &RigidBody.Transform, CharacterRoot);
+        &m_renderTransform, CharacterRoot);
 
     m_renderSkeleton->BindAction(AnimArmsWalk, &m_animArmsWalk);
     m_renderSkeleton->BindAction(AnimLegsWalk, &m_animLegsWalk);
     m_renderSkeleton->BindAction(AnimLegsIdle, &m_animLegsIdle);
     m_renderSkeleton->BindAction(AnimArmsIdle, &m_animArmsIdle);
+    m_renderSkeleton->BindAction(AnimTurnBack, &m_animLegsTurnBack);
+    m_renderSkeleton->BindAction(AnimTurnForward, &m_animLegsTurnForward);
+    m_renderSkeleton->BindAction(AnimLegsFalling, &m_animLegsFalling);
+    m_renderSkeleton->BindAction(AnimLegsHanging, &m_animLegsHanging);
+    m_renderSkeleton->BindAction(AnimArmsHanging, &m_animArmsHanging);
 
     m_legsChannel = m_renderSkeleton->AnimationMixer.NewChannel();
     m_armsChannel = m_renderSkeleton->AnimationMixer.NewChannel();
+    m_rotationChannel = m_renderSkeleton->AnimationMixer.NewChannel();
 
     m_gripCooldown.setCooldownPeriod(0.0f);
 }
@@ -68,6 +89,12 @@ void c_adv::Player::process() {
         ysMath::LoadVector(0.0f, -15.0f / RigidBody.GetInverseMass(), 0.0f),
         RigidBody.Transform.GetWorldPosition());
 
+    m_springConnector.setTarget(RigidBody.Transform.GetWorldPosition());
+    m_springConnector.update(m_world->getEngine().GetFrameLength());
+
+    m_renderTransform.SetPosition(m_springConnector.getPosition());
+    m_renderTransform.SetOrientation(RigidBody.Transform.GetWorldOrientation());
+
     processImpactDamage();
     updateMotion();
     updateAnimation();
@@ -76,11 +103,7 @@ void c_adv::Player::process() {
 }
 
 void c_adv::Player::render() {
-    int color[] = { 0xf1, 0xc4, 0x0f };
-    m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
-    //m_world->getEngine().DrawBox(color, 5.0f, 5.0f, (int)Layer::Player);
-
-    m_world->getEngine().SetMultiplyColor(ysVector4(1.0f, 1.0f, 1.0f, 1.0f));
+    m_world->getEngine().SetMultiplyColor(ysVector4(0xff / 255.0f, 0xb9 / 255.0f, 0x97 / 255.0f, 1.0f));
     m_world->getEngine().DrawRenderSkeleton(m_renderSkeleton, 1.0f, (int)Layer::Player);
 
     dbasic::Console *console = m_world->getEngine().GetConsole();
@@ -91,6 +114,7 @@ void c_adv::Player::render() {
 
     std::stringstream msg;
     ysVector position = RigidBody.Transform.GetWorldPosition();
+    msg << "////// Delta Game Engine ///////" << "\n";
     msg << "Pos " << ysMath::GetX(position) << "/" << ysMath::GetY(position) << "          \n";
     msg << "V   " << ysMath::GetX(RigidBody.GetVelocity()) << "/" << ysMath::GetY(RigidBody.GetVelocity()) << "             \n";
     msg << "FPS " << m_world->getEngine().GetAverageFramerate() << "          \n";
@@ -257,6 +281,11 @@ void c_adv::Player::updateMotion() {
 
         if (engine.IsKeyDown(ysKeyboard::KEY_D)) {
             RigidBody.SetVelocity(ysMath::LoadVector(3.0f, ysMath::GetY(v), 0.0f));
+            m_nextDirection = Direction::Forward;
+        }
+        else if (engine.IsKeyDown(ysKeyboard::KEY_A)) {
+            RigidBody.SetVelocity(ysMath::LoadVector(-3.0f, ysMath::GetY(v), 0.0f));
+            m_nextDirection = Direction::Back;
         }
         else if (std::abs(ysMath::GetX(v)) > 0.01f) {
             RigidBody.AddForceWorldSpace(ysMath::LoadVector(-ysMath::GetX(v) * 10, 0.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
@@ -273,69 +302,256 @@ void c_adv::Player::updateMotion() {
     else {
         if (engine.IsKeyDown(ysKeyboard::KEY_D) && ysMath::GetX(v) < 0.5f) {
             RigidBody.AddForceWorldSpace(ysMath::LoadVector(2.0f, 0.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
+            m_nextDirection = Direction::Forward;
         }
         else if (engine.IsKeyDown(ysKeyboard::KEY_A) && ysMath::GetX(v) > -0.5f) {
             RigidBody.AddForceWorldSpace(ysMath::LoadVector(-2.0f, 0.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
+            m_nextDirection = Direction::Back;
         }
     }
 }
 
 void c_adv::Player::updateAnimation() {
+    legsAnimationFsm();
+    rotationAnimationFsm();
+    armsAnimationFsm();
+
+    m_renderSkeleton->UpdateAnimation(m_world->getEngine().GetFrameLength() * 60.0f);
+}
+
+void c_adv::Player::legsAnimationFsm() {
     ysVector velocity = RigidBody.GetVelocity();
     float hMag = ysMath::GetScalar(ysMath::Dot(velocity, ysMath::Constants::XAxis));
 
-    if (hMag > 1.0f && isOnSurface()) {
-        ysAnimationChannel::ActionSettings smooth;
-        smooth.FadeIn = 20.0f;
-        smooth.Speed = 1.0f;
+    LegsState current = m_legsState;
+    LegsState next = m_legsState;
+    LegsState queued = LegsState::Undefined;
 
-        ysAnimationChannel::ActionSettings immediate;
-        immediate.FadeIn = 0.0f;
-        immediate.Speed = 1.0f;
+    float nextFade = 0.0f;
+    float queuedFade = 0.0f;
+    float queuedClip = 0.0f;
+    float nextOffset = 0.0f;
 
-        if (m_legsChannel->GetCurrentAction() != &m_animLegsWalk) {
-            m_legsChannel->AddSegment(&m_animLegsWalk, smooth);
-            m_legsChannel->ClearQueue();
+    if (isOnSurface()) {
+        if (current == LegsState::Running) {
+            if (std::abs(hMag) < 1.0f) {
+                next = LegsState::Idle;
+                nextFade = 20.0f;
+            }
+            else {
+                next = LegsState::Running;
+                queued = LegsState::Running;
+                queuedFade = 0.0f;
+            }
         }
-        else if (!m_legsChannel->HasQueuedSegments()) {
-            m_legsChannel->QueueSegment(&m_animLegsWalk, immediate);
+        else if (current == LegsState::Falling) {
+            if (std::abs(hMag) < 1.0f) {
+                next = LegsState::Idle;
+                nextFade = 20.0f;
+            }
+            else {
+                next = LegsState::Running;
+                nextFade = 20.0f;
+            }
         }
+        else if (current == LegsState::Idle) {
+            if (std::abs(hMag) > 1.0f) {
+                next = LegsState::Running;
+                nextFade = 20.0f;
+            }
+            else {
+                queued = LegsState::Idle;
+                queuedFade = 0.0f;
+            }
+        }
+    }
+    else if (!isHanging()) {
+        next = LegsState::Falling;
+        nextFade = 20.0f;
 
-        if (m_armsChannel->GetCurrentAction() != &m_animArmsWalk) {
-            m_armsChannel->AddSegment(&m_animArmsWalk, smooth);
-            m_armsChannel->ClearQueue();
-        }
-        else if (!m_armsChannel->HasQueuedSegments()) {
-            m_armsChannel->QueueSegment(&m_animArmsWalk, immediate);
-        }
+        queued = LegsState::Falling;
+        queuedFade = 0.0f;
     }
     else {
-        ysAnimationChannel::ActionSettings smooth;
-        smooth.FadeIn = 20.0f;
-        smooth.Speed = 1.0f;
+        next = LegsState::Hanging;
+        nextFade = 20.0f;
 
-        ysAnimationChannel::ActionSettings immediate;
-        immediate.FadeIn = 0.0f;
-        immediate.Speed = 1.0f;
+        queued = LegsState::Hanging;
+        queuedFade = 20.0f;
+        queuedClip = 63.0f;
+    }
 
-        if (m_legsChannel->GetCurrentAction() != &m_animLegsIdle) {
-            m_legsChannel->AddSegment(&m_animLegsIdle, smooth);
-            m_legsChannel->ClearQueue();
+    m_legsChannel->ClearQueue();
+
+    if (next != current) {
+        ysAnimationActionBinding *nextAnimation = nullptr;
+        if (next == LegsState::Idle) {
+            nextAnimation = &m_animLegsIdle;
         }
-        else if (!m_legsChannel->HasQueuedSegments()) {
-            m_legsChannel->QueueSegment(&m_animLegsIdle, immediate);
+        else if (next == LegsState::Running) {
+            nextAnimation = &m_animLegsWalk;
+        }
+        else if (next == LegsState::Falling) {
+            nextAnimation = &m_animLegsFalling;
+        }
+        else if (next == LegsState::Hanging) {
+            nextAnimation = &m_animLegsHanging;
         }
 
-        if (m_armsChannel->GetCurrentAction() != &m_animArmsIdle) {
-            m_armsChannel->AddSegment(&m_animArmsIdle, smooth);
-            m_armsChannel->ClearQueue();
+        ysAnimationChannel::ActionSettings settings;
+        settings.FadeIn = nextFade;
+        settings.Speed = 1.0f;
+        if (nextOffset == 0) {
+            m_legsChannel->AddSegment(nextAnimation, settings);
         }
-        else if (!m_armsChannel->HasQueuedSegments()) {
-            m_armsChannel->QueueSegment(&m_animArmsIdle, immediate);
+        else {
+            m_legsChannel->AddSegmentAtOffset(nextAnimation, nextOffset, settings);
         }
     }
 
-    m_renderSkeleton->UpdateAnimation(m_world->getEngine().GetFrameLength() * 60.0f);
+    if (queued != LegsState::Undefined) {
+        ysAnimationActionBinding *queuedAnimation = nullptr;
+        if (queued == LegsState::Idle) {
+            queuedAnimation = &m_animLegsIdle;
+        }
+        else if (queued == LegsState::Running) {
+            queuedAnimation = &m_animLegsWalk;
+        }
+        else if (queued == LegsState::Falling) {
+            queuedAnimation = &m_animLegsFalling;
+        }
+        else if (queued == LegsState::Hanging) {
+            queuedAnimation = &m_animLegsHanging;
+        }
+
+        ysAnimationChannel::ActionSettings settings;
+        settings.FadeIn = queuedFade;
+        settings.Speed = 1.0f;
+        settings.LeftClip = queuedClip;
+        settings.RightClip = queuedAnimation->GetAction()->GetLength();
+        settings.Clip = true;
+        m_legsChannel->QueueSegment(queuedAnimation, settings);
+    }
+
+    m_legsState = next;
+}
+
+void c_adv::Player::rotationAnimationFsm() {
+    if (m_nextDirection != m_direction) {
+        ysAnimationChannel::ActionSettings settings;
+        settings.FadeIn = 20.0f;
+        settings.Speed = 1.0f;
+
+        if (m_nextDirection == Direction::Back) {
+            m_direction = Direction::Back;
+            m_rotationChannel->AddSegment(&m_animLegsTurnBack, settings);
+        }
+        else if (m_nextDirection == Direction::Forward) {
+            m_direction = Direction::Forward;
+            m_rotationChannel->AddSegment(&m_animLegsTurnForward, settings);
+        }
+    }
+}
+
+void c_adv::Player::armsAnimationFsm() {
+    ysVector velocity = RigidBody.GetVelocity();
+    float hMag = ysMath::GetScalar(ysMath::Dot(velocity, ysMath::Constants::XAxis));
+
+    ArmsState current = m_armsState;
+    ArmsState next = m_armsState;
+    ArmsState queued = ArmsState::Undefined;
+
+    float nextFade = 0.0f;
+    float queuedFade = 0.0f;
+    float queuedClip = 0.0f;
+    float nextOffset = 0.0f;
+
+    if (isOnSurface()) {
+        if (current == ArmsState::Running) {
+            if (std::abs(hMag) < 1.0f) {
+                next = ArmsState::Idle;
+                nextFade = 20.0f;
+            }
+            else {
+                next = ArmsState::Running;
+                queued = ArmsState::Running;
+                queuedFade = 0.0f;
+            }
+        }
+        else if (current == ArmsState::Idle) {
+            if (std::abs(hMag) > 1.0f) {
+                next = ArmsState::Running;
+                nextFade = 20.0f;
+            }
+            else {
+                queued = ArmsState::Idle;
+                queuedFade = 0.0f;
+            }
+        }
+    }
+    else if (!isHanging()) {
+        next = ArmsState::Idle;
+        nextFade = 20.0f;
+
+        queued = ArmsState::Idle;
+        queuedFade = 0.0f;
+    }
+    else {
+        next = ArmsState::Hanging;
+        nextFade = 20.0f;
+
+        queued = ArmsState::Hanging;
+        queuedFade = 20.0f;
+        queuedClip = 20.0f;
+    }
+
+    m_armsChannel->ClearQueue();
+
+    if (next != current) {
+        ysAnimationActionBinding *nextAnimation = nullptr;
+        if (next == ArmsState::Idle) {
+            nextAnimation = &m_animArmsIdle;
+        }
+        else if (next == ArmsState::Running) {
+            nextAnimation = &m_animArmsWalk;
+        }
+        else if (next == ArmsState::Hanging) {
+            nextAnimation = &m_animArmsHanging;
+        }
+
+        ysAnimationChannel::ActionSettings settings;
+        settings.FadeIn = nextFade;
+        settings.Speed = 1.0f;
+        if (nextOffset == 0) {
+            m_armsChannel->AddSegment(nextAnimation, settings);
+        }
+        else {
+            m_armsChannel->AddSegmentAtOffset(nextAnimation, nextOffset, settings);
+        }
+    }
+
+    if (queued != ArmsState::Undefined) {
+        ysAnimationActionBinding *queuedAnimation = nullptr;
+        if (queued == ArmsState::Idle) {
+            queuedAnimation = &m_animArmsIdle;
+        }
+        else if (queued == ArmsState::Running) {
+            queuedAnimation = &m_animArmsWalk;
+        }
+        else if (queued == ArmsState::Hanging) {
+            queuedAnimation = &m_animArmsHanging;
+        }
+
+        ysAnimationChannel::ActionSettings settings;
+        settings.FadeIn = queuedFade;
+        settings.Speed = 1.0f;
+        settings.LeftClip = queuedClip;
+        settings.RightClip = queuedAnimation->GetAction()->GetLength();
+        settings.Clip = true;
+        m_armsChannel->QueueSegment(queuedAnimation, settings);
+    }
+
+    m_armsState = next;
 }
 
 void c_adv::Player::configureAssets(dbasic::AssetManager *am) {
@@ -343,11 +559,20 @@ void c_adv::Player::configureAssets(dbasic::AssetManager *am) {
     AnimArmsWalk = am->GetAction("ArmsRun");
     AnimLegsIdle = am->GetAction("LegsIdle");
     AnimArmsIdle = am->GetAction("ArmsIdle");
+    AnimTurnBack = am->GetAction("TurnBack");
+    AnimTurnForward = am->GetAction("TurnForward");
+    AnimLegsFalling = am->GetAction("LegsFalling");
+    AnimLegsHanging = am->GetAction("LegsHanging");
+    AnimArmsHanging = am->GetAction("ArmsHanging");
 
     AnimLegsWalk->SetLength(39.0f);
     AnimArmsWalk->SetLength(39.0f);
     AnimLegsIdle->SetLength(100.0f);
     AnimArmsIdle->SetLength(100.0f);
+    AnimTurnBack->SetLength(20.0f);
+    AnimLegsFalling->SetLength(100.0f);
+    AnimLegsHanging->SetLength(150.0f);
+    AnimArmsHanging->SetLength(30.0f);
 
     CharacterRoot = am->GetSceneObject("CerealArmature");
 }
