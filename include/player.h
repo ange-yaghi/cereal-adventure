@@ -61,6 +61,7 @@ namespace c_adv {
 
     protected:
         float m_health;
+        bool m_graspReady;
 
     protected:
         ysAnimationActionBinding

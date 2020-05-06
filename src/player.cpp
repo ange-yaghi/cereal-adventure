@@ -28,6 +28,7 @@ c_adv::Player::Player() {
 
     m_health = 10.0f;
     m_ledgeGraspDistance = 3.0f;
+    m_graspReady = false;
 
     m_direction = Direction::Forward;
     m_nextDirection = Direction::Forward;
@@ -54,8 +55,8 @@ void c_adv::Player::initialize() {
     dphysics::CollisionObject *bounds;
     RigidBody.CollisionGeometry.NewBoxObject(&bounds);
     bounds->SetMode(dphysics::CollisionObject::Mode::Fine);
-    bounds->GetAsBox()->HalfHeight = 1.45f;
-    bounds->GetAsBox()->HalfWidth = 0.2f;
+    bounds->GetAsBox()->HalfHeight = 1.5f;
+    bounds->GetAsBox()->HalfWidth = 0.4f;
 
     RigidBody.CollisionGeometry.NewCircleObject(&bounds);
     bounds->SetMode(dphysics::CollisionObject::Mode::Sensor);
@@ -218,6 +219,7 @@ void c_adv::Player::attemptGrip() {
 
     if (closestLedge != nullptr) {
         m_ledge = closestLedge;
+        m_graspReady = true;
 
         if (m_gripLink != nullptr) {
             m_gripLink->SetAnchor(closestLedge->RigidBody.Transform.GetWorldPosition());
@@ -230,6 +232,7 @@ void c_adv::Player::attemptGrip() {
     }
     else {
         m_ledge = closestLedge;
+        m_graspReady = false;
         releaseGrip();
     }
 }
@@ -239,6 +242,7 @@ void c_adv::Player::releaseGrip() {
         m_realm->PhysicsSystem.DeleteLink(m_gripLink);
         m_gripLink = nullptr;
         m_ledge = nullptr;
+        m_graspReady = false;
     }
 }
 
@@ -280,11 +284,11 @@ void c_adv::Player::updateMotion() {
         }
 
         if (engine.IsKeyDown(ysKeyboard::KEY_D)) {
-            RigidBody.SetVelocity(ysMath::LoadVector(3.0f, ysMath::GetY(v), 0.0f));
+            RigidBody.SetVelocity(ysMath::LoadVector(4.0f, ysMath::GetY(v), 0.0f));
             m_nextDirection = Direction::Forward;
         }
         else if (engine.IsKeyDown(ysKeyboard::KEY_A)) {
-            RigidBody.SetVelocity(ysMath::LoadVector(-3.0f, ysMath::GetY(v), 0.0f));
+            RigidBody.SetVelocity(ysMath::LoadVector(-4.0f, ysMath::GetY(v), 0.0f));
             m_nextDirection = Direction::Back;
         }
         else if (std::abs(ysMath::GetX(v)) > 0.01f) {
@@ -300,12 +304,12 @@ void c_adv::Player::updateMotion() {
         }
     }
     else {
-        if (engine.IsKeyDown(ysKeyboard::KEY_D) && ysMath::GetX(v) < 0.5f) {
-            RigidBody.AddForceWorldSpace(ysMath::LoadVector(2.0f, 0.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
+        if (engine.IsKeyDown(ysKeyboard::KEY_D) && ysMath::GetX(v) < 2.0f) {
+            RigidBody.AddForceWorldSpace(ysMath::LoadVector(10.0f, 0.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
             m_nextDirection = Direction::Forward;
         }
-        else if (engine.IsKeyDown(ysKeyboard::KEY_A) && ysMath::GetX(v) > -0.5f) {
-            RigidBody.AddForceWorldSpace(ysMath::LoadVector(-2.0f, 0.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
+        else if (engine.IsKeyDown(ysKeyboard::KEY_A) && ysMath::GetX(v) > -2.0f) {
+            RigidBody.AddForceWorldSpace(ysMath::LoadVector(-10.0f, 0.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
             m_nextDirection = Direction::Back;
         }
     }
@@ -462,9 +466,9 @@ void c_adv::Player::armsAnimationFsm() {
     ArmsState queued = ArmsState::Undefined;
 
     float nextFade = 0.0f;
+    float nextClip = 0.0f;
     float queuedFade = 0.0f;
     float queuedClip = 0.0f;
-    float nextOffset = 0.0f;
 
     if (isOnSurface()) {
         if (current == ArmsState::Running) {
@@ -488,21 +492,54 @@ void c_adv::Player::armsAnimationFsm() {
                 queuedFade = 0.0f;
             }
         }
+        else if (current == ArmsState::Hanging) {
+            if (std::abs(hMag) < 1.0f) {
+                next = ArmsState::Idle;
+                nextFade = 20.0f;
+            }
+            else {
+                next = ArmsState::Running;
+                nextFade = 20.0f;
+            }
+        }
     }
-    else if (!isHanging()) {
-        next = ArmsState::Idle;
-        nextFade = 20.0f;
-
-        queued = ArmsState::Idle;
-        queuedFade = 0.0f;
-    }
-    else {
+    else if (isHanging()) {
         next = ArmsState::Hanging;
-        nextFade = 20.0f;
+        nextFade = 2.0f;
+        nextClip = 30.0f;
 
         queued = ArmsState::Hanging;
         queuedFade = 20.0f;
-        queuedClip = 20.0f;
+        queuedClip = 30.0f;
+    }
+    else if (m_graspReady) {
+        next = ArmsState::Hanging;
+        nextFade = 10.0f;
+        nextClip = 10.0f;
+
+        queued = ArmsState::Hanging;
+        queuedFade = 20.0f;
+        queuedClip = 30.0f;
+    }
+    else {
+        if (current == ArmsState::Hanging) {
+            next = ArmsState::Idle;
+            nextFade = 40.0f;
+        }
+        else if (current == ArmsState::Running) {
+            next = ArmsState::Idle;
+            nextFade = 20.0f;
+
+            queued = ArmsState::Idle;
+            queuedFade = 0.0f;
+        }
+        else if (current == ArmsState::Idle) {
+            next = ArmsState::Idle;
+            nextFade = 20.0f;
+
+            queued = ArmsState::Idle;
+            queuedFade = 0.0f;
+        }
     }
 
     m_armsChannel->ClearQueue();
@@ -522,12 +559,10 @@ void c_adv::Player::armsAnimationFsm() {
         ysAnimationChannel::ActionSettings settings;
         settings.FadeIn = nextFade;
         settings.Speed = 1.0f;
-        if (nextOffset == 0) {
-            m_armsChannel->AddSegment(nextAnimation, settings);
-        }
-        else {
-            m_armsChannel->AddSegmentAtOffset(nextAnimation, nextOffset, settings);
-        }
+        settings.Clip = true;
+        settings.LeftClip = nextClip;
+        settings.RightClip = nextAnimation->GetAction()->GetLength();
+        m_armsChannel->AddSegment(nextAnimation, settings);
     }
 
     if (queued != ArmsState::Undefined) {
@@ -572,7 +607,7 @@ void c_adv::Player::configureAssets(dbasic::AssetManager *am) {
     AnimTurnBack->SetLength(20.0f);
     AnimLegsFalling->SetLength(100.0f);
     AnimLegsHanging->SetLength(150.0f);
-    AnimArmsHanging->SetLength(30.0f);
+    AnimArmsHanging->SetLength(60.0f);
 
     CharacterRoot = am->GetSceneObject("CerealArmature");
 }
