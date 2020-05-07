@@ -381,7 +381,7 @@ void c_adv::Player::legsAnimationFsm() {
         nextFade = 20.0f;
 
         queued = LegsState::Hanging;
-        queuedFade = 20.0f;
+        queuedFade = 0.0f;
         queuedClip = 63.0f;
     }
 
@@ -606,7 +606,7 @@ void c_adv::Player::configureAssets(dbasic::AssetManager *am) {
     AnimArmsIdle->SetLength(100.0f);
     AnimTurnBack->SetLength(20.0f);
     AnimLegsFalling->SetLength(100.0f);
-    AnimLegsHanging->SetLength(150.0f);
+    AnimLegsHanging->SetLength(200.0f);
     AnimArmsHanging->SetLength(60.0f);
 
     CharacterRoot = am->GetSceneObject("CerealArmature");
