@@ -21,7 +21,9 @@ namespace c_adv {
             Running,
             Idle,
             Falling,
+            FastFalling,
             Hanging,
+            ImpactDamage,
             Undefined
         };
 
@@ -29,6 +31,7 @@ namespace c_adv {
             Idle,
             Running,
             Hanging,
+            ImpactDamage,
             Undefined
         };
 
@@ -73,7 +76,10 @@ namespace c_adv {
             m_animLegsTurnForward,
             m_animLegsFalling,
             m_animLegsHanging,
-            m_animArmsHanging;
+            m_animArmsHanging,
+            m_animArmsDamageLanding,
+            m_animLegsDamageLanding,
+            m_animLegsFastFalling;
 
         dbasic::RenderSkeleton *m_renderSkeleton;
         SpringConnector m_springConnector;
@@ -87,11 +93,15 @@ namespace c_adv {
         GameObject *m_ledge;
 
         CooldownTimer m_gripCooldown;
+        CooldownTimer m_movementCooldown;
 
         Direction m_direction;
         Direction m_nextDirection;
         LegsState m_legsState;
         ArmsState m_armsState;
+
+        // Whether impact damage was taken in the last frame
+        bool m_impactDamage;
 
         // Movement parameters
     protected:
@@ -111,7 +121,10 @@ namespace c_adv {
             *AnimTurnForward,
             *AnimLegsFalling,
             *AnimLegsHanging,
-            *AnimArmsHanging;
+            *AnimArmsHanging,
+            *AnimArmsDamageLanding,
+            *AnimLegsDamageLanding,
+            *AnimLegsFastFalling;
 
         static dbasic::SceneObjectAsset *CharacterRoot;
     };

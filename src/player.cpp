@@ -14,7 +14,10 @@ ysAnimationAction
     *c_adv::Player::AnimTurnForward = nullptr,
     *c_adv::Player::AnimLegsFalling = nullptr,
     *c_adv::Player::AnimLegsHanging = nullptr,
-    *c_adv::Player::AnimArmsHanging = nullptr;
+    *c_adv::Player::AnimArmsHanging = nullptr,
+    *c_adv::Player::AnimLegsDamageLanding = nullptr,
+    *c_adv::Player::AnimArmsDamageLanding = nullptr,
+    *c_adv::Player::AnimLegsFastFalling = nullptr;
 
 dbasic::SceneObjectAsset *c_adv::Player::CharacterRoot = nullptr;
 
@@ -34,6 +37,8 @@ c_adv::Player::Player() {
     m_nextDirection = Direction::Forward;
     m_legsState = LegsState::Idle;
     m_armsState = ArmsState::Idle;
+
+    m_impactDamage = false;
 }
 
 c_adv::Player::~Player() {
@@ -55,7 +60,7 @@ void c_adv::Player::initialize() {
     dphysics::CollisionObject *bounds;
     RigidBody.CollisionGeometry.NewBoxObject(&bounds);
     bounds->SetMode(dphysics::CollisionObject::Mode::Fine);
-    bounds->GetAsBox()->HalfHeight = 1.5f;
+    bounds->GetAsBox()->HalfHeight = 1.48f;
     bounds->GetAsBox()->HalfWidth = 0.4f;
 
     RigidBody.CollisionGeometry.NewCircleObject(&bounds);
@@ -74,12 +79,16 @@ void c_adv::Player::initialize() {
     m_renderSkeleton->BindAction(AnimLegsFalling, &m_animLegsFalling);
     m_renderSkeleton->BindAction(AnimLegsHanging, &m_animLegsHanging);
     m_renderSkeleton->BindAction(AnimArmsHanging, &m_animArmsHanging);
+    m_renderSkeleton->BindAction(AnimArmsDamageLanding, &m_animArmsDamageLanding);
+    m_renderSkeleton->BindAction(AnimLegsDamageLanding, &m_animLegsDamageLanding);
+    m_renderSkeleton->BindAction(AnimLegsFastFalling, &m_animLegsFastFalling);
 
     m_legsChannel = m_renderSkeleton->AnimationMixer.NewChannel();
     m_armsChannel = m_renderSkeleton->AnimationMixer.NewChannel();
     m_rotationChannel = m_renderSkeleton->AnimationMixer.NewChannel();
 
     m_gripCooldown.setCooldownPeriod(0.0f);
+    m_movementCooldown.setCooldownPeriod(4.0f);
 }
 
 void c_adv::Player::process() {
@@ -101,6 +110,7 @@ void c_adv::Player::process() {
     updateAnimation();
 
     m_gripCooldown.update(m_world->getEngine().GetFrameLength());
+    m_movementCooldown.update(m_world->getEngine().GetFrameLength());
 }
 
 void c_adv::Player::render() {
@@ -255,6 +265,9 @@ ysVector c_adv::Player::getGripLocationWorld() {
 }
 
 void c_adv::Player::processImpactDamage() {
+    // Clear the impact damage flag
+    m_impactDamage = false;
+
     int collisionCount = RigidBody.GetCollisionCount();
 
     for (int i = 0; i < collisionCount; ++i) {
@@ -266,6 +279,9 @@ void c_adv::Player::processImpactDamage() {
             float mag = ysMath::GetScalar(ysMath::Magnitude(closingVelocity));
             if (mag > 10.0f) {
                 m_health -= (mag - 10.0f);
+
+                m_movementCooldown.trigger();
+                m_impactDamage = true;
             }
         }
     }
@@ -279,23 +295,33 @@ void c_adv::Player::updateMotion() {
     ysVector v = RigidBody.GetVelocity();
     
     if (isOnSurface()) {
-        if (engine.ProcessKeyDown(ysKeyboard::KEY_SPACE)) {
-            RigidBody.AddImpulseWorldSpace(ysMath::LoadVector(0.0f, 8.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
+        bool brake = true;
+        if (m_movementCooldown.ready()) {
+            if (engine.ProcessKeyDown(ysKeyboard::KEY_SPACE)) {
+                RigidBody.AddImpulseWorldSpace(ysMath::LoadVector(0.0f, 8.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
+            }
+
+            if (engine.IsKeyDown(ysKeyboard::KEY_D)) {
+                RigidBody.SetVelocity(ysMath::LoadVector(4.0f, ysMath::GetY(v), 0.0f));
+                m_nextDirection = Direction::Forward;
+
+                brake = false;
+            }
+            else if (engine.IsKeyDown(ysKeyboard::KEY_A)) {
+                RigidBody.SetVelocity(ysMath::LoadVector(-4.0f, ysMath::GetY(v), 0.0f));
+                m_nextDirection = Direction::Back;
+
+                brake = false;
+            }
         }
 
-        if (engine.IsKeyDown(ysKeyboard::KEY_D)) {
-            RigidBody.SetVelocity(ysMath::LoadVector(4.0f, ysMath::GetY(v), 0.0f));
-            m_nextDirection = Direction::Forward;
-        }
-        else if (engine.IsKeyDown(ysKeyboard::KEY_A)) {
-            RigidBody.SetVelocity(ysMath::LoadVector(-4.0f, ysMath::GetY(v), 0.0f));
-            m_nextDirection = Direction::Back;
-        }
-        else if (std::abs(ysMath::GetX(v)) > 0.01f) {
-            RigidBody.AddForceWorldSpace(ysMath::LoadVector(-ysMath::GetX(v) * 10, 0.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
-        }
-        else {
-            RigidBody.SetVelocity(ysMath::LoadVector(0.0f, ysMath::GetY(v), 0.0f));
+        if (brake) {
+            if (std::abs(ysMath::GetX(v)) > 0.01f) {
+                RigidBody.AddForceWorldSpace(ysMath::LoadVector(-ysMath::GetX(v) * 10, 0.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
+            }
+            else {
+                RigidBody.SetVelocity(ysMath::LoadVector(0.0f, ysMath::GetY(v), 0.0f));
+            }
         }
     }
     else if (isHanging()) {
@@ -325,7 +351,8 @@ void c_adv::Player::updateAnimation() {
 
 void c_adv::Player::legsAnimationFsm() {
     ysVector velocity = RigidBody.GetVelocity();
-    float hMag = ysMath::GetScalar(ysMath::Dot(velocity, ysMath::Constants::XAxis));
+    float hMag = ysMath::GetX(velocity);
+    float fallSpeed = max(-ysMath::GetY(velocity), 0.0f);
 
     LegsState current = m_legsState;
     LegsState next = m_legsState;
@@ -348,14 +375,20 @@ void c_adv::Player::legsAnimationFsm() {
                 queuedFade = 0.0f;
             }
         }
-        else if (current == LegsState::Falling) {
-            if (std::abs(hMag) < 1.0f) {
-                next = LegsState::Idle;
-                nextFade = 20.0f;
+        else if (current == LegsState::Falling || current == LegsState::FastFalling) {
+            if (!m_impactDamage) {
+                if (std::abs(hMag) < 1.0f) {
+                    next = LegsState::Idle;
+                    nextFade = 20.0f;
+                }
+                else {
+                    next = LegsState::Running;
+                    nextFade = 20.0f;
+                }
             }
             else {
-                next = LegsState::Running;
-                nextFade = 20.0f;
+                next = LegsState::ImpactDamage;
+                nextFade = 10.0f;
             }
         }
         else if (current == LegsState::Idle) {
@@ -368,13 +401,31 @@ void c_adv::Player::legsAnimationFsm() {
                 queuedFade = 0.0f;
             }
         }
+        else if (current == LegsState::ImpactDamage) {
+            if (m_movementCooldown.ready()) {
+                next = LegsState::Idle;
+                nextFade = 20.0f;
+            }
+            else {
+                next = LegsState::ImpactDamage;
+            }
+        }
     }
     else if (!isHanging()) {
-        next = LegsState::Falling;
-        nextFade = 20.0f;
+        if (fallSpeed > 6.0f) {
+            next = LegsState::FastFalling;
+            nextFade = 40.0f;
 
-        queued = LegsState::Falling;
-        queuedFade = 0.0f;
+            queued = LegsState::FastFalling;
+            queuedFade = 0.0f;
+        }
+        else {
+            next = LegsState::Falling;
+            nextFade = 20.0f;
+
+            queued = LegsState::Falling;
+            queuedFade = 0.0f;
+        }
     }
     else {
         next = LegsState::Hanging;
@@ -401,6 +452,12 @@ void c_adv::Player::legsAnimationFsm() {
         else if (next == LegsState::Hanging) {
             nextAnimation = &m_animLegsHanging;
         }
+        else if (next == LegsState::ImpactDamage) {
+            nextAnimation = &m_animLegsDamageLanding;
+        }
+        else if (next == LegsState::FastFalling) {
+            nextAnimation = &m_animLegsFastFalling;
+        }
 
         ysAnimationChannel::ActionSettings settings;
         settings.FadeIn = nextFade;
@@ -426,6 +483,9 @@ void c_adv::Player::legsAnimationFsm() {
         }
         else if (queued == LegsState::Hanging) {
             queuedAnimation = &m_animLegsHanging;
+        }
+        else if (next == LegsState::FastFalling) {
+            queuedAnimation = &m_animLegsFastFalling;
         }
 
         ysAnimationChannel::ActionSettings settings;
@@ -471,7 +531,11 @@ void c_adv::Player::armsAnimationFsm() {
     float queuedClip = 0.0f;
 
     if (isOnSurface()) {
-        if (current == ArmsState::Running) {
+        if (m_impactDamage) {
+            next = ArmsState::ImpactDamage;
+            nextFade = 20.0f;
+        }
+        else if (current == ArmsState::Running) {
             if (std::abs(hMag) < 1.0f) {
                 next = ArmsState::Idle;
                 nextFade = 20.0f;
@@ -499,6 +563,12 @@ void c_adv::Player::armsAnimationFsm() {
             }
             else {
                 next = ArmsState::Running;
+                nextFade = 20.0f;
+            }
+        }
+        else if (current == ArmsState::ImpactDamage) {
+            if (m_movementCooldown.ready()) {
+                next = ArmsState::Idle;
                 nextFade = 20.0f;
             }
         }
@@ -555,6 +625,9 @@ void c_adv::Player::armsAnimationFsm() {
         else if (next == ArmsState::Hanging) {
             nextAnimation = &m_animArmsHanging;
         }
+        else if (next == ArmsState::ImpactDamage) {
+            nextAnimation = &m_animArmsDamageLanding;
+        }
 
         ysAnimationChannel::ActionSettings settings;
         settings.FadeIn = nextFade;
@@ -599,6 +672,9 @@ void c_adv::Player::configureAssets(dbasic::AssetManager *am) {
     AnimLegsFalling = am->GetAction("LegsFalling");
     AnimLegsHanging = am->GetAction("LegsHanging");
     AnimArmsHanging = am->GetAction("ArmsHanging");
+    AnimLegsDamageLanding = am->GetAction("LegsDamageLanding");
+    AnimArmsDamageLanding = am->GetAction("ArmsDamageLanding");
+    AnimLegsFastFalling = am->GetAction("LegsHighFalling");
 
     AnimLegsWalk->SetLength(39.0f);
     AnimArmsWalk->SetLength(39.0f);
@@ -608,6 +684,9 @@ void c_adv::Player::configureAssets(dbasic::AssetManager *am) {
     AnimLegsFalling->SetLength(100.0f);
     AnimLegsHanging->SetLength(200.0f);
     AnimArmsHanging->SetLength(60.0f);
+    AnimLegsDamageLanding->SetLength(250.0f);
+    AnimArmsDamageLanding->SetLength(250.0f);
+    AnimLegsFastFalling->SetLength(100.0f);
 
     CharacterRoot = am->GetSceneObject("CerealArmature");
 }
