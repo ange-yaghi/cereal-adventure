@@ -412,7 +412,7 @@ void c_adv::Player::legsAnimationFsm() {
         }
     }
     else if (!isHanging()) {
-        if (fallSpeed > 6.0f) {
+        if (fallSpeed > 9.0f) {
             next = LegsState::FastFalling;
             nextFade = 40.0f;
 
