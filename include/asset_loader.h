@@ -13,6 +13,7 @@ namespace c_adv {
         static void createAllMaterials(dbasic::AssetManager *am);
         static void loadAllTextures(const dbasic::Path &assetPath, dbasic::AssetManager *am);
         static void loadAllAssets(const dbasic::Path &assetPath, dbasic::AssetManager *am);
+        static void loadAllAudioAssets(const dbasic::Path &assetPath, dbasic::AssetManager *am);
 
     protected:
         static std::string getPath(const char *path, const dbasic::Path &assetPath);

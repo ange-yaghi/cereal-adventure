@@ -43,6 +43,7 @@ void c_adv::AssetLoader::loadAllTextures(const dbasic::Path &assetPath, dbasic::
 
 void c_adv::AssetLoader::loadAllAssets(const dbasic::Path &assetPath, dbasic::AssetManager *am) {
     loadAllTextures(assetPath, am);
+    loadAllAudioAssets(assetPath, am);
     createAllMaterials(am);
 
     /* Load all model and animation assets here */
@@ -60,6 +61,12 @@ void c_adv::AssetLoader::loadAllAssets(const dbasic::Path &assetPath, dbasic::As
     Counter::configureAssets(am);
     Toaster::configureAssets(am);
     Shelves::configureAssets(am);
+}
+
+void c_adv::AssetLoader::loadAllAudioAssets(const dbasic::Path &assetPath, dbasic::AssetManager *am) {
+    am->LoadAudioFile(getPath("audio/snap_test_2.wav", assetPath).c_str(), "Snap");
+
+    am->GetAudioAsset("Snap")->GetBuffer()->SetMode(ysAudioBuffer::Mode::Play);
 }
 
 std::string c_adv::AssetLoader::getPath(const char *path, const dbasic::Path &assetPath) {
