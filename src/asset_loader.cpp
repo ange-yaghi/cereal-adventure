@@ -65,8 +65,6 @@ void c_adv::AssetLoader::loadAllAssets(const dbasic::Path &assetPath, dbasic::As
 
 void c_adv::AssetLoader::loadAllAudioAssets(const dbasic::Path &assetPath, dbasic::AssetManager *am) {
     am->LoadAudioFile(getPath("audio/snap_test_2.wav", assetPath).c_str(), "Snap");
-
-    am->GetAudioAsset("Snap")->GetBuffer()->SetMode(ysAudioBuffer::Mode::Play);
 }
 
 std::string c_adv::AssetLoader::getPath(const char *path, const dbasic::Path &assetPath) {

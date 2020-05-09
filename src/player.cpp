@@ -19,6 +19,9 @@ ysAnimationAction
     *c_adv::Player::AnimArmsDamageLanding = nullptr,
     *c_adv::Player::AnimLegsFastFalling = nullptr;
 
+dbasic::AudioAsset
+    *c_adv::Player::AudioFootstep = nullptr;
+
 dbasic::SceneObjectAsset *c_adv::Player::CharacterRoot = nullptr;
 
 c_adv::Player::Player() {
@@ -111,6 +114,10 @@ void c_adv::Player::process() {
 
     m_gripCooldown.update(m_world->getEngine().GetFrameLength());
     m_movementCooldown.update(m_world->getEngine().GetFrameLength());
+
+    if (m_world->getEngine().ProcessKeyDown(ysKeyboard::KEY_0)) {
+        m_world->getEngine().PlayAudio(AudioFootstep);
+    }
 }
 
 void c_adv::Player::render() {
@@ -689,4 +696,6 @@ void c_adv::Player::configureAssets(dbasic::AssetManager *am) {
     AnimLegsFastFalling->SetLength(100.0f);
 
     CharacterRoot = am->GetSceneObject("CerealArmature");
+
+    AudioFootstep = am->GetAudioAsset("Snap");
 }

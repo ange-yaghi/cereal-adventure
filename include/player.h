@@ -125,6 +125,9 @@ namespace c_adv {
             *AnimArmsDamageLanding,
             *AnimLegsDamageLanding,
             *AnimLegsFastFalling;
+        
+        static dbasic::AudioAsset
+            *AudioFootstep;
 
         static dbasic::SceneObjectAsset *CharacterRoot;
     };
