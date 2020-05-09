@@ -59,6 +59,7 @@ namespace c_adv {
         void legsAnimationFsm();
         void rotationAnimationFsm();
         void armsAnimationFsm();
+        void updateSoundEffects();
 
         void processImpactDamage();
 
@@ -103,6 +104,9 @@ namespace c_adv {
         // Whether impact damage was taken in the last frame
         bool m_impactDamage;
 
+        // Sound effect internals
+        float m_lastRunPlayhead;
+
         // Movement parameters
     protected:
         float m_ledgeGraspDistance;
@@ -127,7 +131,10 @@ namespace c_adv {
             *AnimLegsFastFalling;
         
         static dbasic::AudioAsset
-            *AudioFootstep;
+            *AudioFootstep01,
+            *AudioFootstep02,
+            *AudioFootstep03,
+            *AudioFootstep04;
 
         static dbasic::SceneObjectAsset *CharacterRoot;
     };

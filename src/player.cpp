@@ -20,7 +20,10 @@ ysAnimationAction
     *c_adv::Player::AnimLegsFastFalling = nullptr;
 
 dbasic::AudioAsset
-    *c_adv::Player::AudioFootstep = nullptr;
+    *c_adv::Player::AudioFootstep01 = nullptr,
+    *c_adv::Player::AudioFootstep02 = nullptr, 
+    *c_adv::Player::AudioFootstep03 = nullptr, 
+    *c_adv::Player::AudioFootstep04 = nullptr;
 
 dbasic::SceneObjectAsset *c_adv::Player::CharacterRoot = nullptr;
 
@@ -42,6 +45,7 @@ c_adv::Player::Player() {
     m_armsState = ArmsState::Idle;
 
     m_impactDamage = false;
+    m_lastRunPlayhead = 0.0f;
 }
 
 c_adv::Player::~Player() {
@@ -116,8 +120,10 @@ void c_adv::Player::process() {
     m_movementCooldown.update(m_world->getEngine().GetFrameLength());
 
     if (m_world->getEngine().ProcessKeyDown(ysKeyboard::KEY_0)) {
-        m_world->getEngine().PlayAudio(AudioFootstep);
+        m_world->getEngine().PlayAudio(AudioFootstep01);
     }
+
+    updateSoundEffects();
 }
 
 void c_adv::Player::render() {
@@ -669,6 +675,37 @@ void c_adv::Player::armsAnimationFsm() {
     m_armsState = next;
 }
 
+void c_adv::Player::updateSoundEffects() {
+    constexpr float Step0 = 5.0f;
+    constexpr float Step1 = 22.0f;
+
+    if (m_legsChannel->GetCurrentAction() == &m_animLegsWalk) {
+        float playhead = m_legsChannel->GetPlayhead();
+        bool playFootstep = false;
+
+        if (playhead >= Step0 && m_lastRunPlayhead < Step0) {
+            playFootstep = true;
+        }
+        else if (playhead >= Step1 && m_lastRunPlayhead < Step1) {
+            playFootstep = true;
+        }
+
+        dbasic::AudioAsset *const FootstepEffects[] = { AudioFootstep01, AudioFootstep02, AudioFootstep03, AudioFootstep04 };
+        dbasic::AudioAsset *randomFootstep = nullptr;
+        if (playFootstep) {
+            int randomIndex = ysMath::UniformRandomInt(4);
+            randomFootstep = FootstepEffects[randomIndex];
+
+            m_world->getEngine().PlayAudio(randomFootstep);
+        }
+
+        m_lastRunPlayhead = playhead;
+    }
+    else {
+        m_lastRunPlayhead = 0.0f;
+    }
+}
+
 void c_adv::Player::configureAssets(dbasic::AssetManager *am) {
     AnimLegsWalk = am->GetAction("LegsRun");
     AnimArmsWalk = am->GetAction("ArmsRun");
@@ -697,5 +734,8 @@ void c_adv::Player::configureAssets(dbasic::AssetManager *am) {
 
     CharacterRoot = am->GetSceneObject("CerealArmature");
 
-    AudioFootstep = am->GetAudioAsset("Snap");
+    AudioFootstep01 = am->GetAudioAsset("CerealBox::Footstep01");
+    AudioFootstep02 = am->GetAudioAsset("CerealBox::Footstep02");
+    AudioFootstep03 = am->GetAudioAsset("CerealBox::Footstep03");
+    AudioFootstep04 = am->GetAudioAsset("CerealBox::Footstep04");
 }
