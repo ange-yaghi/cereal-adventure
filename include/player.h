@@ -134,7 +134,8 @@ namespace c_adv {
             *AudioFootstep01,
             *AudioFootstep02,
             *AudioFootstep03,
-            *AudioFootstep04;
+            *AudioFootstep04,
+            *DamageImpact;
 
         static dbasic::SceneObjectAsset *CharacterRoot;
     };

@@ -23,7 +23,8 @@ dbasic::AudioAsset
     *c_adv::Player::AudioFootstep01 = nullptr,
     *c_adv::Player::AudioFootstep02 = nullptr, 
     *c_adv::Player::AudioFootstep03 = nullptr, 
-    *c_adv::Player::AudioFootstep04 = nullptr;
+    *c_adv::Player::AudioFootstep04 = nullptr,
+    *c_adv::Player::DamageImpact = nullptr;
 
 dbasic::SceneObjectAsset *c_adv::Player::CharacterRoot = nullptr;
 
@@ -640,6 +641,7 @@ void c_adv::Player::armsAnimationFsm() {
         }
         else if (next == ArmsState::ImpactDamage) {
             nextAnimation = &m_animArmsDamageLanding;
+            m_world->getEngine().PlayAudio(DamageImpact);
         }
 
         ysAnimationChannel::ActionSettings settings;
@@ -738,4 +740,5 @@ void c_adv::Player::configureAssets(dbasic::AssetManager *am) {
     AudioFootstep02 = am->GetAudioAsset("CerealBox::Footstep02");
     AudioFootstep03 = am->GetAudioAsset("CerealBox::Footstep03");
     AudioFootstep04 = am->GetAudioAsset("CerealBox::Footstep04");
+    DamageImpact = am->GetAudioAsset("CerealBox::DamageImpact");
 }
