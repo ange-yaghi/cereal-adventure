@@ -48,21 +48,22 @@ void c_adv::Realm::process() {
 
     PhysicsSystem.Update(getEngine().GetFrameLength());
 }
-
+ 
 void c_adv::Realm::render() {
     m_world->getEngine().SetClearColor(0x0b, 0x03, 0x2d);
+    m_world->getEngine().SetClearColor(0, 0, 0);
 
-    m_world->getEngine().SetAmbientLight(ysVector4(0.7f, 0.7f, 0.7f));
-
-    dbasic::Light sun;
-    sun.Position = ysVector4(10.0f, 10.0f, 10.0f);
+    m_world->getEngine().SetAmbientLight(ysVector4(0.6f, 0.5f, 0.5f));
+                   
+    dbasic::Light sun;    
+    sun.Position = ysVector4(10.0f, 10.0f, 10.0f); 
     sun.Color = ysVector4(255 / 255.0f, 255 / 255.0f, 255 / 255.0f, 0.0f);
     sun.Color.Scale(0.3f);
     sun.FalloffEnabled = 0;
     m_world->getEngine().AddLight(sun);
 
-    dbasic::Light backLight;
-    backLight.Position = ysVector4(7.0f, 1.0f, 2.0f);
+    dbasic::Light backLight;  
+    backLight.Position = ysVector4(7.0f, 1.0f, 2.0f);    
     backLight.Color = ysVector4(43 / 255.0f, 209 / 255.0f, 252 / 255.0f, 0.0f);
     backLight.Color.Scale(4.0f);
     backLight.FalloffEnabled = 1;

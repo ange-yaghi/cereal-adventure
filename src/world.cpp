@@ -8,6 +8,7 @@
 #include "../include/counter.h"
 #include "../include/toaster.h"
 #include "../include/shelves.h"
+#include "../include/milk_carton.h"
 
 c_adv::World::World() {
     m_focus = nullptr;
@@ -66,7 +67,10 @@ void c_adv::World::initialSpawn() {
     m_mainRealm->setIndoor(false);
 
     m_focus = m_mainRealm->spawn<Player>();
-    m_focus->RigidBody.Transform.SetPosition(ysMath::LoadVector(0.0f, 10.0f, 0.0f));
+    m_focus->RigidBody.Transform.SetPosition(ysMath::LoadVector(0.0f, 3.0f, 0.0f));
+
+    GameObject *milk = m_mainRealm->spawn<MilkCarton>();
+    milk->RigidBody.Transform.SetPosition(ysMath::LoadVector(2.0f, 5.0f, 0.0f));
 
     ysTransform root;
     dbasic::RenderSkeleton *level1 = m_assetManager.BuildRenderSkeleton(&root, m_assetManager.GetSceneObject("Level1"));

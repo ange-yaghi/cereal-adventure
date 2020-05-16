@@ -81,6 +81,9 @@
     <ClCompile Include="..\..\src\spring_connector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\milk_carton.cpp">
+      <Filter>Source Files\game-objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\delta.h">
@@ -136,6 +139,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\spring_connector.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\milk_carton.h">
+      <Filter>Header Files\game-objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
