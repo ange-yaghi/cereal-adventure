@@ -19,23 +19,23 @@ c_adv::AssetLoader::~AssetLoader() {
 void c_adv::AssetLoader::createAllMaterials(dbasic::AssetManager *am) {
     dbasic::Material *lightFill = am->NewMaterial();
     lightFill->SetName("LightFill");
-    lightFill->SetDiffuseColor(ysVector4(0xEF / 255.0f, 0x38 / 255.0f, 0x37 / 255.0f, 1.0f));
+    lightFill->SetDiffuseColor(ysColor::srgbiToLinear(0xEF, 0x38, 0x37));
 
     dbasic::Material *lineColor = am->NewMaterial();
     lineColor->SetName("LineColor");
-    lineColor->SetDiffuseColor(ysVector4(0x91 / 255.0f, 0x1A / 255.0f, 0x1D / 255.0f, 1.0f));
+    lineColor->SetDiffuseColor(ysColor::srgbiToLinear(0x91, 0x1A, 0x1D));
 
     dbasic::Material *darkFill = am->NewMaterial();
     darkFill->SetName("DarkFill");
-    darkFill->SetDiffuseColor(ysVector4(0xC4 / 255.0f, 0x21 / 255.0f, 0x26 / 255.0f, 1.0f));
+    darkFill->SetDiffuseColor(ysColor::srgbiToLinear(0xC4, 0x21, 0x26));
 
     dbasic::Material *highlight = am->NewMaterial();
     highlight->SetName("Highlight");
-    highlight->SetDiffuseColor(ysVector4(1.0f, 1.0f, 1.0f, 1.0f - 0.941667f));
+    highlight->SetDiffuseColor(ysMath::LoadVector(1.0f, 1.0f, 1.0f, 1.0f - 0.941667f));
 
     dbasic::Material *playerMaterial = am->NewMaterial();
     playerMaterial->SetName("PlayerMaterial");
-    playerMaterial->SetDiffuseColor(ysVector4(0xff / 255.0f, 0xb9 / 255.0f, 0x97 / 255.0f, 1.0f));
+    playerMaterial->SetDiffuseColor(ysColor::srgbiToLinear(0x2c, 0x3e, 0x50));
 }
 
 void c_adv::AssetLoader::loadAllTextures(const dbasic::Path &assetPath, dbasic::AssetManager *am) {

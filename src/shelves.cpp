@@ -28,9 +28,11 @@ void c_adv::Shelves::initialize() {
 }
 
 void c_adv::Shelves::render() {
+    m_world->getEngine().ResetBrdfParameters();
+    m_world->getEngine().SetBaseColor(ysColor::srgbiToLinear(128, 128, 128));
+
     m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
-    m_world->getEngine().SetMultiplyColor(ysVector4(0.5f, 0.5f, 0.5f, 1.0f));
-    m_world->getEngine().DrawModel(m_shelvesAsset, RigidBody.Transform.GetWorldTransform(), 1.0f, nullptr);
+    //m_world->getEngine().DrawModel(m_shelvesAsset, 1.0f, nullptr);
 }
 
 void c_adv::Shelves::process() {

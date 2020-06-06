@@ -128,7 +128,7 @@ void c_adv::Player::process() {
 }
 
 void c_adv::Player::render() {
-    m_world->getEngine().SetMultiplyColor(ysVector4(0xff / 255.0f, 0xb9 / 255.0f, 0x97 / 255.0f, 1.0f));
+    m_world->getEngine().ResetBrdfParameters();
     m_world->getEngine().DrawRenderSkeleton(m_renderSkeleton, 1.0f, (int)Layer::Player);
 
     dbasic::Console *console = m_world->getEngine().GetConsole();
@@ -148,7 +148,7 @@ void c_adv::Player::render() {
         m_realm->getDeadObjectCount() << "/" << 
         m_realm->getVisibleObjectCount() << "          \n";
     msg << "Healh " << m_health << "\n";
-    console->DrawGeneralText(msg.str().c_str());
+    //console->DrawGeneralText(msg.str().c_str());
 }
 
 bool c_adv::Player::isOnSurface() {

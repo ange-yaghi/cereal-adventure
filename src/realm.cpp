@@ -50,10 +50,9 @@ void c_adv::Realm::process() {
 }
  
 void c_adv::Realm::render() {
-    m_world->getEngine().SetClearColor(0x0b, 0x03, 0x2d);
-    m_world->getEngine().SetClearColor(0, 0, 0);
+    m_world->getEngine().SetClearColor(0xc0, 0x39, 0x2b);
 
-    m_world->getEngine().SetAmbientLight(ysVector4(0.6f, 0.5f, 0.5f));
+    m_world->getEngine().SetAmbientLight(ysMath::GetVector4(ysColor::srgbiToLinear(0xc0, 0x39, 0x2b)));
                    
     dbasic::Light sun;    
     sun.Position = ysVector4(10.0f, 10.0f, 10.0f); 

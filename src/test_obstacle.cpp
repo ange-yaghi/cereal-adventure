@@ -52,8 +52,9 @@ void c_adv::TestObstacle::destroy() {
 
 void c_adv::TestObstacle::render() {
     m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
-    m_world->getEngine().SetMultiplyColor(ysVector4(1.0f, 1.0f, 1.0f, 1.0f));
-    m_world->getEngine().DrawModel(m_obstacleMesh, RigidBody.Transform.GetWorldTransform(), 1.0f, nullptr);
+    m_world->getEngine().ResetBrdfParameters();
+    m_world->getEngine().SetBaseColor(ysColor::srgbiToLinear(255, 255, 255));
+    m_world->getEngine().DrawModel(m_obstacleMesh, 1.0f, nullptr);
 }
 
 void c_adv::TestObstacle::process() {

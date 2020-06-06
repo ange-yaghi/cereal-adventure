@@ -28,9 +28,11 @@ void c_adv::Toaster::initialize() {
 }
 
 void c_adv::Toaster::render() {
+    m_world->getEngine().ResetBrdfParameters();
+    m_world->getEngine().SetBaseColor(ysColor::srgbiToLinear(50, 50, 50));
+
     m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
-    m_world->getEngine().SetMultiplyColor(ysVector4(0.1f, 0.1f, 0.1f, 1.0f));
-    m_world->getEngine().DrawModel(m_toasterAsset, RigidBody.Transform.GetWorldTransform(), 1.0f, nullptr);
+    //m_world->getEngine().DrawModel(m_toasterAsset, 1.0f, nullptr);
 }
 
 void c_adv::Toaster::process() {

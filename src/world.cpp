@@ -120,6 +120,7 @@ void c_adv::World::render() {
     m_engine.SetCameraPosition(ysMath::GetX(cameraTarget), ysMath::GetY(cameraTarget));
     m_engine.SetCameraAltitude(7.0f);
     m_engine.SetCameraTarget(m_smoothTarget.getPosition());
+    m_engine.SetCameraUp(ysMath::Constants::YAxis);
 
     m_mainRealm->render();
 }
