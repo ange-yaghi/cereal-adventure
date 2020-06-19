@@ -84,6 +84,15 @@
     <ClCompile Include="..\..\src\milk_carton.cpp">
       <Filter>Source Files\game-objects</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\fridge.cpp">
+      <Filter>Source Files\game-objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\stool_1.cpp">
+      <Filter>Source Files\game-objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\microwave.cpp">
+      <Filter>Source Files\game-objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\delta.h">
@@ -141,6 +150,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\milk_carton.h">
+      <Filter>Header Files\game-objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\fridge.h">
+      <Filter>Header Files\game-objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\stool_1.h">
+      <Filter>Header Files\game-objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\microwave.h">
       <Filter>Header Files\game-objects</Filter>
     </ClInclude>
   </ItemGroup>

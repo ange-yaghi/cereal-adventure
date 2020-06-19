@@ -32,7 +32,7 @@ void c_adv::Counter::render() {
     m_world->getEngine().SetBaseColor(ysColor::srgbiToLinear(128, 128, 128));
 
     m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
-    //m_world->getEngine().DrawModel(m_counterAsset, 1.0f, nullptr);
+    m_world->getEngine().DrawModel(m_counterAsset, 1.0f, nullptr);
 }
 
 void c_adv::Counter::process() {

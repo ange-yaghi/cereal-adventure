@@ -148,7 +148,7 @@ void c_adv::Player::render() {
         m_realm->getDeadObjectCount() << "/" << 
         m_realm->getVisibleObjectCount() << "          \n";
     msg << "Healh " << m_health << "\n";
-    //console->DrawGeneralText(msg.str().c_str());
+    console->DrawGeneralText(msg.str().c_str());
 }
 
 bool c_adv::Player::isOnSurface() {

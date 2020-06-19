@@ -22,11 +22,13 @@
     <ClCompile Include="..\..\src\asset_loader.cpp" />
     <ClCompile Include="..\..\src\cooldown_timer.cpp" />
     <ClCompile Include="..\..\src\counter.cpp" />
+    <ClCompile Include="..\..\src\fridge.cpp" />
     <ClCompile Include="..\..\src\game_object.cpp" />
     <ClCompile Include="..\..\src\jitter_filter.cpp" />
     <ClCompile Include="..\..\src\ledge.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\math_utilities.cpp" />
+    <ClCompile Include="..\..\src\microwave.cpp" />
     <ClCompile Include="..\..\src\milk_carton.cpp" />
     <ClCompile Include="..\..\src\os_utilities.cpp" />
     <ClCompile Include="..\..\src\cereal_adventure_app.cpp" />
@@ -34,6 +36,7 @@
     <ClCompile Include="..\..\src\realm.cpp" />
     <ClCompile Include="..\..\src\shelves.cpp" />
     <ClCompile Include="..\..\src\spring_connector.cpp" />
+    <ClCompile Include="..\..\src\stool_1.cpp" />
     <ClCompile Include="..\..\src\test_obstacle.cpp" />
     <ClCompile Include="..\..\src\toaster.cpp" />
     <ClCompile Include="..\..\src\world.cpp" />
@@ -41,6 +44,8 @@
   <ItemGroup>
     <ClInclude Include="..\..\include\aabb.h" />
     <ClInclude Include="..\..\include\asset_loader.h" />
+    <ClInclude Include="..\..\include\fridge.h" />
+    <ClInclude Include="..\..\include\microwave.h" />
     <ClInclude Include="..\..\include\milk_carton.h" />
     <ClInclude Include="..\..\include\spring_connector.h" />
     <ClInclude Include="..\..\include\cooldown_timer.h" />
@@ -55,6 +60,7 @@
     <ClInclude Include="..\..\include\player.h" />
     <ClInclude Include="..\..\include\realm.h" />
     <ClInclude Include="..\..\include\shelves.h" />
+    <ClInclude Include="..\..\include\stool_1.h" />
     <ClInclude Include="..\..\include\test_obstacle.h" />
     <ClInclude Include="..\..\include\toaster.h" />
     <ClInclude Include="..\..\include\world.h" />

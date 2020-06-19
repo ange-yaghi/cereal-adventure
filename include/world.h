@@ -13,6 +13,9 @@ namespace c_adv {
 
     class World {
     public:
+        static const float DefaultCameraDistance;
+
+    public:
         World();
         ~World();
 
@@ -52,6 +55,8 @@ namespace c_adv {
 
         SpringConnector m_smoothCamera;
         SpringConnector m_smoothTarget;
+
+        float m_cameraDistance;
 
     protected:
         dbasic::DeltaEngine m_engine;

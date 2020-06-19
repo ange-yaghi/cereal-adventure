@@ -9,10 +9,16 @@
 #include "../include/toaster.h"
 #include "../include/shelves.h"
 #include "../include/milk_carton.h"
+#include "../include/fridge.h"
+#include "../include/stool_1.h"
+#include "../include/microwave.h"
+
+const float c_adv::World::DefaultCameraDistance = 7.0f;
 
 c_adv::World::World() {
     m_focus = nullptr;
     m_mainRealm = nullptr;
+    m_cameraDistance = DefaultCameraDistance;
 }
 
 c_adv::World::~World() {
@@ -73,7 +79,7 @@ void c_adv::World::initialSpawn() {
     milk->RigidBody.Transform.SetPosition(ysMath::LoadVector(2.0f, 5.0f, 0.0f));
 
     ysTransform root;
-    dbasic::RenderSkeleton *level1 = m_assetManager.BuildRenderSkeleton(&root, m_assetManager.GetSceneObject("Level1"));
+    dbasic::RenderSkeleton *level1 = m_assetManager.BuildRenderSkeleton(&root, m_assetManager.GetSceneObject("Level 1"));
     generateLevel(level1);
 }
 
@@ -118,7 +124,7 @@ void c_adv::World::render() {
     ysVector cameraTarget = m_smoothCamera.getPosition();
 
     m_engine.SetCameraPosition(ysMath::GetX(cameraTarget), ysMath::GetY(cameraTarget));
-    m_engine.SetCameraAltitude(7.0f);
+    m_engine.SetCameraAltitude(m_cameraDistance);
     m_engine.SetCameraTarget(m_smoothTarget.getPosition());
     m_engine.SetCameraUp(ysMath::Constants::YAxis);
 
@@ -130,6 +136,17 @@ void c_adv::World::process() {
 
     m_smoothCamera.update(m_engine.GetFrameLength());
     m_smoothTarget.update(m_engine.GetFrameLength());
+
+    if (m_engine.IsKeyDown(ysKeyboard::KEY_SUBTRACT)) {
+        m_cameraDistance += 0.5f;
+    }
+    else if (m_engine.IsKeyDown(ysKeyboard::KEY_ADD)) {
+        m_cameraDistance -= 0.5f;
+        if (m_cameraDistance < 1.0f) m_cameraDistance = 1.0f;
+    }
+    else if (m_engine.IsKeyDown(ysKeyboard::KEY_BACK)) {
+        m_cameraDistance = DefaultCameraDistance;
+    }
 }
 
 void c_adv::World::generateLevel(dbasic::RenderSkeleton *hierarchy) {
@@ -146,7 +163,7 @@ void c_adv::World::generateLevel(dbasic::RenderSkeleton *hierarchy) {
             Counter *newCounter = m_mainRealm->spawn<Counter>();
             newCounter->RigidBody.Transform.SetPosition(position);
         }
-        else if (strcmp(sceneAsset->GetName(), "Toaster") == 0) {
+        else if (strcmp(sceneAsset->GetName(), "Toaster") == 0) { 
             ysVector position = node->Transform.GetWorldPosition();
             Toaster *newToaster = m_mainRealm->spawn<Toaster>();
             newToaster->RigidBody.Transform.SetPosition(position);
@@ -155,6 +172,21 @@ void c_adv::World::generateLevel(dbasic::RenderSkeleton *hierarchy) {
             ysVector position = node->Transform.GetWorldPosition();
             Shelves *newShelves = m_mainRealm->spawn<Shelves>();
             newShelves->RigidBody.Transform.SetPosition(position);
+        }
+        else if (strcmp(sceneAsset->GetName(), "Fridge") == 0) {
+            ysVector position = node->Transform.GetWorldPosition();
+            Fridge *newFridge = m_mainRealm->spawn<Fridge>();
+            newFridge->RigidBody.Transform.SetPosition(position);
+        }
+        else if (strcmp(sceneAsset->GetName(), "Stool_1") == 0) {
+            ysVector position = node->Transform.GetWorldPosition();
+            Stool_1 *newStool = m_mainRealm->spawn<Stool_1>();
+            newStool->RigidBody.Transform.SetPosition(position);
+        }
+        else if (strcmp(sceneAsset->GetName(), "Microwave") == 0) {
+            ysVector position = node->Transform.GetWorldPosition();
+            Microwave *newMicrowave = m_mainRealm->spawn<Microwave>();
+            newMicrowave->RigidBody.Transform.SetPosition(position);
         }
     }
 }
