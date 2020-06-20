@@ -12,6 +12,8 @@
 #include "../include/fridge.h"
 #include "../include/stool_1.h"
 #include "../include/microwave.h"
+#include "../include/oven.h"
+#include "../include/single_shelf.h"
 
 const float c_adv::World::DefaultCameraDistance = 7.0f;
 
@@ -187,6 +189,16 @@ void c_adv::World::generateLevel(dbasic::RenderSkeleton *hierarchy) {
             ysVector position = node->Transform.GetWorldPosition();
             Microwave *newMicrowave = m_mainRealm->spawn<Microwave>();
             newMicrowave->RigidBody.Transform.SetPosition(position);
+        }
+        else if (strcmp(sceneAsset->GetName(), "Oven") == 0) {
+            ysVector position = node->Transform.GetWorldPosition();
+            Oven *newOven = m_mainRealm->spawn<Oven>();
+            newOven->RigidBody.Transform.SetPosition(position);
+        }
+        else if (strcmp(sceneAsset->GetName(), "SingleShelf") == 0) {
+            ysVector position = node->Transform.GetWorldPosition();
+            SingleShelf *newOven = m_mainRealm->spawn<SingleShelf>();
+            newOven->RigidBody.Transform.SetPosition(position);
         }
     }
 }

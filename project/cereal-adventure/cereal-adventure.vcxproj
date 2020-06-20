@@ -32,9 +32,11 @@
     <ClCompile Include="..\..\src\milk_carton.cpp" />
     <ClCompile Include="..\..\src\os_utilities.cpp" />
     <ClCompile Include="..\..\src\cereal_adventure_app.cpp" />
+    <ClCompile Include="..\..\src\oven.cpp" />
     <ClCompile Include="..\..\src\player.cpp" />
     <ClCompile Include="..\..\src\realm.cpp" />
     <ClCompile Include="..\..\src\shelves.cpp" />
+    <ClCompile Include="..\..\src\single_shelf.cpp" />
     <ClCompile Include="..\..\src\spring_connector.cpp" />
     <ClCompile Include="..\..\src\stool_1.cpp" />
     <ClCompile Include="..\..\src\test_obstacle.cpp" />
@@ -47,6 +49,8 @@
     <ClInclude Include="..\..\include\fridge.h" />
     <ClInclude Include="..\..\include\microwave.h" />
     <ClInclude Include="..\..\include\milk_carton.h" />
+    <ClInclude Include="..\..\include\oven.h" />
+    <ClInclude Include="..\..\include\single_shelf.h" />
     <ClInclude Include="..\..\include\spring_connector.h" />
     <ClInclude Include="..\..\include\cooldown_timer.h" />
     <ClInclude Include="..\..\include\counter.h" />

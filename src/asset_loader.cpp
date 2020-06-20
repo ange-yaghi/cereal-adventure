@@ -10,6 +10,8 @@
 #include "../include/fridge.h"
 #include "../include/stool_1.h"
 #include "../include/microwave.h"
+#include "../include/oven.h"
+#include "../include/single_shelf.h"
 
 c_adv::AssetLoader::AssetLoader() {
     /* void */
@@ -69,6 +71,8 @@ void c_adv::AssetLoader::loadAllAssets(const dbasic::Path &assetPath, dbasic::As
     Fridge::configureAssets(am);
     Stool_1::configureAssets(am);
     Microwave::configureAssets(am);
+    Oven::configureAssets(am);
+    SingleShelf::configureAssets(am);
 }
 
 void c_adv::AssetLoader::loadAllAudioAssets(const dbasic::Path &assetPath, dbasic::AssetManager *am) {
