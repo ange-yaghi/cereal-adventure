@@ -26,4 +26,3 @@ namespace c_adv {
 } /* namespace c_adv */
 
 #endif /* CEREAL_ADVENTURE_MICROWAVE_H */
-

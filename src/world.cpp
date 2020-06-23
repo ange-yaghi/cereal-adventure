@@ -4,16 +4,8 @@
 #include "../include/realm.h"
 #include "../include/player.h"
 #include "../include/test_obstacle.h"
-#include "../include/ledge.h"
-#include "../include/counter.h"
-#include "../include/toaster.h"
-#include "../include/shelves.h"
-#include "../include/milk_carton.h"
-#include "../include/fridge.h"
-#include "../include/stool_1.h"
-#include "../include/microwave.h"
-#include "../include/oven.h"
-#include "../include/single_shelf.h"
+
+#include "../include/game_objects.h"
 
 const float c_adv::World::DefaultCameraDistance = 7.0f;
 
@@ -199,6 +191,44 @@ void c_adv::World::generateLevel(dbasic::RenderSkeleton *hierarchy) {
             ysVector position = node->Transform.GetWorldPosition();
             SingleShelf *newOven = m_mainRealm->spawn<SingleShelf>();
             newOven->RigidBody.Transform.SetPosition(position);
+        }
+        else if (strcmp(sceneAsset->GetName(), "Vase") == 0) {
+            ysVector position = node->Transform.GetWorldPosition();
+            Vase *newVase = m_mainRealm->spawn<Vase>();
+            newVase->RigidBody.Transform.SetPosition(position);
+        }
+        else if (strcmp(sceneAsset->GetName(), "Cabinet") == 0) {
+            ysVector position = node->Transform.GetWorldPosition();
+            Cabinet *newCabinet = m_mainRealm->spawn<Cabinet>();
+            newCabinet->RigidBody.Transform.SetPosition(position);
+        }
+        else if (strcmp(sceneAsset->GetName(), "Sink") == 0) {
+            ysVector position = node->Transform.GetWorldPosition();
+            Sink *newSink = m_mainRealm->spawn<Sink>();
+            newSink->RigidBody.Transform.SetPosition(position);
+        }
+        else if (strcmp(sceneAsset->GetName(), "PlayerStart") == 0) {
+            ysVector position = node->Transform.GetWorldPosition();
+            m_focus->RigidBody.Transform.SetPosition(position);
+        }
+        else if (strcmp(sceneAsset->GetName(), "LightSource::Ceiling") == 0) {
+            ysVector position = node->Transform.GetWorldPosition();
+            CeilingLightSource *newLight = m_mainRealm->spawn<CeilingLightSource>();
+            newLight->RigidBody.Transform.SetPosition(position);
+        }
+        else if (strcmp(sceneAsset->GetName(), "StoveHood") == 0) {
+            ysVector position = node->Transform.GetWorldPosition();
+            StoveHood *stoveHood = m_mainRealm->spawn<StoveHood>();
+            stoveHood->RigidBody.Transform.SetPosition(position);
+        }
+        else if (sceneAsset->GetType() == ysObjectData::ObjectType::Instance) {
+            ysVector position = node->Transform.GetWorldPosition();
+            ysQuaternion orientation = node->Transform.GetWorldOrientation();
+
+            StaticArt *newStaticArt = m_mainRealm->spawn<StaticArt>();
+            newStaticArt->setAsset(node->GetModelAsset());
+            newStaticArt->RigidBody.Transform.SetPosition(position);
+            newStaticArt->RigidBody.Transform.SetOrientation(orientation);
         }
     }
 }

@@ -166,7 +166,7 @@ float f_diffuse(float3 i, float3 o, float3 h, float3 normal, float power, float 
 	float cos_theta_o = dot(o, normal);
 
 	float f_d = (1 + (f_d90 - 1) * pow5(1 - cos_theta_i)) * (1 + (f_d90 - 1) * pow5(1 - cos_theta_o));
-	return min(1.0, f_d * power * cos_theta_i);
+	return clamp(f_d * power * cos_theta_i, 0.0, 1.0);
 }
 
 float f_specular(float3 i, float3 o, float3 h, float3 normal, float F0, float power, float specularPower) {
@@ -290,14 +290,13 @@ float4 PS(VS_OUTPUT input) : SV_Target {
 			// Spotlight calculation
 			float spotCoherence = -dot(i, light.Direction.xyz);
 			float spotAttenuation = 1.0f;
-			if (spotCoherence > light.Attenuation0) spotAttenuation = 1.0f;
+			if (spotCoherence >= light.Attenuation0) spotAttenuation = 1.0f;
 			else if (spotCoherence < light.Attenuation1) spotAttenuation = 0.0f;
 			else {
 				float t = light.Attenuation0 - light.Attenuation1;
 				if (t == 0) spotAttenuation = 1.0f;
 				else spotAttenuation = (spotCoherence - light.Attenuation1) / t;
 			}
-			spotAttenuation = 1.0;
 
 			float falloff = 1.0;
 			if (light.FalloffEnabled == 1) {

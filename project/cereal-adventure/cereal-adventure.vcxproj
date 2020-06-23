@@ -20,6 +20,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\asset_loader.cpp" />
+    <ClCompile Include="..\..\src\cabinet.cpp" />
+    <ClCompile Include="..\..\src\ceiling_light_source.cpp" />
+    <ClCompile Include="..\..\src\colors.cpp" />
     <ClCompile Include="..\..\src\cooldown_timer.cpp" />
     <ClCompile Include="..\..\src\counter.cpp" />
     <ClCompile Include="..\..\src\fridge.cpp" />
@@ -37,20 +40,29 @@
     <ClCompile Include="..\..\src\realm.cpp" />
     <ClCompile Include="..\..\src\shelves.cpp" />
     <ClCompile Include="..\..\src\single_shelf.cpp" />
+    <ClCompile Include="..\..\src\sink.cpp" />
     <ClCompile Include="..\..\src\spring_connector.cpp" />
+    <ClCompile Include="..\..\src\static_art.cpp" />
     <ClCompile Include="..\..\src\stool_1.cpp" />
+    <ClCompile Include="..\..\src\stove_hood.cpp" />
     <ClCompile Include="..\..\src\test_obstacle.cpp" />
     <ClCompile Include="..\..\src\toaster.cpp" />
+    <ClCompile Include="..\..\src\vase.cpp" />
     <ClCompile Include="..\..\src\world.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\aabb.h" />
     <ClInclude Include="..\..\include\asset_loader.h" />
+    <ClInclude Include="..\..\include\cabinet.h" />
+    <ClInclude Include="..\..\include\ceiling_light_source.h" />
+    <ClInclude Include="..\..\include\colors.h" />
     <ClInclude Include="..\..\include\fridge.h" />
+    <ClInclude Include="..\..\include\game_objects.h" />
     <ClInclude Include="..\..\include\microwave.h" />
     <ClInclude Include="..\..\include\milk_carton.h" />
     <ClInclude Include="..\..\include\oven.h" />
     <ClInclude Include="..\..\include\single_shelf.h" />
+    <ClInclude Include="..\..\include\sink.h" />
     <ClInclude Include="..\..\include\spring_connector.h" />
     <ClInclude Include="..\..\include\cooldown_timer.h" />
     <ClInclude Include="..\..\include\counter.h" />
@@ -64,9 +76,12 @@
     <ClInclude Include="..\..\include\player.h" />
     <ClInclude Include="..\..\include\realm.h" />
     <ClInclude Include="..\..\include\shelves.h" />
+    <ClInclude Include="..\..\include\static_art.h" />
     <ClInclude Include="..\..\include\stool_1.h" />
+    <ClInclude Include="..\..\include\stove_hood.h" />
     <ClInclude Include="..\..\include\test_obstacle.h" />
     <ClInclude Include="..\..\include\toaster.h" />
+    <ClInclude Include="..\..\include\vase.h" />
     <ClInclude Include="..\..\include\world.h" />
   </ItemGroup>
   <ItemGroup>

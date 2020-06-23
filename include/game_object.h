@@ -30,6 +30,7 @@ namespace c_adv {
 
         enum class Tag {
             Ledge,
+            Dynamic,
             Count
         };
 
@@ -44,6 +45,7 @@ namespace c_adv {
 
         virtual void initialize();
         virtual void destroy();
+        virtual void resetAccumulators();
         virtual void render();
         virtual void process();
 
@@ -110,6 +112,8 @@ namespace c_adv {
         int m_referenceCount;
 
     protected:
+        ysVector m_defaultColor;
+
         World *m_world;
         Realm *m_realm;
         Realm *m_newRealm;

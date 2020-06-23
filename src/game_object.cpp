@@ -24,6 +24,11 @@ c_adv::GameObject::GameObject() {
 
     m_visualBounds.maxPoint = ysMath::LoadVector(FLT_MAX, FLT_MAX, 0.0f, 1.0f);
     m_visualBounds.minPoint = ysMath::LoadVector(FLT_MIN, FLT_MIN, 0.0f, 1.0f);
+
+    m_defaultColor = ysColor::srgbiToLinear(
+        ysMath::UniformRandomInt(256),
+        ysMath::UniformRandomInt(256),
+        ysMath::UniformRandomInt(256));
 }
 
 c_adv::GameObject::~GameObject() {
@@ -105,6 +110,10 @@ void c_adv::GameObject::initialize() {
 
 void c_adv::GameObject::destroy() {
     /* void */
+}
+
+void c_adv::GameObject::resetAccumulators() {
+    RigidBody.ClearAccumulators();
 }
 
 void c_adv::GameObject::render() {

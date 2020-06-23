@@ -1,6 +1,7 @@
 #include "../include/fridge.h"
 
 #include "../include/world.h"
+#include "../include/colors.h"
 
 dbasic::ModelAsset *c_adv::Fridge::m_fridgeAsset = nullptr;
 
@@ -29,7 +30,7 @@ void c_adv::Fridge::initialize() {
 
 void c_adv::Fridge::render() {
     m_world->getEngine().ResetBrdfParameters();
-    m_world->getEngine().SetBaseColor(ysColor::srgbiToLinear(50, 50, 50));
+    m_world->getEngine().SetBaseColor(CyberYellow);
 
     m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
     m_world->getEngine().DrawModel(m_fridgeAsset, 1.0f, nullptr);

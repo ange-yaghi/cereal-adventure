@@ -43,6 +43,7 @@ void c_adv::Realm::process() {
         if (g->getDeletionFlag()) continue;
 
         g->createVisualBounds();
+        g->resetAccumulators();
         g->process();
     }
 
@@ -50,16 +51,41 @@ void c_adv::Realm::process() {
 }
  
 void c_adv::Realm::render() {
-    m_world->getEngine().SetClearColor(0xc0, 0x39, 0x2b);
+    m_world->getEngine().SetClearColor(0x0, 0x0, 0x0);
 
-    m_world->getEngine().SetAmbientLight(ysMath::GetVector4(ysColor::srgbiToLinear(0xc0, 0x39, 0x2b)));
-                   
-    dbasic::Light sun;    
-    sun.Position = ysVector4(10.0f, 10.0f, 10.0f); 
-    sun.Color = ysVector4(255 / 255.0f, 255 / 255.0f, 255 / 255.0f, 0.0f);
-    sun.Color.Scale(0.3f);
-    sun.FalloffEnabled = 0;
-    m_world->getEngine().AddLight(sun);
+    ysVector4 ambient = ysMath::GetVector4(ysColor::srgbiToLinear(0xCC, 0xca, 0xf9));
+    ambient.Scale(0.5f);
+    m_world->getEngine().SetAmbientLight(ambient);
+    
+    dbasic::Light sun0;
+    sun0.Position = ysVector4(10.0f, 10.0f, 10.0f);
+    sun0.Color = ysVector4(255 / 255.0f, 255 / 255.0f, 255 / 255.0f, 0.0f);
+    sun0.Color.Scale(80.0f);
+    sun0.FalloffEnabled = 1;
+    sun0.Attenuation0 = 0;
+    sun0.Attenuation1 = 0;
+    sun0.Direction = ysVector4(0.0f, 0.0f, 0.0f);
+    m_world->getEngine().AddLight(sun0);
+
+    dbasic::Light sun1;
+    sun1.Position = ysVector4(57.0f, 10.0f, 10.0f);
+    sun1.Color = ysVector4(255 / 255.0f, 255 / 255.0f, 255 / 255.0f, 0.0f);
+    sun1.Color.Scale(80.0f);
+    sun1.FalloffEnabled = 1;
+    sun1.Attenuation0 = 0;
+    sun1.Attenuation1 = 0;
+    sun1.Direction = ysVector4(0.0f, 0.0f, 0.0f);
+    m_world->getEngine().AddLight(sun1);
+
+    dbasic::Light sun2;
+    sun2.Position = ysVector4(30.0f, 10.0f, 10.0f);
+    sun2.Color = ysVector4(255 / 255.0f, 255 / 255.0f, 255 / 255.0f, 0.0f);
+    sun2.Color.Scale(80.0f);
+    sun2.FalloffEnabled = 1;
+    sun2.Attenuation0 = 0;
+    sun2.Attenuation1 = 0;
+    sun2.Direction = ysVector4(0.0f, 0.0f, 0.0f);
+    m_world->getEngine().AddLight(sun2);
 
     dbasic::Light backLight;  
     backLight.Position = ysVector4(7.0f, 1.0f, 2.0f);    

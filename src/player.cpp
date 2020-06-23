@@ -56,6 +56,8 @@ c_adv::Player::~Player() {
 void c_adv::Player::initialize() {
     GameObject::initialize();
 
+    addTag(Tag::Dynamic);
+
     RigidBody.SetHint(dphysics::RigidBody::RigidBodyHint::Dynamic);
     RigidBody.SetInverseMass(1.0f);
     RigidBody.SetAlwaysAwake(true);
@@ -102,7 +104,6 @@ void c_adv::Player::initialize() {
 void c_adv::Player::process() {
     GameObject::process();
 
-    RigidBody.ClearAccumulators();
     RigidBody.AddForceWorldSpace(
         ysMath::LoadVector(0.0f, -15.0f / RigidBody.GetInverseMass(), 0.0f),
         RigidBody.Transform.GetWorldPosition());
@@ -159,8 +160,8 @@ bool c_adv::Player::isOnSurface() {
         if (getCollidingObject(col)->hasTag(Tag::Ledge)) continue;
 
         if (!col->m_sensor && !col->IsGhost()) {
-            ysVector normal = col->m_normal;
-            if (std::abs(ysMath::GetScalar(ysMath::Dot(normal, ysMath::Constants::YAxis))) > 0.5f) {
+            ysVector normal = (col->m_body1 == &RigidBody) ? col->m_normal : ysMath::Negate(col->m_normal);
+            if (ysMath::GetScalar(ysMath::Dot(normal, ysMath::Constants::YAxis)) > 0.5f) {
                 return true;
             }
         }

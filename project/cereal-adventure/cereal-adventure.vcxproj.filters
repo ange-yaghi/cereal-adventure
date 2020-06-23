@@ -28,6 +28,12 @@
     <Filter Include="Source Files\utilities">
       <UniqueIdentifier>{fbd25c9b-4c64-4648-aba2-2edaa02d454c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\colors">
+      <UniqueIdentifier>{5ffa741f-e87a-4e0d-acf6-7583624c7a81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\colors">
+      <UniqueIdentifier>{d1010010-6429-478a-9e00-490db9bb79e6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -97,6 +103,27 @@
       <Filter>Source Files\game-objects</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\single_shelf.cpp">
+      <Filter>Source Files\game-objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\vase.cpp">
+      <Filter>Source Files\game-objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\cabinet.cpp">
+      <Filter>Source Files\game-objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sink.cpp">
+      <Filter>Source Files\game-objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\static_art.cpp">
+      <Filter>Source Files\game-objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\colors.cpp">
+      <Filter>Source Files\colors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ceiling_light_source.cpp">
+      <Filter>Source Files\game-objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\stove_hood.cpp">
       <Filter>Source Files\game-objects</Filter>
     </ClCompile>
   </ItemGroup>
@@ -171,6 +198,30 @@
       <Filter>Header Files\game-objects</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\single_shelf.h">
+      <Filter>Header Files\game-objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\vase.h">
+      <Filter>Header Files\game-objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\cabinet.h">
+      <Filter>Header Files\game-objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\game_objects.h">
+      <Filter>Header Files\game-objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\sink.h">
+      <Filter>Header Files\game-objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\static_art.h">
+      <Filter>Header Files\game-objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\colors.h">
+      <Filter>Header Files\colors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ceiling_light_source.h">
+      <Filter>Header Files\game-objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\stove_hood.h">
       <Filter>Header Files\game-objects</Filter>
     </ClInclude>
   </ItemGroup>

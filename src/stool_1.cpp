@@ -1,6 +1,7 @@
 #include "../include/stool_1.h"
 
 #include "../include/world.h"
+#include "../include/colors.h"
 
 dbasic::ModelAsset *c_adv::Stool_1::m_stoolAsset = nullptr;
 
@@ -29,7 +30,7 @@ void c_adv::Stool_1::initialize() {
 
 void c_adv::Stool_1::render() {
     m_world->getEngine().ResetBrdfParameters();
-    m_world->getEngine().SetBaseColor(ysColor::srgbiToLinear(50, 50, 50));
+    m_world->getEngine().SetBaseColor(CyberYellow);
 
     m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
     m_world->getEngine().DrawModel(m_stoolAsset, 1.0f, nullptr);

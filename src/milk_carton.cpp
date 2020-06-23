@@ -1,6 +1,7 @@
 #include "../include/milk_carton.h"
 
 #include "../include/world.h"
+#include "../include/colors.h"
 
 dbasic::ModelAsset *c_adv::MilkCarton::m_placeholderAsset = nullptr;
 
@@ -29,7 +30,7 @@ void c_adv::MilkCarton::initialize() {
 
 void c_adv::MilkCarton::render() {
     m_world->getEngine().ResetBrdfParameters();
-    m_world->getEngine().SetBaseColor(ysColor::srgbiToLinear(128, 128, 128));
+    m_world->getEngine().SetBaseColor(CyberYellow);
 
     m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
     m_world->getEngine().DrawModel(m_placeholderAsset, 1.0f, nullptr);

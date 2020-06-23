@@ -1,17 +1,6 @@
 #include "../include/asset_loader.h"
 
-#include "../include/player.h"
-#include "../include/test_obstacle.h"
-#include "../include/ledge.h"
-#include "../include/counter.h"
-#include "../include/toaster.h"
-#include "../include/shelves.h"
-#include "../include/milk_carton.h"
-#include "../include/fridge.h"
-#include "../include/stool_1.h"
-#include "../include/microwave.h"
-#include "../include/oven.h"
-#include "../include/single_shelf.h"
+#include "../include/game_objects.h"
 
 c_adv::AssetLoader::AssetLoader() {
     /* void */
@@ -40,7 +29,7 @@ void c_adv::AssetLoader::createAllMaterials(dbasic::AssetManager *am) {
 
     dbasic::Material *playerMaterial = am->NewMaterial();
     playerMaterial->SetName("PlayerMaterial");
-    playerMaterial->SetDiffuseColor(ysColor::srgbiToLinear(0x2c, 0x3e, 0x50));
+    playerMaterial->SetDiffuseColor(ysColor::srgbiToLinear(240, 240, 240));
 }
 
 void c_adv::AssetLoader::loadAllTextures(const dbasic::Path &assetPath, dbasic::AssetManager *am) {
@@ -73,6 +62,10 @@ void c_adv::AssetLoader::loadAllAssets(const dbasic::Path &assetPath, dbasic::As
     Microwave::configureAssets(am);
     Oven::configureAssets(am);
     SingleShelf::configureAssets(am);
+    Vase::configureAssets(am);
+    Cabinet::configureAssets(am);
+    Sink::configureAssets(am);
+    StoveHood::configureAssets(am);
 }
 
 void c_adv::AssetLoader::loadAllAudioAssets(const dbasic::Path &assetPath, dbasic::AssetManager *am) {
