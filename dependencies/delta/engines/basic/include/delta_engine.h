@@ -58,8 +58,8 @@ namespace dbasic {
         ysError SetAmbientLight(const ysVector4 &ambient);
 
         ysError DrawImage(ysTexture *image, int layer = 0, float scaleX = 1.0f, float scaleY = 1.0f, float texOffsetU = 0.0f, float texOffsetV = 0.0f, float texScaleX = 1.0f, float texScaleY = 1.0f);
-        ysError DrawBox(float width, float height, int layer = 0, bool lit = true);
-        ysError DrawAxis(const ysVector &position, const ysVector &direction, float width, float length, int layer = 0, bool lit = false);
+        ysError DrawBox(float width, float height, int layer = 0);
+        ysError DrawAxis(const ysVector &position, const ysVector &direction, float width, float length, int layer = 0);
         ysError DrawModel(ModelAsset *model, float scale, ysTexture *texture, int layer = 0, bool lit = true);
         ysError DrawRenderSkeleton(RenderSkeleton *skeleton, float scale, int layer);
         ysError LoadTexture(ysTexture **image, const char *fname);
@@ -107,9 +107,15 @@ namespace dbasic {
         bool IsKeyDown(ysKeyboard::KEY_CODE key);
         bool ProcessKeyDown(ysKeyboard::KEY_CODE key);
 
-        bool IsMouseKeyDown(ysMouse::BUTTON_CODE key);
+        bool IsMouseKeyDown(ysMouse::Button key);
         int GetMouseWheel();
         void GetMousePos(int *x, int *y);
+
+        void SetCursorPositionLock(bool lock) { m_cursorPositionLocked = lock; }
+        bool GetCursorPositionLock() { return m_cursorPositionLocked; }
+
+        void SetCursorHidden(bool hidden) { m_cursorHidden = hidden; }
+        bool GetCursorHidden() const { return m_cursorHidden; }
 
         float GetFrameLength();
         float GetAverageFramerate();
@@ -118,6 +124,7 @@ namespace dbasic {
         void SetBaseColor(const ysVector &color);
         void ResetBaseColor();
 
+        void SetLit(bool lit);
         void SetEmission(const ysVector &emission);
         void SetSpecularMix(float specularMix);
         void SetDiffuseMix(float diffuseMix);
@@ -220,6 +227,10 @@ namespace dbasic {
         // Settings
         float m_clearColor[4];
 
+        // Cursor
+        bool m_cursorPositionLocked;
+        bool m_cursorHidden;
+
     protected:
         // Initialization Routines
         ysError InitializeGeometry();
@@ -227,6 +238,7 @@ namespace dbasic {
 
     protected:
         // Drawing queues
+        // TODO: these should not be on the stack
         ysExpandingArray<DrawCall, 256> m_drawQueue[MAX_LAYERS];
         ysExpandingArray<DrawCall, 256> m_drawQueueGui[MAX_LAYERS];
         ysError ExecuteDrawQueue(DrawTarget target);
