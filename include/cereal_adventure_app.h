@@ -12,7 +12,7 @@ namespace c_adv {
         CerealAdventureApp();
         ~CerealAdventureApp();
 
-        void Initialize(void *instance, ysContextObject::DEVICE_API api);
+        void Initialize(void *instance, ysContextObject::DeviceAPI api);
         void Run();
 
         World m_world;

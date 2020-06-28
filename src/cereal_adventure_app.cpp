@@ -8,7 +8,7 @@ c_adv::CerealAdventureApp::~CerealAdventureApp() {
     /* void */
 }
 
-void c_adv::CerealAdventureApp::Initialize(void *instance, ysContextObject::DEVICE_API api) {
+void c_adv::CerealAdventureApp::Initialize(void *instance, ysContextObject::DeviceAPI api) {
     m_world.initialize(instance, api);
 }
 

@@ -19,7 +19,7 @@ namespace c_adv {
         World();
         ~World();
 
-        void initialize(void *instance, ysContextObject::DEVICE_API api);
+        void initialize(void *instance, ysContextObject::DeviceAPI api);
         void initialSpawn();
         void run();
         void frameTick();

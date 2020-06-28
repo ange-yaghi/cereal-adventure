@@ -19,7 +19,7 @@ c_adv::World::~World() {
     /* void */
 }
 
-void c_adv::World::initialize(void *instance, ysContextObject::DEVICE_API api) {
+void c_adv::World::initialize(void *instance, ysContextObject::DeviceAPI api) {
     dbasic::Path modulePath = dbasic::GetModulePath();
     dbasic::Path confPath = modulePath.Append("delta.conf");
 
