@@ -22,6 +22,7 @@
     <ClCompile Include="..\..\src\asset_loader.cpp" />
     <ClCompile Include="..\..\src\cabinet.cpp" />
     <ClCompile Include="..\..\src\ceiling_light_source.cpp" />
+    <ClCompile Include="..\..\src\clock.cpp" />
     <ClCompile Include="..\..\src\colors.cpp" />
     <ClCompile Include="..\..\src\cooldown_timer.cpp" />
     <ClCompile Include="..\..\src\counter.cpp" />
@@ -55,6 +56,7 @@
     <ClInclude Include="..\..\include\asset_loader.h" />
     <ClInclude Include="..\..\include\cabinet.h" />
     <ClInclude Include="..\..\include\ceiling_light_source.h" />
+    <ClInclude Include="..\..\include\clock.h" />
     <ClInclude Include="..\..\include\colors.h" />
     <ClInclude Include="..\..\include\fridge.h" />
     <ClInclude Include="..\..\include\game_objects.h" />

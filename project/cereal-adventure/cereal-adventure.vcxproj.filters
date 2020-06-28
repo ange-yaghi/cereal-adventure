@@ -126,6 +126,9 @@
     <ClCompile Include="..\..\src\stove_hood.cpp">
       <Filter>Source Files\game-objects</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\clock.cpp">
+      <Filter>Source Files\utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\delta.h">
@@ -223,6 +226,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\stove_hood.h">
       <Filter>Header Files\game-objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\clock.h">
+      <Filter>Header Files\utilities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

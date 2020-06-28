@@ -65,6 +65,8 @@ namespace c_adv {
 
     protected:
         float m_health;
+        float m_fallDamageThreshold;
+        float m_fallDamageMultiplier;
         bool m_graspReady;
 
     protected:

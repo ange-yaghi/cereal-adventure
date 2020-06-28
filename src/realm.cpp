@@ -47,7 +47,10 @@ void c_adv::Realm::process() {
         g->process();
     }
 
-    PhysicsSystem.Update(getEngine().GetFrameLength());
+    // Limit min framerate to 30 fps
+    float dt = min(1 / 30.0f, getEngine().GetFrameLength());
+
+    PhysicsSystem.Update(dt);
 }
  
 void c_adv::Realm::render() {

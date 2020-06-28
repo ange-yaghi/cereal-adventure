@@ -6,7 +6,11 @@
 dbasic::ModelAsset *c_adv::StoveHood::m_stoveHoodAsset = nullptr;
 
 c_adv::StoveHood::StoveHood() {
-    /* void */
+    m_clock.setLowTime(10.0f);
+    m_clock.setHighTime(10.0f);
+
+    m_currentPower = 0.0f;
+    m_maxPower = 30.0f;
 }
 
 c_adv::StoveHood::~StoveHood() {
@@ -31,7 +35,9 @@ void c_adv::StoveHood::initialize() {
 
 void c_adv::StoveHood::render() {
     m_world->getEngine().ResetBrdfParameters();
-    m_world->getEngine().SetBaseColor(CyberYellow);
+
+    ysVector color = ysMath::Lerp(CyberYellow, DebugRed, m_currentPower / m_maxPower);
+    m_world->getEngine().SetBaseColor(color);
 
     m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
     m_world->getEngine().DrawModel(m_stoveHoodAsset, 1.0f, nullptr);
@@ -39,15 +45,34 @@ void c_adv::StoveHood::render() {
 
 void c_adv::StoveHood::process() {
     GameObject::process();
+    float dt = m_world->getEngine().GetFrameLength();
+
+    m_clock.update(dt);
+
+    if (m_clock.getState()) {
+        m_currentPower += dt * 7.0f;
+        m_currentPower = min(m_currentPower, m_maxPower);
+    }
+    else {
+        m_currentPower -= dt * 15.0f;
+        m_currentPower = max(m_currentPower, 0.0f);
+    }
 
     int collisionCount = RigidBody.GetCollisionCount();
     for (int i = 0; i < collisionCount; ++i) {
         dphysics::Collision *col = RigidBody.GetCollision(i);
 
         if (col->m_sensor) {
-            if (getCollidingObject(col)->hasTag(GameObject::Tag::Dynamic)) {
-                getCollidingObject(col)->RigidBody.AddForceLocalSpace(
-                    ysMath::LoadVector(0.0f, 50.0f, 0.0f), ysMath::Constants::Zero);
+            GameObject *obj = getCollidingObject(col);
+
+            float obj_x = ysMath::GetX(obj->RigidBody.Transform.GetWorldPosition());
+            float hood_x = ysMath::GetX(RigidBody.Transform.GetWorldPosition());
+
+            if (std::abs(obj_x - hood_x) < 1.5f) {
+                if (obj->hasTag(GameObject::Tag::Dynamic)) {
+                    obj->RigidBody.AddForceLocalSpace(
+                        ysMath::LoadVector(0.0f, m_currentPower, 0.0f), ysMath::Constants::Zero);
+                }
             }
         }
     }

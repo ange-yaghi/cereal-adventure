@@ -47,6 +47,9 @@ c_adv::Player::Player() {
 
     m_impactDamage = false;
     m_lastRunPlayhead = 0.0f;
+
+    m_fallDamageThreshold = 15.0f;
+    m_fallDamageMultiplier = 0.3f;
 }
 
 c_adv::Player::~Player() {
@@ -287,10 +290,13 @@ void c_adv::Player::processImpactDamage() {
         // TODO: check if hanging or not
 
         if (!col->m_sensor && !col->IsGhost()) {
-            ysVector closingVelocity = col->GetContactVelocity();
-            float mag = ysMath::GetScalar(ysMath::Magnitude(closingVelocity));
-            if (mag > 10.0f) {
-                m_health -= (mag - 10.0f);
+            ysVector closingVelocity = col->GetContactVelocityWorld();
+            float mag = (&RigidBody == col->m_body1)
+                ? ysMath::GetY(closingVelocity)
+                : -ysMath::GetY(closingVelocity);
+
+            if (mag < -m_fallDamageThreshold) {
+                m_health -= (abs(mag) - m_fallDamageThreshold);
 
                 m_movementCooldown.trigger();
                 m_impactDamage = true;

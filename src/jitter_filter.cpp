@@ -9,5 +9,5 @@ c_adv::JitterFilter::~JitterFilter() {
 }
 
 void c_adv::JitterFilter::Update() {
-
+    /* void */
 }

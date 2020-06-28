@@ -3,6 +3,9 @@
 
 #include "game_object.h"
 
+#include "cooldown_timer.h"
+#include "clock.h"
+
 namespace c_adv {
 
     class StoveHood : public GameObject {
@@ -14,6 +17,11 @@ namespace c_adv {
 
         virtual void render();
         virtual void process();
+
+    protected:
+        Clock m_clock;
+        float m_currentPower;
+        float m_maxPower;
 
         // Assets ----
     public:
