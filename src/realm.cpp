@@ -51,7 +51,7 @@ void c_adv::Realm::process() {
 }
  
 void c_adv::Realm::render() {
-    m_world->getEngine().SetClearColor(0x0, 0x0, 0x0);
+    m_world->getEngine().SetClearColor(ysColor::srgbiToLinear(0x000000));
 
     ysVector4 ambient = ysMath::GetVector4(ysColor::srgbiToLinear(0xCC, 0xca, 0xf9));
     ambient.Scale(0.5f);

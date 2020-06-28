@@ -133,10 +133,7 @@ void c_adv::Player::render() {
     m_world->getEngine().DrawRenderSkeleton(m_renderSkeleton, 1.0f, (int)Layer::Player);
 
     dbasic::Console *console = m_world->getEngine().GetConsole();
-    console->MoveToLocation(dbasic::GuiPoint(1, 2));
-    
-    console->SetFontForeColor(0, 0, 0, 1.0f);
-    console->SetFontBackColor(0, 0, 0, 0.0f);
+    console->MoveToOrigin();
 
     std::stringstream msg;
     ysVector position = RigidBody.Transform.GetWorldPosition();

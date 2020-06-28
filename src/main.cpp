@@ -9,7 +9,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     c_adv::CerealAdventureApp app;
     app.Initialize((void *)&hInstance, ysContextObject::OPENGL4_0);
-    app.Run();
+    app.Run(); 
 
     return 0;
 }
