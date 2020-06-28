@@ -12,7 +12,7 @@ VARIABLES = [
     ('dependencies', "{root}/dependencies"),
     ('delta', "{dependencies}/delta"),
     ('submodules',"{dependencies}/submodules"),
-    ('delta_build',"{submodules}/delta-studios/workspace/build/delta")
+    ('delta_build',"{submodules}/delta-studio/workspace/build/delta")
 ]
 
 CLEAN_DIRECTORIES = []
