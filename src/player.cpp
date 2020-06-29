@@ -37,7 +37,7 @@ c_adv::Player::Player() {
     m_ledge = nullptr;
 
     m_health = 10.0f;
-    m_ledgeGraspDistance = 3.0f;
+    m_ledgeGraspDistance = 0.5f;
     m_graspReady = false;
 
     m_direction = Direction::Forward;
@@ -50,6 +50,9 @@ c_adv::Player::Player() {
 
     m_fallDamageThreshold = 15.0f;
     m_fallDamageMultiplier = 0.3f;
+
+    m_runVelocity = 0.0f;
+    m_maxRunVelocity = 4.0f;
 }
 
 c_adv::Player::~Player() {
@@ -272,7 +275,12 @@ void c_adv::Player::releaseGrip() {
 }
 
 ysVector c_adv::Player::getGripLocationLocal() {
-    return ysMath::LoadVector(0.2f, 1.2f, 0.0f);
+    if (m_direction == Direction::Forward) {
+        return ysMath::LoadVector(0.4f, 1.2f, 0.0f);
+    }
+    else {
+        return ysMath::LoadVector(-0.4f, 1.2f, 0.0f);
+    }
 }
 
 ysVector c_adv::Player::getGripLocationWorld() {
@@ -311,6 +319,7 @@ void c_adv::Player::updateMotion() {
     updateGrip();
 
     ysVector v = RigidBody.GetVelocity();
+    m_runVelocity = ysMath::GetX(v);
     
     if (isOnSurface()) {
         bool brake = true;
@@ -320,16 +329,24 @@ void c_adv::Player::updateMotion() {
             }
 
             if (engine.IsKeyDown(ysKeyboard::KEY_D)) {
-                RigidBody.SetVelocity(ysMath::LoadVector(4.0f, ysMath::GetY(v), 0.0f));
                 m_nextDirection = Direction::Forward;
+
+                m_runVelocity += 20.0f * engine.GetFrameLength();
+                if (m_runVelocity > m_maxRunVelocity) m_runVelocity = m_maxRunVelocity;
 
                 brake = false;
             }
             else if (engine.IsKeyDown(ysKeyboard::KEY_A)) {
-                RigidBody.SetVelocity(ysMath::LoadVector(-4.0f, ysMath::GetY(v), 0.0f));
                 m_nextDirection = Direction::Back;
 
+                m_runVelocity -= 20.0f * engine.GetFrameLength();
+                if (m_runVelocity < -m_maxRunVelocity) m_runVelocity = -m_maxRunVelocity;
+
                 brake = false;
+            }
+
+            if (!brake) {
+                RigidBody.SetVelocity(ysMath::LoadVector(m_runVelocity, ysMath::GetY(v), 0.0f));
             }
         }
 
