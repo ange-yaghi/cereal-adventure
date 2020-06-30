@@ -142,6 +142,10 @@ namespace c_adv {
             *DamageImpact;
 
         static dbasic::SceneObjectAsset *CharacterRoot;
+        static dbasic::ModelAsset *Sphere;
+
+    protected:
+        std::string m_lastMissReason;
     };
 
 

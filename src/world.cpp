@@ -114,9 +114,17 @@ c_adv::AABB c_adv::World::getCameraExtents() const {
 }
 
 void c_adv::World::render() {
+    float offset_x = 0.0f, offset_y = 0.0f;
+    if (m_engine.IsKeyDown(ysKeyboard::KEY_DOWN)) {
+        offset_y = -5.0f;
+    }
+    else if (m_engine.IsKeyDown(ysKeyboard::KEY_UP)) {
+        offset_y = 5.0f;
+    }
+
     ysVector focusPosition = m_focus->RigidBody.Transform.GetWorldPosition();
     m_smoothCamera.setTarget(focusPosition);
-    m_smoothTarget.setTarget(focusPosition);
+    m_smoothTarget.setTarget(ysMath::Add(focusPosition, ysMath::LoadVector(offset_x, offset_y, 0.0f)));
 
     ysVector cameraTarget = m_smoothCamera.getPosition();
 

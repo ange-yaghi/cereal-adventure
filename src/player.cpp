@@ -2,6 +2,7 @@
 
 #include "../include/world.h"
 #include "../include/math_utilities.h"
+#include "../include/colors.h"
 
 #include <sstream>
 
@@ -27,6 +28,7 @@ dbasic::AudioAsset
     *c_adv::Player::DamageImpact = nullptr;
 
 dbasic::SceneObjectAsset *c_adv::Player::CharacterRoot = nullptr;
+dbasic::ModelAsset *c_adv::Player::Sphere = nullptr;
 
 c_adv::Player::Player() {
     m_armsChannel = nullptr;
@@ -37,7 +39,7 @@ c_adv::Player::Player() {
     m_ledge = nullptr;
 
     m_health = 10.0f;
-    m_ledgeGraspDistance = 0.5f;
+    m_ledgeGraspDistance = 1.5f;
     m_graspReady = false;
 
     m_direction = Direction::Forward;
@@ -53,6 +55,8 @@ c_adv::Player::Player() {
 
     m_runVelocity = 0.0f;
     m_maxRunVelocity = 4.0f;
+
+    m_lastMissReason = "";
 }
 
 c_adv::Player::~Player() {
@@ -138,6 +142,12 @@ void c_adv::Player::render() {
     m_world->getEngine().ResetBrdfParameters();
     m_world->getEngine().DrawRenderSkeleton(m_renderSkeleton, 1.0f, (int)Layer::Player);
 
+    m_world->getEngine().ResetBrdfParameters();
+    m_world->getEngine().SetLit(false);
+    m_world->getEngine().SetBaseColor(CyberYellow);
+    m_world->getEngine().SetObjectTransform(ysMath::TranslationTransform(getGripLocationWorld()));
+    m_world->getEngine().DrawModel(Sphere, 1.0f, nullptr);
+
     dbasic::Console *console = m_world->getEngine().GetConsole();
     console->MoveToOrigin();
 
@@ -151,7 +161,9 @@ void c_adv::Player::render() {
         m_realm->getAliveObjectCount() << "/" << 
         m_realm->getDeadObjectCount() << "/" << 
         m_realm->getVisibleObjectCount() << "          \n";
-    msg << "Healh " << m_health << "\n";
+    msg << "Health: " << m_health << "\n";
+    msg << "Last Miss: " << m_lastMissReason << "              \n";
+
     console->DrawGeneralText(msg.str().c_str());
 }
 
@@ -220,11 +232,12 @@ void c_adv::Player::updateGrip() {
 void c_adv::Player::attemptGrip() {
     int collisionCount = RigidBody.GetCollisionCount();
 
-    float closestLedgeDistance = m_ledgeGraspDistance;
+    float closestLedgeDistance = FLT_MAX;
     GameObject *closestLedge = nullptr;
 
     ysVector gripLocation = getGripLocationWorld();
     float gy = ysMath::GetY(gripLocation);
+    float gx = ysMath::GetX(gripLocation);
 
     for (int i = 0; i < collisionCount; ++i) {
         dphysics::Collision *col = RigidBody.GetCollision(i);
@@ -234,14 +247,20 @@ void c_adv::Player::attemptGrip() {
         if (col->m_sensor && !col->IsGhost()) {
             ysVector ledgePosition = ledge->RigidBody.Transform.GetWorldPosition();
             float ly = ysMath::GetY(ledgePosition);
+            float lx = ysMath::GetX(ledgePosition);
 
             if (ly < gy) {
-                float d = distance(ledgePosition, gripLocation);
-                if (d < closestLedgeDistance) {
+                float d = distance(gripLocation, ledgePosition);
+                if (d < closestLedgeDistance &&
+                    std::abs(gx - lx) < 0.1f &&
+                    std::abs(gy - ly) < m_ledgeGraspDistance) 
+                {
                     closestLedge = ledge;
                     closestLedgeDistance = d;
                 }
+                else m_lastMissReason = "Too Far";
             }
+            else m_lastMissReason = "Below";
         }
     }
 
@@ -257,9 +276,11 @@ void c_adv::Player::attemptGrip() {
             m_gripLink->SetAnchor(closestLedge->RigidBody.Transform.GetWorldPosition());
             m_gripLink->SetGripLocal(getGripLocationLocal());
         }
+
+        m_lastMissReason = "";
     }
     else {
-        m_ledge = closestLedge;
+        m_ledge = nullptr;
         m_graspReady = false;
         releaseGrip();
     }
@@ -276,10 +297,10 @@ void c_adv::Player::releaseGrip() {
 
 ysVector c_adv::Player::getGripLocationLocal() {
     if (m_direction == Direction::Forward) {
-        return ysMath::LoadVector(0.4f, 1.2f, 0.0f);
+        return ysMath::LoadVector(0.4f, 1.3f, 0.0f);
     }
     else {
-        return ysMath::LoadVector(-0.4f, 1.2f, 0.0f);
+        return ysMath::LoadVector(-0.4f, 1.3f, 0.0f);
     }
 }
 
@@ -319,13 +340,17 @@ void c_adv::Player::updateMotion() {
     updateGrip();
 
     ysVector v = RigidBody.GetVelocity();
-    m_runVelocity = ysMath::GetX(v);
-    
+
     if (isOnSurface()) {
         bool brake = true;
         if (m_movementCooldown.ready()) {
             if (engine.ProcessKeyDown(ysKeyboard::KEY_SPACE)) {
-                RigidBody.AddImpulseWorldSpace(ysMath::LoadVector(0.0f, 8.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
+                if (engine.IsKeyDown(ysKeyboard::KEY_SHIFT)) {
+                    RigidBody.AddImpulseWorldSpace(ysMath::LoadVector(0.0f, 8.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
+                }
+                else {
+                    RigidBody.AddImpulseWorldSpace(ysMath::LoadVector(0.0f, 6.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
+                }
             }
 
             if (engine.IsKeyDown(ysKeyboard::KEY_D)) {
@@ -351,6 +376,7 @@ void c_adv::Player::updateMotion() {
         }
 
         if (brake) {
+            m_runVelocity = 0.0f;
             if (std::abs(ysMath::GetX(v)) > 0.01f) {
                 RigidBody.AddForceWorldSpace(ysMath::LoadVector(-ysMath::GetX(v) * 10, 0.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
             }
@@ -762,4 +788,6 @@ void c_adv::Player::configureAssets(dbasic::AssetManager *am) {
     AudioFootstep03 = am->GetAudioAsset("CerealBox::Footstep03");
     AudioFootstep04 = am->GetAudioAsset("CerealBox::Footstep04");
     DamageImpact = am->GetAudioAsset("CerealBox::DamageImpact");
+
+    Sphere = am->GetModelAsset("Sphere");
 }

@@ -32,7 +32,8 @@ void c_adv::Ledge::render() {
     m_world->getEngine().ResetBrdfParameters();
     m_world->getEngine().SetBaseColor(ysColor::srgbiToLinear(255, 255, 0));
     m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
-    m_world->getEngine().DrawModel(m_ledgeAsset, 1.0f, nullptr, 0, false);
+    m_world->getEngine().SetLit(false);
+    m_world->getEngine().DrawModel(m_ledgeAsset, 1.0f, nullptr, 0);
 }
 
 void c_adv::Ledge::process() {
