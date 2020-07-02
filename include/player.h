@@ -40,28 +40,31 @@ namespace c_adv {
         ~Player();
 
         virtual void initialize();
-        virtual void process();
+        virtual void process(float dt);
         virtual void render();
 
+        bool isHurt();
         bool isOnSurface();
         bool isHanging();
 
         void updateGrip();
         void attemptGrip();
+        GameObject *findGrip();
         void releaseGrip();
 
         ysVector getGripLocationLocal();
         ysVector getGripLocationWorld();
 
     protected:
-        void updateMotion();
-        void updateAnimation();
+        void updateMotion(float dt);
+        void updateAnimation(float dt);
         void legsAnimationFsm();
         void rotationAnimationFsm();
         void armsAnimationFsm();
         void updateSoundEffects();
 
         void processImpactDamage();
+        void updateGroundTimer(float dt);
 
     protected:
         float m_health;
@@ -69,6 +72,7 @@ namespace c_adv {
         float m_fallDamageMultiplier;
         float m_runVelocity;
         float m_maxRunVelocity;
+        float m_groundTimer;
         bool m_graspReady;
 
     protected:
@@ -104,9 +108,6 @@ namespace c_adv {
         Direction m_nextDirection;
         LegsState m_legsState;
         ArmsState m_armsState;
-
-        // Whether impact damage was taken in the last frame
-        bool m_impactDamage;
 
         // Sound effect internals
         float m_lastRunPlayhead;

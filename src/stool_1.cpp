@@ -36,10 +36,6 @@ void c_adv::Stool_1::render() {
     m_world->getEngine().DrawModel(m_stoolAsset, 1.0f, nullptr);
 }
 
-void c_adv::Stool_1::process() {
-    GameObject::process();
-}
-
 void c_adv::Stool_1::configureAssets(dbasic::AssetManager *am) {
     m_stoolAsset = am->GetModelAsset("Stool_1");
 }

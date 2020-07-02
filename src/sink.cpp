@@ -36,10 +36,6 @@ void c_adv::Sink::render() {
     m_world->getEngine().DrawModel(m_sinkAsset, 1.0f, nullptr);
 }
 
-void c_adv::Sink::process() {
-    GameObject::process();
-}
-
 void c_adv::Sink::configureAssets(dbasic::AssetManager *am) {
     m_sinkAsset = am->GetModelAsset("Sink");
 }

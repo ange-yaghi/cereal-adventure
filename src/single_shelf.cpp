@@ -36,10 +36,6 @@ void c_adv::SingleShelf::render() {
     m_world->getEngine().DrawModel(m_singleShelfAsset, 1.0f, nullptr);
 }
 
-void c_adv::SingleShelf::process() {
-    GameObject::process();
-}
-
 void c_adv::SingleShelf::configureAssets(dbasic::AssetManager *am) {
     m_singleShelfAsset = am->GetModelAsset("SingleShelf");
 }

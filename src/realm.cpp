@@ -34,7 +34,7 @@ void c_adv::Realm::unregisterGameObject(GameObject *object) {
     m_gameObjects.pop_back();
 }
 
-void c_adv::Realm::process() {
+void c_adv::Realm::process(float dt) {
     cleanObjectList();
     spawnObjects();
     respawnObjects();
@@ -44,11 +44,8 @@ void c_adv::Realm::process() {
 
         g->createVisualBounds();
         g->resetAccumulators();
-        g->process();
+        g->process(dt);
     }
-
-    // Limit min framerate to 30 fps
-    float dt = min(1 / 30.0f, getEngine().GetFrameLength());
 
     PhysicsSystem.Update(dt);
 }

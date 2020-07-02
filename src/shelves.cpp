@@ -36,10 +36,6 @@ void c_adv::Shelves::render() {
     m_world->getEngine().DrawModel(m_shelvesAsset, 1.0f, nullptr);
 }
 
-void c_adv::Shelves::process() {
-    GameObject::process();
-}
-
 void c_adv::Shelves::configureAssets(dbasic::AssetManager *am) {
     m_shelvesAsset = am->GetModelAsset("Shelves");
 }

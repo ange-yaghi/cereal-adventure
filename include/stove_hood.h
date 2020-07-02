@@ -16,7 +16,7 @@ namespace c_adv {
         virtual void initialize();
 
         virtual void render();
-        virtual void process();
+        virtual void process(float dt);
 
     protected:
         Clock m_clock;

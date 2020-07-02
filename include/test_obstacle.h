@@ -16,7 +16,6 @@ namespace c_adv {
         virtual void destroy();
 
         virtual void render();
-        virtual void process();
 
     protected:
         Ledge *m_ledge0, *m_ledge1, *m_ledge2, *m_ledge3;

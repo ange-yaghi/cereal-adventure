@@ -13,7 +13,6 @@ namespace c_adv {
         virtual void initialize();
 
         virtual void render();
-        virtual void process();
 
         // Assets ----
     public:

@@ -35,7 +35,7 @@ c_adv::GameObject::~GameObject() {
     /* void */
 }
 
-void c_adv::GameObject::process() {
+void c_adv::GameObject::process(float dt) {
     if (inGraceMode() && !colliding()) {
         setGraceMode(false);
     }

@@ -36,8 +36,8 @@ void c_adv::MilkCarton::render() {
     m_world->getEngine().DrawModel(m_placeholderAsset, 1.0f, nullptr);
 }
 
-void c_adv::MilkCarton::process() {
-    GameObject::process();
+void c_adv::MilkCarton::process(float dt) {
+    GameObject::process(dt);
 
     RigidBody.ClearAccumulators();
     RigidBody.AddForceWorldSpace(

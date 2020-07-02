@@ -39,7 +39,7 @@ c_adv::Player::Player() {
     m_ledge = nullptr;
 
     m_health = 10.0f;
-    m_ledgeGraspDistance = 1.5f;
+    m_ledgeGraspDistance = 0.75f;
     m_graspReady = false;
 
     m_direction = Direction::Forward;
@@ -47,7 +47,6 @@ c_adv::Player::Player() {
     m_legsState = LegsState::Idle;
     m_armsState = ArmsState::Idle;
 
-    m_impactDamage = false;
     m_lastRunPlayhead = 0.0f;
 
     m_fallDamageThreshold = 15.0f;
@@ -57,6 +56,7 @@ c_adv::Player::Player() {
     m_maxRunVelocity = 4.0f;
 
     m_lastMissReason = "";
+    m_groundTimer = FLT_MAX;
 }
 
 c_adv::Player::~Player() {
@@ -111,25 +111,30 @@ void c_adv::Player::initialize() {
     m_movementCooldown.setCooldownPeriod(4.0f);
 }
 
-void c_adv::Player::process() {
-    GameObject::process();
+void c_adv::Player::process(float dt) {
+    GameObject::process(dt);
 
-    RigidBody.AddForceWorldSpace(
-        ysMath::LoadVector(0.0f, -15.0f / RigidBody.GetInverseMass(), 0.0f),
-        RigidBody.Transform.GetWorldPosition());
+    ysVector v = RigidBody.GetVelocity();
+    if (ysMath::GetY(v) > -15.0f) {
+        RigidBody.AddForceWorldSpace(
+            ysMath::LoadVector(0.0f, -15.0f / RigidBody.GetInverseMass(), 0.0f),
+            RigidBody.Transform.GetWorldPosition());
+    }
 
     m_springConnector.setTarget(RigidBody.Transform.GetWorldPosition());
-    m_springConnector.update(m_world->getEngine().GetFrameLength());
+    m_springConnector.update(dt);
 
     m_renderTransform.SetPosition(m_springConnector.getPosition());
+    //m_renderTransform.SetPosition(RigidBody.Transform.GetWorldPosition());
     m_renderTransform.SetOrientation(RigidBody.Transform.GetWorldOrientation());
 
+    updateGroundTimer(dt);
     processImpactDamage();
-    updateMotion();
-    updateAnimation();
+    updateMotion(dt);
+    updateAnimation(dt);
 
-    m_gripCooldown.update(m_world->getEngine().GetFrameLength());
-    m_movementCooldown.update(m_world->getEngine().GetFrameLength());
+    m_gripCooldown.update(dt);
+    m_movementCooldown.update(dt);
 
     if (m_world->getEngine().ProcessKeyDown(ysKeyboard::KEY_0)) {
         m_world->getEngine().PlayAudio(AudioFootstep01);
@@ -144,9 +149,12 @@ void c_adv::Player::render() {
 
     m_world->getEngine().ResetBrdfParameters();
     m_world->getEngine().SetLit(false);
-    m_world->getEngine().SetBaseColor(CyberYellow);
+    m_world->getEngine().SetBaseColor(DebugRed);
     m_world->getEngine().SetObjectTransform(ysMath::TranslationTransform(getGripLocationWorld()));
-    m_world->getEngine().DrawModel(Sphere, 1.0f, nullptr);
+
+    if (findGrip() != nullptr) {
+        m_world->getEngine().DrawModel(Sphere, 0.2f, nullptr);
+    }
 
     dbasic::Console *console = m_world->getEngine().GetConsole();
     console->MoveToOrigin();
@@ -163,26 +171,26 @@ void c_adv::Player::render() {
         m_realm->getVisibleObjectCount() << "          \n";
     msg << "Health: " << m_health << "\n";
     msg << "Last Miss: " << m_lastMissReason << "              \n";
+    msg << "Status: ";
+    if (isHanging()) msg << "HANGING ";
+    if (isOnSurface()) msg << "ON SURFACE ";
+    msg << "             \n";
 
     console->DrawGeneralText(msg.str().c_str());
 }
 
+bool c_adv::Player::isHurt() {
+    return !m_movementCooldown.ready();
+}
+
 bool c_adv::Player::isOnSurface() {
-    int collisionCount = RigidBody.GetCollisionCount();
+    constexpr float VelocityThreshold = 1.0f;
 
-    for (int i = 0; i < collisionCount; ++i) {
-        dphysics::Collision *col = RigidBody.GetCollision(i);
-        if (getCollidingObject(col)->hasTag(Tag::Ledge)) continue;
-
-        if (!col->m_sensor && !col->IsGhost()) {
-            ysVector normal = (col->m_body1 == &RigidBody) ? col->m_normal : ysMath::Negate(col->m_normal);
-            if (ysMath::GetScalar(ysMath::Dot(normal, ysMath::Constants::YAxis)) > 0.5f) {
-                return true;
-            }
-        }
+    if (std::abs(ysMath::GetY(RigidBody.GetVelocity())) > VelocityThreshold) {
+        return false;
     }
 
-    return false;
+    return (m_groundTimer < 1 / 10.0f);
 }
 
 bool c_adv::Player::isHanging() {
@@ -230,6 +238,29 @@ void c_adv::Player::updateGrip() {
 }
 
 void c_adv::Player::attemptGrip() {
+    GameObject *closestLedge = findGrip();
+
+    if (closestLedge != nullptr) {
+        m_ledge = closestLedge;
+        m_graspReady = true;
+
+        if (m_gripLink != nullptr) {
+            m_gripLink->SetAnchor(closestLedge->RigidBody.Transform.GetWorldPosition());
+        }
+        else {
+            m_gripLink = m_realm->PhysicsSystem.CreateLink<dphysics::LedgeLink>(&this->RigidBody, &closestLedge->RigidBody);
+            m_gripLink->SetAnchor(closestLedge->RigidBody.Transform.GetWorldPosition());
+            m_gripLink->SetGripLocal(getGripLocationLocal());
+        }
+    }
+    else {
+        m_ledge = nullptr;
+        m_graspReady = false;
+        releaseGrip();
+    }
+}
+
+c_adv::GameObject *c_adv::Player::findGrip() {
     int collisionCount = RigidBody.GetCollisionCount();
 
     float closestLedgeDistance = FLT_MAX;
@@ -252,38 +283,16 @@ void c_adv::Player::attemptGrip() {
             if (ly < gy) {
                 float d = distance(gripLocation, ledgePosition);
                 if (d < closestLedgeDistance &&
-                    std::abs(gx - lx) < 0.1f &&
-                    std::abs(gy - ly) < m_ledgeGraspDistance) 
-                {
+                    std::abs(gx - lx) < 0.4f &&
+                    std::abs(gy - ly) < m_ledgeGraspDistance) {
                     closestLedge = ledge;
                     closestLedgeDistance = d;
                 }
-                else m_lastMissReason = "Too Far";
             }
-            else m_lastMissReason = "Below";
         }
     }
 
-    if (closestLedge != nullptr) {
-        m_ledge = closestLedge;
-        m_graspReady = true;
-
-        if (m_gripLink != nullptr) {
-            m_gripLink->SetAnchor(closestLedge->RigidBody.Transform.GetWorldPosition());
-        }
-        else {
-            m_gripLink = m_realm->PhysicsSystem.CreateLink<dphysics::LedgeLink>(&this->RigidBody, &closestLedge->RigidBody);
-            m_gripLink->SetAnchor(closestLedge->RigidBody.Transform.GetWorldPosition());
-            m_gripLink->SetGripLocal(getGripLocationLocal());
-        }
-
-        m_lastMissReason = "";
-    }
-    else {
-        m_ledge = nullptr;
-        m_graspReady = false;
-        releaseGrip();
-    }
+    return closestLedge;
 }
 
 void c_adv::Player::releaseGrip() {
@@ -309,9 +318,6 @@ ysVector c_adv::Player::getGripLocationWorld() {
 }
 
 void c_adv::Player::processImpactDamage() {
-    // Clear the impact damage flag
-    m_impactDamage = false;
-
     int collisionCount = RigidBody.GetCollisionCount();
 
     for (int i = 0; i < collisionCount; ++i) {
@@ -326,15 +332,37 @@ void c_adv::Player::processImpactDamage() {
 
             if (mag < -m_fallDamageThreshold) {
                 m_health -= (abs(mag) - m_fallDamageThreshold);
-
                 m_movementCooldown.trigger();
-                m_impactDamage = true;
             }
         }
     }
 }
 
-void c_adv::Player::updateMotion() {
+void c_adv::Player::updateGroundTimer(float dt) {
+    bool groundCollision = false;
+    int collisionCount = RigidBody.GetCollisionCount();
+    for (int i = 0; i < collisionCount; ++i) {
+        dphysics::Collision *col = RigidBody.GetCollision(i);
+        if (getCollidingObject(col)->hasTag(Tag::Ledge)) continue;
+
+        if (!col->m_sensor && !col->IsGhost()) {
+            ysVector normal = (col->m_body1 == &RigidBody) ? col->m_normal : ysMath::Negate(col->m_normal);
+            if (ysMath::GetScalar(ysMath::Dot(normal, ysMath::Constants::YAxis)) > 0.5f) {
+                groundCollision = true;
+                break;
+            }
+        }
+    }
+
+    if (groundCollision) {
+        m_groundTimer = 0.0f;
+    }
+    else if (m_groundTimer != FLT_MAX) {
+        m_groundTimer += dt;
+    }
+}
+
+void c_adv::Player::updateMotion(float dt) {
     dbasic::DeltaEngine &engine = m_world->getEngine();
 
     updateGrip();
@@ -356,7 +384,7 @@ void c_adv::Player::updateMotion() {
             if (engine.IsKeyDown(ysKeyboard::KEY_D)) {
                 m_nextDirection = Direction::Forward;
 
-                m_runVelocity += 20.0f * engine.GetFrameLength();
+                m_runVelocity += 20.0f * dt;
                 if (m_runVelocity > m_maxRunVelocity) m_runVelocity = m_maxRunVelocity;
 
                 brake = false;
@@ -364,7 +392,7 @@ void c_adv::Player::updateMotion() {
             else if (engine.IsKeyDown(ysKeyboard::KEY_A)) {
                 m_nextDirection = Direction::Back;
 
-                m_runVelocity -= 20.0f * engine.GetFrameLength();
+                m_runVelocity -= 20.0f * dt;
                 if (m_runVelocity < -m_maxRunVelocity) m_runVelocity = -m_maxRunVelocity;
 
                 brake = false;
@@ -402,12 +430,12 @@ void c_adv::Player::updateMotion() {
     }
 }
 
-void c_adv::Player::updateAnimation() {
+void c_adv::Player::updateAnimation(float dt) {
     legsAnimationFsm();
     rotationAnimationFsm();
     armsAnimationFsm();
 
-    m_renderSkeleton->UpdateAnimation(m_world->getEngine().GetFrameLength() * 60.0f);
+    m_renderSkeleton->UpdateAnimation(dt * 60.0f);
 }
 
 void c_adv::Player::legsAnimationFsm() {
@@ -437,7 +465,7 @@ void c_adv::Player::legsAnimationFsm() {
             }
         }
         else if (current == LegsState::Falling || current == LegsState::FastFalling) {
-            if (!m_impactDamage) {
+            if (!isHurt()) {
                 if (std::abs(hMag) < 1.0f) {
                     next = LegsState::Idle;
                     nextFade = 20.0f;
@@ -463,7 +491,7 @@ void c_adv::Player::legsAnimationFsm() {
             }
         }
         else if (current == LegsState::ImpactDamage) {
-            if (m_movementCooldown.ready()) {
+            if (!isHurt()) {
                 next = LegsState::Idle;
                 nextFade = 20.0f;
             }
@@ -592,7 +620,7 @@ void c_adv::Player::armsAnimationFsm() {
     float queuedClip = 0.0f;
 
     if (isOnSurface()) {
-        if (m_impactDamage) {
+        if (isHurt()) {
             next = ArmsState::ImpactDamage;
             nextFade = 20.0f;
         }

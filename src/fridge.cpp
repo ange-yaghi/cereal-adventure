@@ -36,10 +36,6 @@ void c_adv::Fridge::render() {
     m_world->getEngine().DrawModel(m_fridgeAsset, 1.0f, nullptr);
 }
 
-void c_adv::Fridge::process() {
-    GameObject::process();
-}
-
 void c_adv::Fridge::configureAssets(dbasic::AssetManager *am) {
     m_fridgeAsset = am->GetModelAsset("Fridge");
 }

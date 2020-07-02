@@ -36,10 +36,6 @@ void c_adv::Counter::render() {
     m_world->getEngine().DrawModel(m_counterAsset, 1.0f, nullptr);
 }
 
-void c_adv::Counter::process() {
-    GameObject::process();
-}
-
 void c_adv::Counter::configureAssets(dbasic::AssetManager *am) {
     m_counterAsset = am->GetModelAsset("Counter_1");
 }

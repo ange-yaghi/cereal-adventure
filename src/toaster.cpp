@@ -36,10 +36,6 @@ void c_adv::Toaster::render() {
     m_world->getEngine().DrawModel(m_toasterAsset, 1.0f, nullptr);
 }
 
-void c_adv::Toaster::process() {
-    GameObject::process();
-}
-
 void c_adv::Toaster::configureAssets(dbasic::AssetManager *am) {
     m_toasterAsset = am->GetModelAsset("Toaster");
 }

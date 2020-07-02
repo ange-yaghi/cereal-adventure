@@ -33,7 +33,3 @@ void c_adv::CeilingLightSource::render() {
 
     m_world->getEngine().AddLight(light); 
 }
-
-void c_adv::CeilingLightSource::process() {
-    GameObject::process();
-}

@@ -36,10 +36,6 @@ void c_adv::Ledge::render() {
     m_world->getEngine().DrawModel(m_ledgeAsset, 1.0f, nullptr, 0);
 }
 
-void c_adv::Ledge::process() {
-    /* void */
-}
-
 void c_adv::Ledge::configureAssets(dbasic::AssetManager *am) {
     m_ledgeAsset = am->GetModelAsset("LedgeDebug");
 }

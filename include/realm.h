@@ -24,7 +24,7 @@ namespace c_adv {
 
         void updateRealms();
 
-        void process();
+        void process(float dt);
         void render();
 
         bool isIndoor() const { return m_indoor; }

@@ -57,10 +57,6 @@ void c_adv::TestObstacle::render() {
     m_world->getEngine().DrawModel(m_obstacleMesh, 1.0f, nullptr);
 }
 
-void c_adv::TestObstacle::process() {
-    GameObject::process();
-}
-
 void c_adv::TestObstacle::configureAssets(dbasic::AssetManager *am) {
     m_obstacleMesh = am->GetModelAsset("TestObstacle");
 }

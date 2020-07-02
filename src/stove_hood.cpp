@@ -43,9 +43,8 @@ void c_adv::StoveHood::render() {
     m_world->getEngine().DrawModel(m_stoveHoodAsset, 1.0f, nullptr);
 }
 
-void c_adv::StoveHood::process() {
-    GameObject::process();
-    float dt = m_world->getEngine().GetFrameLength();
+void c_adv::StoveHood::process(float dt) {
+    GameObject::process(dt);
 
     m_clock.update(dt);
 

@@ -36,10 +36,6 @@ void c_adv::Oven::render() {
     m_world->getEngine().DrawModel(m_ovenAsset, 1.0f, nullptr);
 }
 
-void c_adv::Oven::process() {
-    GameObject::process();
-}
-
 void c_adv::Oven::configureAssets(dbasic::AssetManager *am) {
     m_ovenAsset = am->GetModelAsset("Oven");
 }

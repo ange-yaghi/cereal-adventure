@@ -36,10 +36,6 @@ void c_adv::Cabinet::render() {
     m_world->getEngine().DrawModel(m_cabinetAsset, 1.0f, nullptr);
 }
 
-void c_adv::Cabinet::process() {
-    GameObject::process();
-}
-
 void c_adv::Cabinet::configureAssets(dbasic::AssetManager *am) {
     m_cabinetAsset = am->GetModelAsset("Cabinet");
 }

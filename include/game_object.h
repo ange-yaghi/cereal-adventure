@@ -47,7 +47,7 @@ namespace c_adv {
         virtual void destroy();
         virtual void resetAccumulators();
         virtual void render();
-        virtual void process();
+        virtual void process(float dt);
 
         virtual void onCarry();
         virtual void onDrop();

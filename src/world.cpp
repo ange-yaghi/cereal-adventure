@@ -72,9 +72,6 @@ void c_adv::World::initialSpawn() {
     m_focus = m_mainRealm->spawn<Player>();
     m_focus->RigidBody.Transform.SetPosition(ysMath::LoadVector(0.0f, 3.0f, 0.0f));
 
-    GameObject *milk = m_mainRealm->spawn<MilkCarton>();
-    milk->RigidBody.Transform.SetPosition(ysMath::LoadVector(2.0f, 5.0f, 0.0f));
-
     ysTransform root;
     dbasic::RenderSkeleton *level1 = m_assetManager.BuildRenderSkeleton(&root, m_assetManager.GetSceneObject("Level 1"));
     generateLevel(level1);
@@ -137,10 +134,13 @@ void c_adv::World::render() {
 }
 
 void c_adv::World::process() {
-    m_mainRealm->process();
+    // Limit min framerate to 30 fps
+    float dt = min(1 / 30.0f, getEngine().GetFrameLength());
 
-    m_smoothCamera.update(m_engine.GetFrameLength());
-    m_smoothTarget.update(m_engine.GetFrameLength());
+    m_mainRealm->process(dt);
+
+    m_smoothCamera.update(dt);
+    m_smoothTarget.update(dt);
 
     if (m_engine.IsKeyDown(ysKeyboard::KEY_SUBTRACT)) {
         m_cameraDistance += 0.5f;

@@ -31,7 +31,3 @@ void c_adv::StaticArt::render() {
     m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
     m_world->getEngine().DrawModel(m_asset, 1.0f, nullptr);
 }
-
-void c_adv::StaticArt::process() {
-    GameObject::process();
-}

@@ -13,7 +13,6 @@ namespace c_adv {
         virtual void initialize();
 
         virtual void render();
-        virtual void process();
 
         void setAsset(dbasic::ModelAsset *asset) { m_asset = asset; }
         dbasic::ModelAsset *getAsset() const { return m_asset; }

@@ -93,6 +93,9 @@
     <ProjectReference Include="..\..\dependencies\submodules\delta-studios\project\delta-core\delta-core.vcxproj">
       <Project>{6db2fa44-5c75-431b-85f5-baa11d6ef583}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\dependencies\submodules\delta-studio\project\delta-physics\delta-physics.vcxproj">
+      <Project>{aed09032-5029-4526-a032-5bc47185516b}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

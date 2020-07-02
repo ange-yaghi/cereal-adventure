@@ -36,8 +36,8 @@ void c_adv::Vase::render() {
     m_world->getEngine().DrawModel(m_vaseAsset, 1.0f, nullptr);
 }
 
-void c_adv::Vase::process() {
-    GameObject::process();
+void c_adv::Vase::process(float dt) {
+    GameObject::process(dt);
 
     RigidBody.ClearAccumulators();
     RigidBody.AddForceWorldSpace(

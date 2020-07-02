@@ -36,10 +36,6 @@ void c_adv::Microwave::render() {
     m_world->getEngine().DrawModel(m_microwaveAsset, 1.0f, nullptr);
 }
 
-void c_adv::Microwave::process() {
-    GameObject::process();
-}
-
 void c_adv::Microwave::configureAssets(dbasic::AssetManager *am) {
     m_microwaveAsset = am->GetModelAsset("Microwave");
 }
