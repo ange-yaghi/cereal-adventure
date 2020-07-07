@@ -2,6 +2,7 @@
 
 #include "../include/game_object.h"
 #include "../include/world.h"
+#include "../include/colors.h"
 
 c_adv::Realm::Realm() {
     m_exitPortal = nullptr;
@@ -53,7 +54,7 @@ void c_adv::Realm::process(float dt) {
 void c_adv::Realm::render() {
     m_world->getEngine().SetClearColor(ysColor::srgbiToLinear(0x000000));
 
-    ysVector4 ambient = ysMath::GetVector4(ysColor::srgbiToLinear(0xCC, 0xca, 0xf9));
+    ysVector4 ambient = WallColor;
     ambient.Scale(0.5f);
     m_world->getEngine().SetAmbientLight(ambient);
     

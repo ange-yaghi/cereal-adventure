@@ -22,10 +22,10 @@ void c_adv::StaticArt::render() {
     m_world->getEngine().ResetBrdfParameters();
 
     if (strcmp(m_asset->GetName(), "Level1Wall") == 0) {
-        m_world->getEngine().SetBaseColor(DebugBlue);
+        m_world->getEngine().SetBaseColor(WallColor);
     }
     else {
-        m_world->getEngine().SetBaseColor(CyberYellow);
+        m_world->getEngine().SetBaseColor(ObjectColor);
     }
 
     m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());

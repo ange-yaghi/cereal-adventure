@@ -1,6 +1,7 @@
 #include "../include/asset_loader.h"
 
 #include "../include/game_objects.h"
+#include "../include/colors.h"
 
 c_adv::AssetLoader::AssetLoader() {
     /* void */
@@ -29,7 +30,7 @@ void c_adv::AssetLoader::createAllMaterials(dbasic::AssetManager *am) {
 
     dbasic::Material *playerMaterial = am->NewMaterial();
     playerMaterial->SetName("PlayerMaterial");
-    playerMaterial->SetDiffuseColor(ysColor::srgbiToLinear(240, 240, 240));
+    playerMaterial->SetDiffuseColor(White);
 }
 
 void c_adv::AssetLoader::loadAllTextures(const dbasic::Path &assetPath, dbasic::AssetManager *am) {

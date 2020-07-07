@@ -149,7 +149,7 @@ void c_adv::Player::render() {
 
     m_world->getEngine().ResetBrdfParameters();
     m_world->getEngine().SetLit(false);
-    m_world->getEngine().SetBaseColor(DebugRed);
+    m_world->getEngine().SetBaseColor(White);
     m_world->getEngine().SetObjectTransform(ysMath::TranslationTransform(getGripLocationWorld()));
 
     if (findGrip() != nullptr) {

@@ -38,6 +38,7 @@ void c_adv::StoveHood::render() {
 
     ysVector color = ysMath::Lerp(CyberYellow, DebugRed, m_currentPower / m_maxPower);
     m_world->getEngine().SetBaseColor(color);
+    m_world->getEngine().SetBaseColor(ObjectColor);
 
     m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
     m_world->getEngine().DrawModel(m_stoveHoodAsset, 1.0f, nullptr);

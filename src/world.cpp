@@ -61,8 +61,8 @@ void c_adv::World::initialize(void *instance, ysContextObject::DeviceAPI api) {
     m_smoothTarget.setStiffnessTensor(ysMath::LoadVector(250.0f, 100.0f, 0.0f));
     m_smoothTarget.setDampingTensor(ysMath::LoadVector(0.3f, 0.5f, 0.0f));
 
-    //m_engine.SetCursorHidden(true);
-    //m_engine.SetCursorPositionLock(true);
+    m_engine.SetCursorHidden(false);
+    m_engine.SetCursorPositionLock(false);
 }
 
 void c_adv::World::initialSpawn() {

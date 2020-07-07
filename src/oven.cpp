@@ -30,7 +30,7 @@ void c_adv::Oven::initialize() {
 
 void c_adv::Oven::render() {
     m_world->getEngine().ResetBrdfParameters();
-    m_world->getEngine().SetBaseColor(CyberYellow);
+    m_world->getEngine().SetBaseColor(ObjectColor);
 
     m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
     m_world->getEngine().DrawModel(m_ovenAsset, 1.0f, nullptr);

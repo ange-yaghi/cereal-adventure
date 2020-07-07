@@ -30,7 +30,7 @@ void c_adv::Vase::initialize() {
 
 void c_adv::Vase::render() {
     m_world->getEngine().ResetBrdfParameters();
-    m_world->getEngine().SetBaseColor(CyberYellow);
+    m_world->getEngine().SetBaseColor(DebugRed);
 
     m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
     m_world->getEngine().DrawModel(m_vaseAsset, 1.0f, nullptr);
