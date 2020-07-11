@@ -3,6 +3,8 @@
 
 #include "game_object.h"
 
+#include "spring_connector.h"
+
 namespace c_adv {
 
     class Vase : public GameObject {
@@ -14,6 +16,12 @@ namespace c_adv {
 
         virtual void render();
         virtual void process(float dt);
+
+    protected:
+        ysTransform m_renderTransform;
+
+        SpringConnector m_positionDamper;
+        SpringConnector m_rotationDamper;
 
         // Assets ----
     public:

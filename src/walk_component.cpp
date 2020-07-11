@@ -59,19 +59,20 @@ void c_adv::WalkComponent::process(float dt) {
         m_currentSurface = nullptr;
     }
 
+    float impulseAppliedToSurface = 0.0f;
     float forceAppliedToSurface = 0.0f;
 
     if (m_walkingRight) {
         m_runVelocity += m_acceleration * dt;
         if (m_runVelocity > m_maxRunVelocity) m_runVelocity = m_maxRunVelocity;
 
-        forceAppliedToSurface = -m_acceleration / rigidBody.GetInverseMass();
+        impulseAppliedToSurface = (-m_acceleration / rigidBody.GetInverseMass()) * dt;
     }
     else if (m_walkingLeft) {
         m_runVelocity -= m_acceleration * dt;
         if (m_runVelocity < -m_maxRunVelocity) m_runVelocity = -m_maxRunVelocity;
 
-        forceAppliedToSurface = m_acceleration / rigidBody.GetInverseMass();
+        impulseAppliedToSurface = (m_acceleration / rigidBody.GetInverseMass()) * dt;
     }
 
     if (m_walkingLeft || m_walkingRight) {
@@ -93,6 +94,11 @@ void c_adv::WalkComponent::process(float dt) {
     if (m_currentSurface != nullptr) {
         m_currentSurface->RigidBody.AddForceWorldSpace(
             ysMath::LoadVector(forceAppliedToSurface, 0.0f, 0.0f),
+            m_contactPoint
+        );
+
+        m_currentSurface->RigidBody.AddImpulseWorldSpace(
+            ysMath::LoadVector(impulseAppliedToSurface, 0.0f, 0.0f),
             m_contactPoint
         );
     }
