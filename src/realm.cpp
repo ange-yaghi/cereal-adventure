@@ -10,6 +10,8 @@ c_adv::Realm::Realm() {
     m_indoor = false;
 
     m_visibleObjectCount = 0;
+
+    initializeFrictionTable();
 }
 
 c_adv::Realm::~Realm() {
@@ -42,13 +44,21 @@ void c_adv::Realm::process(float dt) {
 
     for (GameObject *g : m_gameObjects) {
         if (g->getDeletionFlag()) continue;
+        g->resetAccumulators();
+    }
+
+    for (GameObject *g : m_gameObjects) {
+        if (g->getDeletionFlag()) continue;
 
         g->createVisualBounds();
-        g->resetAccumulators();
         g->process(dt);
     }
 
-    PhysicsSystem.Update(dt);
+    m_world->getEngine().GetBreakdownTimer().StartMeasurement(World::PhysicsTimer);
+    {
+        PhysicsSystem.Update(dt);
+    }
+    m_world->getEngine().GetBreakdownTimer().EndMeasurement(World::PhysicsTimer);
 }
  
 void c_adv::Realm::render() {
@@ -206,4 +216,16 @@ void c_adv::Realm::cleanObjectList() {
 
 void c_adv::Realm::destroyObject(GameObject *object) {
     _aligned_free((void *)object);
+}
+
+void c_adv::Realm::initializeFrictionTable() {
+    PhysicsSystem.InitializeFrictionTable(10, 0.5f, 0.5f);
+
+    PhysicsSystem.SetFriction(
+        GameObject::PlayerFrictionMaterial, GameObject::GenericFrictionMaterial,
+        0.1f, 0.1f);
+
+    PhysicsSystem.SetFriction(
+        GameObject::GenericFrictionMaterial, GameObject::GenericFrictionMaterial,
+        2.5f, 2.5f);
 }

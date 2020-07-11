@@ -49,14 +49,11 @@ c_adv::Player::Player() {
 
     m_lastRunPlayhead = 0.0f;
 
-    m_fallDamageThreshold = 15.0f;
+    m_terminalFallVelocity = 15.0f;
+    m_fallDamageThreshold = 12.0f;
     m_fallDamageMultiplier = 0.3f;
 
-    m_runVelocity = 0.0f;
-    m_maxRunVelocity = 4.0f;
-
     m_lastMissReason = "";
-    m_groundTimer = FLT_MAX;
 }
 
 c_adv::Player::~Player() {
@@ -68,10 +65,14 @@ void c_adv::Player::initialize() {
 
     addTag(Tag::Dynamic);
 
+    m_fireDamageComponent.initialize(this);
+    m_walkComponent.initialize(this);
+
     RigidBody.SetHint(dphysics::RigidBody::RigidBodyHint::Dynamic);
     RigidBody.SetInverseMass(1.0f);
     RigidBody.SetAlwaysAwake(true);
     RigidBody.SetRequestsInformation(true);
+    RigidBody.SetMaterial(PlayerFrictionMaterial);
 
     m_springConnector.setDampingTensor(ysMath::LoadVector(0.5f, 0.5f, 0.0f));
     m_springConnector.setStiffnessTensor(ysMath::LoadVector(500.0f, 500.0f, 0.0f));
@@ -114,8 +115,11 @@ void c_adv::Player::initialize() {
 void c_adv::Player::process(float dt) {
     GameObject::process(dt);
 
+    m_fireDamageComponent.process(dt);
+    m_walkComponent.process(dt);
+
     ysVector v = RigidBody.GetVelocity();
-    if (ysMath::GetY(v) > -15.0f) {
+    if (ysMath::GetY(v) > -m_terminalFallVelocity) {
         RigidBody.AddForceWorldSpace(
             ysMath::LoadVector(0.0f, -15.0f / RigidBody.GetInverseMass(), 0.0f),
             RigidBody.Transform.GetWorldPosition());
@@ -125,10 +129,8 @@ void c_adv::Player::process(float dt) {
     m_springConnector.update(dt);
 
     m_renderTransform.SetPosition(m_springConnector.getPosition());
-    //m_renderTransform.SetPosition(RigidBody.Transform.GetWorldPosition());
     m_renderTransform.SetOrientation(RigidBody.Transform.GetWorldOrientation());
 
-    updateGroundTimer(dt);
     processImpactDamage();
     updateMotion(dt);
     updateAnimation(dt);
@@ -169,11 +171,11 @@ void c_adv::Player::render() {
         m_realm->getAliveObjectCount() << "/" << 
         m_realm->getDeadObjectCount() << "/" << 
         m_realm->getVisibleObjectCount() << "          \n";
-    msg << "Health: " << m_health << "\n";
+    msg << "Health: " << m_health << "              \n";
     msg << "Last Miss: " << m_lastMissReason << "              \n";
     msg << "Status: ";
     if (isHanging()) msg << "HANGING ";
-    if (isOnSurface()) msg << "ON SURFACE ";
+    if (m_walkComponent.isOnSurface()) msg << "ON SURFACE ";
     msg << "             \n";
 
     console->DrawGeneralText(msg.str().c_str());
@@ -181,16 +183,6 @@ void c_adv::Player::render() {
 
 bool c_adv::Player::isHurt() {
     return !m_movementCooldown.ready();
-}
-
-bool c_adv::Player::isOnSurface() {
-    constexpr float VelocityThreshold = 1.0f;
-
-    if (std::abs(ysMath::GetY(RigidBody.GetVelocity())) > VelocityThreshold) {
-        return false;
-    }
-
-    return (m_groundTimer < 1 / 10.0f);
 }
 
 bool c_adv::Player::isHanging() {
@@ -220,7 +212,7 @@ void c_adv::Player::updateGrip() {
         }
     }
 
-    if (!isOnSurface()) {
+    if (!m_walkComponent.isOnSurface()) {
         if (engine.IsKeyDown(ysKeyboard::KEY_SHIFT)) {
             if (m_gripCooldown.ready()) {
                 m_gripCooldown.trigger();
@@ -331,45 +323,27 @@ void c_adv::Player::processImpactDamage() {
                 : -ysMath::GetY(closingVelocity);
 
             if (mag < -m_fallDamageThreshold) {
-                m_health -= (abs(mag) - m_fallDamageThreshold);
+                takeDamage(abs(mag) - m_fallDamageThreshold);
                 m_movementCooldown.trigger();
             }
         }
     }
 }
 
-void c_adv::Player::updateGroundTimer(float dt) {
-    bool groundCollision = false;
-    int collisionCount = RigidBody.GetCollisionCount();
-    for (int i = 0; i < collisionCount; ++i) {
-        dphysics::Collision *col = RigidBody.GetCollision(i);
-        if (getCollidingObject(col)->hasTag(Tag::Ledge)) continue;
-
-        if (!col->m_sensor && !col->IsGhost()) {
-            ysVector normal = (col->m_body1 == &RigidBody) ? col->m_normal : ysMath::Negate(col->m_normal);
-            if (ysMath::GetScalar(ysMath::Dot(normal, ysMath::Constants::YAxis)) > 0.5f) {
-                groundCollision = true;
-                break;
-            }
-        }
-    }
-
-    if (groundCollision) {
-        m_groundTimer = 0.0f;
-    }
-    else if (m_groundTimer != FLT_MAX) {
-        m_groundTimer += dt;
-    }
+void c_adv::Player::takeDamage(float damage) {
+    m_health -= damage;
 }
 
 void c_adv::Player::updateMotion(float dt) {
     dbasic::DeltaEngine &engine = m_world->getEngine();
+    ysVector v = RigidBody.GetVelocity();
 
     updateGrip();
 
-    ysVector v = RigidBody.GetVelocity();
+    m_walkComponent.setWalkingRight(false);
+    m_walkComponent.setWalkingLeft(false);
 
-    if (isOnSurface()) {
+    if (m_walkComponent.isOnSurface()) {
         bool brake = true;
         if (m_movementCooldown.ready()) {
             if (engine.ProcessKeyDown(ysKeyboard::KEY_SPACE)) {
@@ -383,33 +357,11 @@ void c_adv::Player::updateMotion(float dt) {
 
             if (engine.IsKeyDown(ysKeyboard::KEY_D)) {
                 m_nextDirection = Direction::Forward;
-
-                m_runVelocity += 20.0f * dt;
-                if (m_runVelocity > m_maxRunVelocity) m_runVelocity = m_maxRunVelocity;
-
-                brake = false;
+                m_walkComponent.setWalkingRight(true);
             }
             else if (engine.IsKeyDown(ysKeyboard::KEY_A)) {
                 m_nextDirection = Direction::Back;
-
-                m_runVelocity -= 20.0f * dt;
-                if (m_runVelocity < -m_maxRunVelocity) m_runVelocity = -m_maxRunVelocity;
-
-                brake = false;
-            }
-
-            if (!brake) {
-                RigidBody.SetVelocity(ysMath::LoadVector(m_runVelocity, ysMath::GetY(v), 0.0f));
-            }
-        }
-
-        if (brake) {
-            m_runVelocity = 0.0f;
-            if (std::abs(ysMath::GetX(v)) > 0.01f) {
-                RigidBody.AddForceWorldSpace(ysMath::LoadVector(-ysMath::GetX(v) * 10, 0.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
-            }
-            else {
-                RigidBody.SetVelocity(ysMath::LoadVector(0.0f, ysMath::GetY(v), 0.0f));
+                m_walkComponent.setWalkingLeft(true);
             }
         }
     }
@@ -452,7 +404,7 @@ void c_adv::Player::legsAnimationFsm() {
     float queuedClip = 0.0f;
     float nextOffset = 0.0f;
 
-    if (isOnSurface()) {
+    if (m_walkComponent.isOnSurface()) {
         if (current == LegsState::Running) {
             if (std::abs(hMag) < 1.0f) {
                 next = LegsState::Idle;
@@ -619,7 +571,7 @@ void c_adv::Player::armsAnimationFsm() {
     float queuedFade = 0.0f;
     float queuedClip = 0.0f;
 
-    if (isOnSurface()) {
+    if (m_walkComponent.isOnSurface()) {
         if (isHurt()) {
             next = ArmsState::ImpactDamage;
             nextFade = 20.0f;

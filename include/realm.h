@@ -64,6 +64,8 @@ namespace c_adv {
         void cleanObjectList();
         void destroyObject(GameObject *object);
 
+        void initializeFrictionTable();
+
     protected:
         std::queue<GameObject *> m_unloadQueue;
         std::queue<GameObject *> m_spawnQueue;

@@ -5,7 +5,7 @@
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
     (void)nCmdShow;
     (void)lpCmdLine;
-    (void)hPrevInstance;
+    (void)hPrevInstance; 
 
     c_adv::CerealAdventureApp app;
     app.Initialize((void *)&hInstance, ysContextObject::DeviceAPI::DirectX11); 

@@ -17,9 +17,10 @@ void c_adv::Vase::initialize() {
     GameObject::initialize();
 
     RigidBody.SetHint(dphysics::RigidBody::RigidBodyHint::Dynamic);
-    RigidBody.SetInverseMass(1 / 1.0f);
+    RigidBody.SetInverseMass(1.0f);
     RigidBody.SetInverseInertiaTensor(RigidBody.GetRectangleTensor(2.24f, 0.963f));
     RigidBody.SetRequestsInformation(true);
+    RigidBody.SetMaterial(GenericFrictionMaterial);
 
     dphysics::CollisionObject *bounds;
     RigidBody.CollisionGeometry.NewBoxObject(&bounds);
@@ -39,7 +40,6 @@ void c_adv::Vase::render() {
 void c_adv::Vase::process(float dt) {
     GameObject::process(dt);
 
-    RigidBody.ClearAccumulators();
     RigidBody.AddForceWorldSpace(
         ysMath::LoadVector(0.0f, -15.0f / RigidBody.GetInverseMass(), 0.0f),
         RigidBody.Transform.GetWorldPosition());

@@ -26,6 +26,7 @@
     <ClCompile Include="..\..\src\colors.cpp" />
     <ClCompile Include="..\..\src\cooldown_timer.cpp" />
     <ClCompile Include="..\..\src\counter.cpp" />
+    <ClCompile Include="..\..\src\fire_damage_component.cpp" />
     <ClCompile Include="..\..\src\fridge.cpp" />
     <ClCompile Include="..\..\src\game_object.cpp" />
     <ClCompile Include="..\..\src\jitter_filter.cpp" />
@@ -49,6 +50,7 @@
     <ClCompile Include="..\..\src\test_obstacle.cpp" />
     <ClCompile Include="..\..\src\toaster.cpp" />
     <ClCompile Include="..\..\src\vase.cpp" />
+    <ClCompile Include="..\..\src\walk_component.cpp" />
     <ClCompile Include="..\..\src\world.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -58,6 +60,7 @@
     <ClInclude Include="..\..\include\ceiling_light_source.h" />
     <ClInclude Include="..\..\include\clock.h" />
     <ClInclude Include="..\..\include\colors.h" />
+    <ClInclude Include="..\..\include\fire_damage_component.h" />
     <ClInclude Include="..\..\include\fridge.h" />
     <ClInclude Include="..\..\include\game_objects.h" />
     <ClInclude Include="..\..\include\microwave.h" />
@@ -84,6 +87,7 @@
     <ClInclude Include="..\..\include\test_obstacle.h" />
     <ClInclude Include="..\..\include\toaster.h" />
     <ClInclude Include="..\..\include\vase.h" />
+    <ClInclude Include="..\..\include\walk_component.h" />
     <ClInclude Include="..\..\include\world.h" />
   </ItemGroup>
   <ItemGroup>

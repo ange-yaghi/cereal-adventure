@@ -16,6 +16,8 @@ c_adv::Oven::~Oven() {
 void c_adv::Oven::initialize() {
     GameObject::initialize();
 
+    addTag(GameObject::Tag::Oven);
+
     RigidBody.SetHint(dphysics::RigidBody::RigidBodyHint::Dynamic);
     RigidBody.SetInverseMass(0.0f);
 
@@ -26,14 +28,41 @@ void c_adv::Oven::initialize() {
     bounds->GetAsBox()->HalfWidth = 1.0f;
     bounds->GetAsBox()->Orientation = ysMath::Constants::QuatIdentity;
     bounds->GetAsBox()->Position = ysMath::Constants::Zero;
+
+    m_clock.setLowTime(2.0f);
+    m_clock.setHighTime(2.0f);
 }
 
 void c_adv::Oven::render() {
+    GameObject::render();
+
     m_world->getEngine().ResetBrdfParameters();
-    m_world->getEngine().SetBaseColor(ObjectColor);
+
+    if (isHot()) {
+        m_world->getEngine().SetBaseColor(DebugRed);
+    }
+    else {
+        m_world->getEngine().SetBaseColor(ObjectColor);
+    }
 
     m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
     m_world->getEngine().DrawModel(m_ovenAsset, 1.0f, nullptr);
+}
+
+void c_adv::Oven::process(float dt) {
+    GameObject::process(dt);
+
+    m_clock.update(dt);
+}
+
+bool c_adv::Oven::isHot() {
+    return m_clock.getState();
+}
+
+bool c_adv::Oven::isDangerous(const ysVector &p_world) {
+    ysVector local = RigidBody.Transform.WorldToLocalSpace(p_world);
+
+    return ysMath::GetY(local) > HalfHeight - 0.1f;
 }
 
 void c_adv::Oven::configureAssets(dbasic::AssetManager *am) {

@@ -8,6 +8,7 @@
 #include "../include/game_objects.h"
 
 const float c_adv::World::DefaultCameraDistance = 7.0f;
+const std::string c_adv::World::PhysicsTimer = "Physics";
 
 c_adv::World::World() {
     m_focus = nullptr;
@@ -25,6 +26,8 @@ void c_adv::World::initialize(void *instance, ysContextObject::DeviceAPI api) {
 
     std::string enginePath = "../../dependencies/delta/engines/basic";
     std::string assetPath = "../../assets";
+    std::string loggingPath = "../../workspace";
+    std::string shaderPath;
     if (confPath.Exists()) {
         std::fstream confFile(confPath.ToString(), std::ios::in);
 
@@ -32,19 +35,29 @@ void c_adv::World::initialize(void *instance, ysContextObject::DeviceAPI api) {
         std::getline(confFile, assetPath);
         enginePath = modulePath.Append(enginePath).ToString();
         assetPath = modulePath.Append(assetPath).ToString();
+        loggingPath = modulePath.ToString();
 
         confFile.close();
     }
 
+    shaderPath = enginePath + "/shaders/";
     m_assetPath = dbasic::Path(assetPath);
 
     m_engine.GetConsole()->SetDefaultFontDirectory(enginePath + "/fonts/");
 
-    m_engine.CreateGameWindow(
-        "Cereal Adventure // Development Build // " __DATE__,
-        instance,
-        api,
-        (enginePath + "/shaders/").c_str());
+    dbasic::DeltaEngine::GameEngineSettings settings;
+    settings.API = api;
+    settings.DepthBuffer = true;
+    settings.FrameLogging = true;
+    settings.Instance = instance;
+    settings.LoggingDirectory = loggingPath.c_str();
+    settings.ShaderDirectory = shaderPath.c_str();
+    settings.WindowTitle = "Cereal Adventure // Development Build // " __DATE__;
+
+    // Create timers
+    m_engine.GetBreakdownTimer().CreateChannel(PhysicsTimer);
+
+    m_engine.CreateGameWindow(settings);
 
     m_assetManager.SetEngine(&m_engine);
 

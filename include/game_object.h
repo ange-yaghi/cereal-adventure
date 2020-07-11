@@ -12,10 +12,12 @@ namespace c_adv {
 
     class GameObject {
     public:
+        static constexpr int PlayerFrictionMaterial = 0;
+        static constexpr int GenericFrictionMaterial = 1;
+
         enum class CollisionLayers {
             Main = 0x0,
             Box = 0x1,
-            CarriedBoxableItem = 0x2
         };
 
         enum class Layer {
@@ -31,6 +33,7 @@ namespace c_adv {
         enum class Tag {
             Ledge,
             Dynamic,
+            Oven,
             Count
         };
 

@@ -18,6 +18,7 @@ void c_adv::Counter::initialize() {
 
     RigidBody.SetHint(dphysics::RigidBody::RigidBodyHint::Dynamic);
     RigidBody.SetInverseMass(0.0f);
+    RigidBody.SetMaterial(GenericFrictionMaterial);
 
     dphysics::CollisionObject *bounds;
     RigidBody.CollisionGeometry.NewBoxObject(&bounds);

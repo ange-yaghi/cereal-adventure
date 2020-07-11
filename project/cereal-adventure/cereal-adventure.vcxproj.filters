@@ -34,6 +34,12 @@
     <Filter Include="Source Files\colors">
       <UniqueIdentifier>{d1010010-6429-478a-9e00-490db9bb79e6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\game-objects\player">
+      <UniqueIdentifier>{a8b3521f-f2ce-4cff-a0d5-7de0d35194ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\game-objects\player">
+      <UniqueIdentifier>{784c607a-1ebb-4228-8e47-9b7590dda82e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -61,9 +67,6 @@
       <Filter>Source Files\game-objects</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\test_obstacle.cpp">
-      <Filter>Source Files\game-objects</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\player.cpp">
       <Filter>Source Files\game-objects</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\ledge.cpp">
@@ -129,6 +132,15 @@
     <ClCompile Include="..\..\src\clock.cpp">
       <Filter>Source Files\utilities</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\player.cpp">
+      <Filter>Source Files\game-objects\player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fire_damage_component.cpp">
+      <Filter>Source Files\game-objects\player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\walk_component.cpp">
+      <Filter>Source Files\game-objects\player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\delta.h">
@@ -156,9 +168,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\game_object.h">
-      <Filter>Header Files\game-objects</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\player.h">
       <Filter>Header Files\game-objects</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\test_obstacle.h">
@@ -229,6 +238,15 @@
     </ClInclude>
     <ClInclude Include="..\..\include\clock.h">
       <Filter>Header Files\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\player.h">
+      <Filter>Header Files\game-objects\player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\fire_damage_component.h">
+      <Filter>Header Files\game-objects\player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\walk_component.h">
+      <Filter>Header Files\game-objects\player</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

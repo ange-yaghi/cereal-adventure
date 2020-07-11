@@ -5,6 +5,8 @@
 
 #include "cooldown_timer.h"
 #include "spring_connector.h"
+#include "fire_damage_component.h"
+#include "walk_component.h"
 
 namespace c_adv {
 
@@ -44,7 +46,6 @@ namespace c_adv {
         virtual void render();
 
         bool isHurt();
-        bool isOnSurface();
         bool isHanging();
 
         void updateGrip();
@@ -55,6 +56,8 @@ namespace c_adv {
         ysVector getGripLocationLocal();
         ysVector getGripLocationWorld();
 
+        void takeDamage(float damage);
+
     protected:
         void updateMotion(float dt);
         void updateAnimation(float dt);
@@ -64,15 +67,13 @@ namespace c_adv {
         void updateSoundEffects();
 
         void processImpactDamage();
-        void updateGroundTimer(float dt);
 
     protected:
         float m_health;
+        float m_terminalFallVelocity;
         float m_fallDamageThreshold;
         float m_fallDamageMultiplier;
-        float m_runVelocity;
-        float m_maxRunVelocity;
-        float m_groundTimer;
+        
         bool m_graspReady;
 
     protected:
@@ -111,6 +112,11 @@ namespace c_adv {
 
         // Sound effect internals
         float m_lastRunPlayhead;
+
+        // Components
+    public:
+        FireDamageComponent m_fireDamageComponent;
+        WalkComponent m_walkComponent;
 
         // Movement parameters
     protected:

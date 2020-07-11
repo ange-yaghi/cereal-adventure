@@ -3,9 +3,15 @@
 
 #include "game_object.h"
 
+#include "clock.h"
+
 namespace c_adv {
 
     class Oven : public GameObject {
+    public:
+        static constexpr float HalfHeight = 1.0f;
+        static constexpr float HalfWidth = 1.0f;
+
     public:
         Oven();
         ~Oven();
@@ -13,6 +19,13 @@ namespace c_adv {
         virtual void initialize();
 
         virtual void render();
+        virtual void process(float dt);
+
+        bool isHot();
+        bool isDangerous(const ysVector &p_world);
+
+    protected:
+        Clock m_clock;
 
         // Assets ----
     public:

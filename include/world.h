@@ -8,12 +8,14 @@
 #include "spring_connector.h"
 
 #include <vector>
+#include <string>
 
 namespace c_adv {
 
     class World {
     public:
         static const float DefaultCameraDistance;
+        static const std::string PhysicsTimer;
 
     public:
         World();
