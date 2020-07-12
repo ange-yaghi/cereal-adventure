@@ -46,6 +46,9 @@ namespace c_adv {
         GameObject *m_currentSurface;
         ysVector m_contactPoint;
         float m_runVelocity;
+
+        void checkSurfaceExists();
+        void changeSurface(GameObject *surface);
     };
 
 } /* namespace c_adv */

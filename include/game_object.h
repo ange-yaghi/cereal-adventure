@@ -66,6 +66,9 @@ namespace c_adv {
         bool colliding();
         bool colliding(GameObject *object);
 
+        bool isDead() const { return m_dead; }
+        void setDead() { m_dead = true; }
+
         bool getDeletionFlag() const { return m_deletionFlag; }
         void setDeletionFlag() { m_deletionFlag = true; }
 
@@ -137,6 +140,7 @@ namespace c_adv {
         bool m_real;
 
     private:
+        bool m_dead;
         bool m_deletionFlag;
 
     private:

@@ -44,13 +44,10 @@ void c_adv::Realm::process(float dt) {
     respawnObjects();
 
     for (GameObject *g : m_gameObjects) {
-        if (g->getDeletionFlag()) continue;
         g->resetAccumulators();
     }
 
     for (GameObject *g : m_gameObjects) {
-        if (g->getDeletionFlag()) continue;
-
         g->createVisualBounds();
         g->process(dt);
     }
@@ -191,6 +188,7 @@ void c_adv::Realm::cleanObjectList() {
     int N = (int)m_gameObjects.size();
     for (int i = 0; i < N; ++i) {
         if (m_gameObjects[i]->getDeletionFlag()) {
+            m_gameObjects[i]->setDead();
             m_deadObjects.push_back(m_gameObjects[i]);
             unregisterGameObject(m_gameObjects[i]);
 

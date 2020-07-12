@@ -24,8 +24,11 @@ void c_adv::ProjectileDamageComponent::process(float dt) {
         if (!object->hasTag(GameObject::Tag::Projectile)) continue;
         if (!object->isDangerous()) continue;
 
+        ysVector collisionVelocity = ysMath::Mask(m_player->getCollisionVelocity(collision), ysMath::Constants::MaskKeepX);
+        collisionVelocity = ysMath::Mul(collisionVelocity, ysMath::LoadScalar(1.0f));
+
         m_player->RigidBody.AddImpulseWorldSpace(
-            ysMath::Mask(m_player->getCollisionVelocity(collision), ysMath::Constants::MaskKeepX),
+            collisionVelocity,
             m_player->RigidBody.Transform.GetWorldPosition()
         );
         m_player->takeDamage(1.0f);

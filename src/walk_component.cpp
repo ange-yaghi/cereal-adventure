@@ -26,6 +26,8 @@ void c_adv::WalkComponent::initialize(GameObject *object) {
 void c_adv::WalkComponent::process(float dt) {
     dphysics::RigidBody &rigidBody = m_object->RigidBody;
 
+    checkSurfaceExists();
+
     bool groundCollision = false;
     int collisionCount = rigidBody.GetCollisionCount();
 
@@ -113,4 +115,18 @@ bool c_adv::WalkComponent::isOnSurface() {
     }
 
     return (m_groundDebounceTimer < DebouncePeriod);
+}
+
+void c_adv::WalkComponent::checkSurfaceExists() {
+    if (m_currentSurface != nullptr && m_currentSurface->isDead()) {
+        changeSurface(nullptr);
+    }
+}
+
+void c_adv::WalkComponent::changeSurface(GameObject *surface) {
+    if (m_currentSurface != nullptr) m_currentSurface->decrementReferenceCount();
+    
+    m_currentSurface = surface;
+    if (m_currentSurface == nullptr) return;
+    else m_currentSurface->incrementReferenceCount();
 }
