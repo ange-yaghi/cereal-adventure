@@ -6,7 +6,9 @@
 #include "cooldown_timer.h"
 #include "spring_connector.h"
 #include "fire_damage_component.h"
+#include "projectile_damage_component.h"
 #include "walk_component.h"
+#include "clock.h"
 
 namespace c_adv {
 
@@ -116,6 +118,7 @@ namespace c_adv {
         // Components
     public:
         FireDamageComponent m_fireDamageComponent;
+        ProjectileDamageComponent m_projectileDamageComponent;
         WalkComponent m_walkComponent;
 
         // Movement parameters
@@ -150,11 +153,14 @@ namespace c_adv {
 
         static dbasic::SceneObjectAsset *CharacterRoot;
         static dbasic::ModelAsset *Sphere;
+        static dbasic::Material *Material;
 
+        // Debug
     protected:
         std::string m_lastMissReason;
+        CooldownTimer m_debugDamageIndicatorCooldown;
+        Clock m_debugDamageFlicker;
     };
-
 
 } /* namespace c_adv */
 

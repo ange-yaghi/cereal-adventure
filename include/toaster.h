@@ -3,6 +3,8 @@
 
 #include "game_object.h"
 
+#include "clock.h"
+
 namespace c_adv {
 
     class Toaster : public GameObject {
@@ -13,6 +15,10 @@ namespace c_adv {
         virtual void initialize();
 
         virtual void render();
+        virtual void process(float dt);
+
+    protected:
+        Clock m_clock;
 
         // Assets ----
     public:

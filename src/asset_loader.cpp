@@ -67,6 +67,9 @@ void c_adv::AssetLoader::loadAllAssets(const dbasic::Path &assetPath, dbasic::As
     Cabinet::configureAssets(am);
     Sink::configureAssets(am);
     StoveHood::configureAssets(am);
+    FruitBowl::configureAssets(am);
+    FruitProjectile::configureAssets(am);
+    ToastProjectile::configureAssets(am);
 }
 
 void c_adv::AssetLoader::loadAllAudioAssets(const dbasic::Path &assetPath, dbasic::AssetManager *am) {

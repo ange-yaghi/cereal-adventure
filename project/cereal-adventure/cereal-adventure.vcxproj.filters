@@ -40,6 +40,18 @@
     <Filter Include="Header Files\game-objects\player">
       <UniqueIdentifier>{784c607a-1ebb-4228-8e47-9b7590dda82e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\game-objects\fruit-bowl">
+      <UniqueIdentifier>{53350071-2d09-44f7-bd36-8500711217c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\game-objects\toaster">
+      <UniqueIdentifier>{8e80138d-4cc2-4fb0-83a4-e807a96033ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\game-objects\toaster">
+      <UniqueIdentifier>{bee0a617-8b89-4c55-b3d3-0279937f78cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\game-objects\fruit-bowl">
+      <UniqueIdentifier>{c3463737-38dd-4202-b030-990f4266ec12}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -79,9 +91,6 @@
       <Filter>Source Files\utilities</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\counter.cpp">
-      <Filter>Source Files\game-objects</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\toaster.cpp">
       <Filter>Source Files\game-objects</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\shelves.cpp">
@@ -141,6 +150,21 @@
     <ClCompile Include="..\..\src\walk_component.cpp">
       <Filter>Source Files\game-objects\player</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\projectile_damage_component.cpp">
+      <Filter>Source Files\game-objects\player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fruit_bowl.cpp">
+      <Filter>Source Files\game-objects\fruit-bowl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fruit_projectile.cpp">
+      <Filter>Source Files\game-objects\fruit-bowl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\toaster.cpp">
+      <Filter>Source Files\game-objects\toaster</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\toast_projectile.cpp">
+      <Filter>Source Files\game-objects\toaster</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\delta.h">
@@ -183,9 +207,6 @@
       <Filter>Header Files\utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\counter.h">
-      <Filter>Header Files\game-objects</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\include\toaster.h">
       <Filter>Header Files\game-objects</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\shelves.h">
@@ -247,6 +268,21 @@
     </ClInclude>
     <ClInclude Include="..\..\include\walk_component.h">
       <Filter>Header Files\game-objects\player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\projectile_damage_component.h">
+      <Filter>Header Files\game-objects\player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\fruit_bowl.h">
+      <Filter>Header Files\game-objects\fruit-bowl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\fruit_projectile.h">
+      <Filter>Header Files\game-objects\fruit-bowl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\toaster.h">
+      <Filter>Header Files\game-objects\toaster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\toast_projectile.h">
+      <Filter>Header Files\game-objects\toaster</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

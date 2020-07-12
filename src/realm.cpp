@@ -19,6 +19,8 @@ c_adv::Realm::~Realm() {
 }
 
 void c_adv::Realm::registerGameObject(GameObject *object) {
+    assert(static_cast<GameObject *>(object->RigidBody.GetOwner()) == object);
+
     object->setRealm(this);
     object->setRealmRecordIndex((int)m_gameObjects.size());
     m_gameObjects.push_back(object);
@@ -38,7 +40,6 @@ void c_adv::Realm::unregisterGameObject(GameObject *object) {
 }
 
 void c_adv::Realm::process(float dt) {
-    cleanObjectList();
     spawnObjects();
     respawnObjects();
 
@@ -53,6 +54,8 @@ void c_adv::Realm::process(float dt) {
         g->createVisualBounds();
         g->process(dt);
     }
+
+    cleanObjectList();
 
     m_world->getEngine().GetBreakdownTimer().StartMeasurement(World::PhysicsTimer);
     {

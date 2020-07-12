@@ -29,6 +29,7 @@ dbasic::AudioAsset
 
 dbasic::SceneObjectAsset *c_adv::Player::CharacterRoot = nullptr;
 dbasic::ModelAsset *c_adv::Player::Sphere = nullptr;
+dbasic::Material *c_adv::Player::Material = nullptr;
 
 c_adv::Player::Player() {
     m_armsChannel = nullptr;
@@ -39,7 +40,7 @@ c_adv::Player::Player() {
     m_ledge = nullptr;
 
     m_health = 10.0f;
-    m_ledgeGraspDistance = 0.75f;
+    m_ledgeGraspDistance = 1.5f;
     m_graspReady = false;
 
     m_direction = Direction::Forward;
@@ -64,9 +65,11 @@ void c_adv::Player::initialize() {
     GameObject::initialize();
 
     addTag(Tag::Dynamic);
+    addTag(Tag::Player);
 
     m_fireDamageComponent.initialize(this);
     m_walkComponent.initialize(this);
+    m_projectileDamageComponent.initialize(this);
 
     RigidBody.SetHint(dphysics::RigidBody::RigidBodyHint::Dynamic);
     RigidBody.SetInverseMass(1.0f);
@@ -110,6 +113,11 @@ void c_adv::Player::initialize() {
 
     m_gripCooldown.setCooldownPeriod(0.0f);
     m_movementCooldown.setCooldownPeriod(4.0f);
+    m_debugDamageIndicatorCooldown.setCooldownPeriod(0.3f);
+
+    m_debugDamageFlicker.setLowTime(0.1f);
+    m_debugDamageFlicker.setHighTime(0.1f);
+    m_debugDamageFlicker.setInverted(true);
 }
 
 void c_adv::Player::process(float dt) {
@@ -117,6 +125,7 @@ void c_adv::Player::process(float dt) {
 
     m_fireDamageComponent.process(dt);
     m_walkComponent.process(dt);
+    m_projectileDamageComponent.process(dt);
 
     ysVector v = RigidBody.GetVelocity();
     if (ysMath::GetY(v) > -m_terminalFallVelocity) {
@@ -137,6 +146,8 @@ void c_adv::Player::process(float dt) {
 
     m_gripCooldown.update(dt);
     m_movementCooldown.update(dt);
+    m_debugDamageIndicatorCooldown.update(dt);
+    m_debugDamageFlicker.update(dt);
 
     if (m_world->getEngine().ProcessKeyDown(ysKeyboard::KEY_0)) {
         m_world->getEngine().PlayAudio(AudioFootstep01);
@@ -151,7 +162,14 @@ void c_adv::Player::render() {
 
     m_world->getEngine().ResetBrdfParameters();
     m_world->getEngine().SetLit(false);
-    m_world->getEngine().SetBaseColor(White);
+
+    if (!m_debugDamageIndicatorCooldown.ready() && m_debugDamageFlicker.getState()) {
+        Material->SetDiffuseColor(ysMath::Lerp(DebugRed, White, 0.5f));
+    }
+    else {
+        Material->SetDiffuseColor(White);
+    }
+
     m_world->getEngine().SetObjectTransform(ysMath::TranslationTransform(getGripLocationWorld()));
 
     if (findGrip() != nullptr) {
@@ -310,6 +328,8 @@ ysVector c_adv::Player::getGripLocationWorld() {
 }
 
 void c_adv::Player::processImpactDamage() {
+    const float VerticalThreshold = ysMath::Constants::SQRT_2 / 2;
+
     int collisionCount = RigidBody.GetCollisionCount();
 
     for (int i = 0; i < collisionCount; ++i) {
@@ -317,6 +337,8 @@ void c_adv::Player::processImpactDamage() {
         // TODO: check if hanging or not
 
         if (!col->m_sensor && !col->IsGhost()) {
+            if (ysMath::GetY(col->m_normal) < VerticalThreshold) continue;
+
             ysVector closingVelocity = col->GetContactVelocityWorld();
             float mag = (&RigidBody == col->m_body1)
                 ? ysMath::GetY(closingVelocity)
@@ -331,6 +353,10 @@ void c_adv::Player::processImpactDamage() {
 }
 
 void c_adv::Player::takeDamage(float damage) {
+    m_debugDamageIndicatorCooldown.trigger();
+    m_debugDamageFlicker.reset();
+
+    releaseGrip();
     m_health -= damage;
 }
 
@@ -770,4 +796,6 @@ void c_adv::Player::configureAssets(dbasic::AssetManager *am) {
     DamageImpact = am->GetAudioAsset("CerealBox::DamageImpact");
 
     Sphere = am->GetModelAsset("Sphere");
+
+    Material = am->FindMaterial("PlayerMaterial");
 }

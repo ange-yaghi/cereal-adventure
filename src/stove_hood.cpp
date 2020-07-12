@@ -10,7 +10,7 @@ c_adv::StoveHood::StoveHood() {
     m_clock.setHighTime(10.0f);
 
     m_currentPower = 0.0f;
-    m_maxPower = 30.0f;
+    m_maxPower = 25.0f;
 }
 
 c_adv::StoveHood::~StoveHood() {
@@ -31,6 +31,12 @@ void c_adv::StoveHood::initialize() {
     bounds->GetAsCircle()->Radius = 4.0f;
     bounds->GetAsCircle()->Position = ysMath::Constants::Zero;
     bounds->SetRelativePosition(ysMath::LoadVector(0.0f, -10.0f, 0.0f));
+
+    RigidBody.CollisionGeometry.NewBoxObject(&bounds);
+    bounds->SetMode(dphysics::CollisionObject::Mode::Fine);
+    bounds->GetAsBox()->HalfWidth = 1.0f;
+    bounds->GetAsBox()->HalfHeight = 31.2f / 2.0f;
+    bounds->SetRelativePosition(ysMath::LoadVector(0.0f, 15.381f, 0.0f));
 }
 
 void c_adv::StoveHood::render() {
@@ -68,10 +74,11 @@ void c_adv::StoveHood::process(float dt) {
             float hood_x = ysMath::GetX(RigidBody.Transform.GetWorldPosition());
 
             if (std::abs(obj_x - hood_x) < 1.5f) {
-                if (obj->hasTag(GameObject::Tag::Dynamic)) {
-                    obj->RigidBody.AddForceLocalSpace(
-                        ysMath::LoadVector(0.0f, m_currentPower, 0.0f), ysMath::Constants::Zero);
-                }
+                if (!obj->hasTag(GameObject::Tag::Dynamic)) continue;
+                if (ysMath::GetY(obj->RigidBody.GetVelocity()) > 10.0f) continue;
+
+                obj->RigidBody.AddForceLocalSpace(
+                    ysMath::LoadVector(0.0f, m_currentPower, 0.0f), ysMath::Constants::Zero);
             }
         }
     }

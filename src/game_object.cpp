@@ -57,6 +57,13 @@ c_adv::GameObject *c_adv::GameObject::getCollidingObject(dphysics::Collision *co
     return reinterpret_cast<c_adv::GameObject *>(body->GetOwner());
 }
 
+ysVector c_adv::GameObject::getCollisionVelocity(dphysics::Collision *collision) {
+    ysVector contactVelocity = collision->GetContactVelocityWorld();
+    return collision->m_body1 == &RigidBody
+        ? ysMath::Negate(contactVelocity)
+        : contactVelocity;
+}
+
 bool c_adv::GameObject::colliding() {
     int collisionCount = RigidBody.GetCollisionCount();
     for (int i = 0; i < collisionCount; ++i) {

@@ -15,6 +15,9 @@ namespace c_adv {
         static constexpr int PlayerFrictionMaterial = 0;
         static constexpr int GenericFrictionMaterial = 1;
 
+        static constexpr int EmitterCollisionLayer = 1;
+        static constexpr int ProjectileCollisionLayer = 2;
+
         enum class CollisionLayers {
             Main = 0x0,
             Box = 0x1,
@@ -34,6 +37,8 @@ namespace c_adv {
             Ledge,
             Dynamic,
             Oven,
+            Player,
+            Projectile,
             Count
         };
 
@@ -56,6 +61,7 @@ namespace c_adv {
         virtual void onDrop();
 
         GameObject *getCollidingObject(dphysics::Collision *collision);
+        ysVector getCollisionVelocity(dphysics::Collision *collision);
 
         bool colliding();
         bool colliding(GameObject *object);
@@ -107,6 +113,8 @@ namespace c_adv {
 
         // Get whether this object has been fully registered in its realm
         bool isReal() const { return m_real; }
+
+        virtual bool isDangerous() { return false; }
 
     protected:
         AABB m_visualBounds;

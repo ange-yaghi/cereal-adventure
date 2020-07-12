@@ -2,6 +2,7 @@
 
 #include "../include/world.h"
 #include "../include/colors.h"
+#include "../include/toast_projectile.h"
 
 dbasic::ModelAsset *c_adv::Toaster::m_toasterAsset = nullptr;
 
@@ -26,6 +27,11 @@ void c_adv::Toaster::initialize() {
     bounds->GetAsBox()->HalfWidth = 0.56f / 2;
     bounds->GetAsBox()->Orientation = ysMath::Constants::QuatIdentity;
     bounds->GetAsBox()->Position = ysMath::Constants::Zero;
+    bounds->SetLayer(EmitterCollisionLayer);
+    bounds->SetCollidesWith(ProjectileCollisionLayer, false);
+
+    m_clock.setHighTime(1.0f);
+    m_clock.setLowTime(0.01f);
 }
 
 void c_adv::Toaster::render() {
@@ -34,6 +40,29 @@ void c_adv::Toaster::render() {
 
     m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
     m_world->getEngine().DrawModel(m_toasterAsset, 1.0f, nullptr);
+}
+
+void c_adv::Toaster::process(float dt) {
+    m_clock.update(dt);
+
+    if (m_clock.getState()) {
+        ToastProjectile *projectile = getRealm()->spawn<ToastProjectile>();
+        projectile->RigidBody.Transform.SetPosition(
+            ysMath::Add(RigidBody.Transform.GetWorldPosition(), ysMath::LoadVector(0.1f, 0.0f, 0.0f))
+        );
+
+        float angle = 0.25f * (0.5f - ysMath::UniformRandom()) * ysMath::Constants::PI + ysMath::Constants::PI / 2;
+        float velocity = ysMath::UniformRandom() * 10.0f + 5.0f;
+        float angularVelocity = (0.5f - ysMath::UniformRandom()) * 5.0f;
+
+        projectile->RigidBody.SetVelocity(
+            ysMath::LoadVector(cos(angle) * velocity, sin(angle) * velocity, 0.0f));
+        projectile->RigidBody.SetAngularVelocity(
+            ysMath::LoadVector(0.0f, 0.0f, angularVelocity)
+        );
+
+        m_clock.reset();
+    }
 }
 
 void c_adv::Toaster::configureAssets(dbasic::AssetManager *am) {

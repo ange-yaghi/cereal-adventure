@@ -245,6 +245,11 @@ void c_adv::World::generateLevel(dbasic::RenderSkeleton *hierarchy) {
             StoveHood *stoveHood = m_mainRealm->spawn<StoveHood>();
             stoveHood->RigidBody.Transform.SetPosition(position);
         }
+        else if (strcmp(sceneAsset->GetName(), "FruitBowl") == 0) {
+            ysVector position = node->Transform.GetWorldPosition();
+            FruitBowl *fruitBowl = m_mainRealm->spawn<FruitBowl>();
+            fruitBowl->RigidBody.Transform.SetPosition(position);
+        }
         else if (sceneAsset->GetType() == ysObjectData::ObjectType::Instance) {
             ysVector position = node->Transform.GetWorldPosition();
             ysQuaternion orientation = node->Transform.GetWorldOrientation();
