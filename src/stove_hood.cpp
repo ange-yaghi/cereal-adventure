@@ -75,7 +75,7 @@ void c_adv::StoveHood::process(float dt) {
 
             if (std::abs(obj_x - hood_x) < 1.5f) {
                 if (!obj->hasTag(GameObject::Tag::Dynamic)) continue;
-                if (ysMath::GetY(obj->RigidBody.GetVelocity()) > 10.0f) continue;
+                if (ysMath::GetY(obj->RigidBody.GetVelocity()) > 7.5f) continue;
 
                 obj->RigidBody.AddForceLocalSpace(
                     ysMath::LoadVector(0.0f, m_currentPower, 0.0f), ysMath::Constants::Zero);

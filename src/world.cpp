@@ -7,7 +7,7 @@
 
 #include "../include/game_objects.h"
 
-const float c_adv::World::DefaultCameraDistance = 7.0f;
+const float c_adv::World::DefaultCameraDistance = 10.0f;
 const std::string c_adv::World::PhysicsTimer = "Physics";
 
 c_adv::World::World() {
@@ -249,6 +249,11 @@ void c_adv::World::generateLevel(dbasic::RenderSkeleton *hierarchy) {
             ysVector position = node->Transform.GetWorldPosition();
             FruitBowl *fruitBowl = m_mainRealm->spawn<FruitBowl>();
             fruitBowl->RigidBody.Transform.SetPosition(position);
+        }
+        else if (strcmp(sceneAsset->GetName(), "Fan") == 0) {
+            ysVector position = node->Transform.GetWorldPosition();
+            Fan *fan = m_mainRealm->spawn<Fan>();
+            fan->RigidBody.Transform.SetPosition(position);
         }
         else if (sceneAsset->GetType() == ysObjectData::ObjectType::Instance) {
             ysVector position = node->Transform.GetWorldPosition();

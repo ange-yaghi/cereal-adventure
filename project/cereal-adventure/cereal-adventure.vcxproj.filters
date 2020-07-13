@@ -165,6 +165,12 @@
     <ClCompile Include="..\..\src\toast_projectile.cpp">
       <Filter>Source Files\game-objects\toaster</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\player_arms_fsm.cpp">
+      <Filter>Source Files\game-objects\player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fan.cpp">
+      <Filter>Source Files\game-objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\delta.h">
@@ -283,6 +289,12 @@
     </ClInclude>
     <ClInclude Include="..\..\include\toast_projectile.h">
       <Filter>Header Files\game-objects\toaster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\player_arms_fsm.h">
+      <Filter>Header Files\game-objects\player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\fan.h">
+      <Filter>Header Files\game-objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

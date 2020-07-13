@@ -9,6 +9,7 @@
 #include "projectile_damage_component.h"
 #include "walk_component.h"
 #include "clock.h"
+#include "player_arms_fsm.h"
 
 namespace c_adv {
 
@@ -31,14 +32,6 @@ namespace c_adv {
             Undefined
         };
 
-        enum class ArmsState {
-            Idle,
-            Running,
-            Hanging,
-            ImpactDamage,
-            Undefined
-        };
-
     public:
         Player();
         ~Player();
@@ -49,6 +42,10 @@ namespace c_adv {
 
         bool isHurt();
         bool isHanging();
+        bool isGraspReady() const { return m_graspReady; }
+        bool isReadyToMove() const { return m_movementCooldown.ready(); }
+        bool isLaunching() const { return m_launching; }
+        bool isCurrentArmActionComplete() const { return m_armsChannel->IsActionComplete(); }
 
         void updateGrip();
         void attemptGrip();
@@ -59,6 +56,8 @@ namespace c_adv {
         ysVector getGripLocationWorld();
 
         void takeDamage(float damage);
+
+        ysAnimationActionBinding *getArmsAction(PlayerArmsFsm::State state);
 
     protected:
         void updateMotion(float dt);
@@ -77,6 +76,7 @@ namespace c_adv {
         float m_fallDamageMultiplier;
         
         bool m_graspReady;
+        bool m_launching;
 
     protected:
         ysAnimationActionBinding
@@ -91,7 +91,8 @@ namespace c_adv {
             m_animArmsHanging,
             m_animArmsDamageLanding,
             m_animLegsDamageLanding,
-            m_animLegsFastFalling;
+            m_animLegsFastFalling,
+            m_animArmsLaunch;
 
         dbasic::RenderSkeleton *m_renderSkeleton;
         SpringConnector m_springConnector;
@@ -109,8 +110,6 @@ namespace c_adv {
 
         Direction m_direction;
         Direction m_nextDirection;
-        LegsState m_legsState;
-        ArmsState m_armsState;
 
         // Sound effect internals
         float m_lastRunPlayhead;
@@ -120,6 +119,10 @@ namespace c_adv {
         FireDamageComponent m_fireDamageComponent;
         ProjectileDamageComponent m_projectileDamageComponent;
         WalkComponent m_walkComponent;
+
+        PlayerArmsFsm m_armsFsm;
+
+        LegsState m_legsState;
 
         // Movement parameters
     protected:
@@ -142,7 +145,8 @@ namespace c_adv {
             *AnimArmsHanging,
             *AnimArmsDamageLanding,
             *AnimLegsDamageLanding,
-            *AnimLegsFastFalling;
+            *AnimLegsFastFalling,
+            *AnimArmsLaunch;
         
         static dbasic::AudioAsset
             *AudioFootstep01,

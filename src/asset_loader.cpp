@@ -70,6 +70,7 @@ void c_adv::AssetLoader::loadAllAssets(const dbasic::Path &assetPath, dbasic::As
     FruitBowl::configureAssets(am);
     FruitProjectile::configureAssets(am);
     ToastProjectile::configureAssets(am);
+    Fan::configureAssets(am);
 }
 
 void c_adv::AssetLoader::loadAllAudioAssets(const dbasic::Path &assetPath, dbasic::AssetManager *am) {

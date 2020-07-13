@@ -25,7 +25,7 @@ void c_adv::ProjectileDamageComponent::process(float dt) {
         if (!object->isDangerous()) continue;
 
         ysVector collisionVelocity = ysMath::Mask(m_player->getCollisionVelocity(collision), ysMath::Constants::MaskKeepX);
-        collisionVelocity = ysMath::Mul(collisionVelocity, ysMath::LoadScalar(1.0f));
+        collisionVelocity = ysMath::Clamp(collisionVelocity, ysMath::LoadScalar(-5.0f), ysMath::LoadScalar(5.0f));
 
         m_player->RigidBody.AddImpulseWorldSpace(
             collisionVelocity,

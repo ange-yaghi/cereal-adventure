@@ -8,6 +8,7 @@ dbasic::ModelAsset *c_adv::ToastProjectile::m_toastAsset = nullptr;
 c_adv::ToastProjectile::ToastProjectile() {
     m_age = 0.0f;
     m_lifespan = 3.0f;
+    m_timeAsGhost = 0.1f;
     m_dangerous = true;
 }
 
@@ -34,6 +35,8 @@ void c_adv::ToastProjectile::initialize() {
     bounds->GetAsBox()->HalfWidth = 0.07f / 2;
     bounds->SetLayer(ProjectileCollisionLayer);
     bounds->SetCollidesWith(EmitterCollisionLayer, false);
+
+    m_collisionPrimitive = bounds;
 
     m_positionDamper.setDampingTensor(ysMath::LoadVector(0.5f, 0.5f, 0.0f));
     m_positionDamper.setStiffnessTensor(ysMath::LoadVector(500.0f, 500.0f, 0.0f));
@@ -69,6 +72,7 @@ void c_adv::ToastProjectile::process(float dt) {
         RigidBody.Transform.GetWorldPosition());
 
     m_age += dt;
+    m_collisionPrimitive->SetCollidesWith(EmitterCollisionLayer, m_age > m_timeAsGhost);
 
     checkDespawn();
 }

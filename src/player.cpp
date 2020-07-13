@@ -18,7 +18,8 @@ ysAnimationAction
     *c_adv::Player::AnimArmsHanging = nullptr,
     *c_adv::Player::AnimLegsDamageLanding = nullptr,
     *c_adv::Player::AnimArmsDamageLanding = nullptr,
-    *c_adv::Player::AnimLegsFastFalling = nullptr;
+    *c_adv::Player::AnimLegsFastFalling = nullptr,
+    *c_adv::Player::AnimArmsLaunch = nullptr;
 
 dbasic::AudioAsset
     *c_adv::Player::AudioFootstep01 = nullptr,
@@ -42,11 +43,11 @@ c_adv::Player::Player() {
     m_health = 10.0f;
     m_ledgeGraspDistance = 1.5f;
     m_graspReady = false;
+    m_launching = false;
 
     m_direction = Direction::Forward;
     m_nextDirection = Direction::Forward;
     m_legsState = LegsState::Idle;
-    m_armsState = ArmsState::Idle;
 
     m_lastRunPlayhead = 0.0f;
 
@@ -70,6 +71,7 @@ void c_adv::Player::initialize() {
     m_fireDamageComponent.initialize(this);
     m_walkComponent.initialize(this);
     m_projectileDamageComponent.initialize(this);
+    m_armsFsm.initialize(this);
 
     RigidBody.SetHint(dphysics::RigidBody::RigidBodyHint::Dynamic);
     RigidBody.SetInverseMass(1.0f);
@@ -106,6 +108,7 @@ void c_adv::Player::initialize() {
     m_renderSkeleton->BindAction(AnimArmsDamageLanding, &m_animArmsDamageLanding);
     m_renderSkeleton->BindAction(AnimLegsDamageLanding, &m_animLegsDamageLanding);
     m_renderSkeleton->BindAction(AnimLegsFastFalling, &m_animLegsFastFalling);
+    m_renderSkeleton->BindAction(AnimArmsLaunch, &m_animArmsLaunch);
 
     m_legsChannel = m_renderSkeleton->AnimationMixer.NewChannel();
     m_armsChannel = m_renderSkeleton->AnimationMixer.NewChannel();
@@ -171,10 +174,6 @@ void c_adv::Player::render() {
     }
 
     m_world->getEngine().SetObjectTransform(ysMath::TranslationTransform(getGripLocationWorld()));
-
-    if (findGrip() != nullptr) {
-        m_world->getEngine().DrawModel(Sphere, 0.2f, nullptr);
-    }
 
     dbasic::Console *console = m_world->getEngine().GetConsole();
     console->MoveToOrigin();
@@ -254,14 +253,13 @@ void c_adv::Player::attemptGrip() {
         m_ledge = closestLedge;
         m_graspReady = true;
 
-        if (m_gripLink != nullptr) {
-            m_gripLink->SetAnchor(closestLedge->RigidBody.Transform.GetWorldPosition());
-        }
-        else {
+        if (m_gripLink == nullptr) {
             m_gripLink = m_realm->PhysicsSystem.CreateLink<dphysics::LedgeLink>(&this->RigidBody, &closestLedge->RigidBody);
             m_gripLink->SetAnchor(closestLedge->RigidBody.Transform.GetWorldPosition());
             m_gripLink->SetGripLocal(getGripLocationLocal());
         }
+
+        m_gripLink->SetAnchor(closestLedge->RigidBody.Transform.GetWorldPosition());
     }
     else {
         m_ledge = nullptr;
@@ -293,7 +291,7 @@ c_adv::GameObject *c_adv::Player::findGrip() {
             if (ly < gy) {
                 float d = distance(gripLocation, ledgePosition);
                 if (d < closestLedgeDistance &&
-                    std::abs(gx - lx) < 0.4f &&
+                    std::abs(gx - lx) < 0.2f &&
                     std::abs(gy - ly) < m_ledgeGraspDistance) {
                     closestLedge = ledge;
                     closestLedgeDistance = d;
@@ -360,6 +358,23 @@ void c_adv::Player::takeDamage(float damage) {
     m_health -= damage;
 }
 
+ysAnimationActionBinding *c_adv::Player::getArmsAction(PlayerArmsFsm::State state) {
+    switch (state) {
+    case PlayerArmsFsm::State::Hanging:
+        return &m_animArmsHanging;
+    case PlayerArmsFsm::State::Idle:
+        return &m_animArmsIdle;
+    case PlayerArmsFsm::State::ImpactDamage:
+        return &m_animArmsDamageLanding;
+    case PlayerArmsFsm::State::Running:
+        return &m_animArmsWalk;
+    case PlayerArmsFsm::State::Launching:
+        return &m_animArmsLaunch;
+    default:
+        return nullptr;
+    }
+}
+
 void c_adv::Player::updateMotion(float dt) {
     dbasic::DeltaEngine &engine = m_world->getEngine();
     ysVector v = RigidBody.GetVelocity();
@@ -368,6 +383,8 @@ void c_adv::Player::updateMotion(float dt) {
 
     m_walkComponent.setWalkingRight(false);
     m_walkComponent.setWalkingLeft(false);
+
+    m_launching = false;
 
     if (m_walkComponent.isOnSurface()) {
         bool brake = true;
@@ -394,6 +411,7 @@ void c_adv::Player::updateMotion(float dt) {
     else if (isHanging()) {
         if (engine.ProcessKeyDown(ysKeyboard::KEY_SPACE)) {
             RigidBody.AddImpulseWorldSpace(ysMath::LoadVector(0.0f, 10.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
+            m_launching = true;
         }
     }
     else {
@@ -585,149 +603,37 @@ void c_adv::Player::rotationAnimationFsm() {
 }
 
 void c_adv::Player::armsAnimationFsm() {
-    ysVector velocity = RigidBody.GetVelocity();
-    float hMag = ysMath::GetScalar(ysMath::Dot(velocity, ysMath::Constants::XAxis));
-
-    ArmsState current = m_armsState;
-    ArmsState next = m_armsState;
-    ArmsState queued = ArmsState::Undefined;
-
-    float nextFade = 0.0f;
-    float nextClip = 0.0f;
-    float queuedFade = 0.0f;
-    float queuedClip = 0.0f;
-
-    if (m_walkComponent.isOnSurface()) {
-        if (isHurt()) {
-            next = ArmsState::ImpactDamage;
-            nextFade = 20.0f;
-        }
-        else if (current == ArmsState::Running) {
-            if (std::abs(hMag) < 1.0f) {
-                next = ArmsState::Idle;
-                nextFade = 20.0f;
-            }
-            else {
-                next = ArmsState::Running;
-                queued = ArmsState::Running;
-                queuedFade = 0.0f;
-            }
-        }
-        else if (current == ArmsState::Idle) {
-            if (std::abs(hMag) > 1.0f) {
-                next = ArmsState::Running;
-                nextFade = 20.0f;
-            }
-            else {
-                queued = ArmsState::Idle;
-                queuedFade = 0.0f;
-            }
-        }
-        else if (current == ArmsState::Hanging) {
-            if (std::abs(hMag) < 1.0f) {
-                next = ArmsState::Idle;
-                nextFade = 20.0f;
-            }
-            else {
-                next = ArmsState::Running;
-                nextFade = 20.0f;
-            }
-        }
-        else if (current == ArmsState::ImpactDamage) {
-            if (m_movementCooldown.ready()) {
-                next = ArmsState::Idle;
-                nextFade = 20.0f;
-            }
-        }
-    }
-    else if (isHanging()) {
-        next = ArmsState::Hanging;
-        nextFade = 2.0f;
-        nextClip = 30.0f;
-
-        queued = ArmsState::Hanging;
-        queuedFade = 20.0f;
-        queuedClip = 30.0f;
-    }
-    else if (m_graspReady) {
-        next = ArmsState::Hanging;
-        nextFade = 10.0f;
-        nextClip = 10.0f;
-
-        queued = ArmsState::Hanging;
-        queuedFade = 20.0f;
-        queuedClip = 30.0f;
-    }
-    else {
-        if (current == ArmsState::Hanging) {
-            next = ArmsState::Idle;
-            nextFade = 40.0f;
-        }
-        else if (current == ArmsState::Running) {
-            next = ArmsState::Idle;
-            nextFade = 20.0f;
-
-            queued = ArmsState::Idle;
-            queuedFade = 0.0f;
-        }
-        else if (current == ArmsState::Idle) {
-            next = ArmsState::Idle;
-            nextFade = 20.0f;
-
-            queued = ArmsState::Idle;
-            queuedFade = 0.0f;
-        }
-    }
+    PlayerArmsFsm::State current = m_armsFsm.getState();
+    PlayerArmsFsm::FsmResults next;
+    m_armsFsm.nextState(next);
 
     m_armsChannel->ClearQueue();
 
-    if (next != current) {
-        ysAnimationActionBinding *nextAnimation = nullptr;
-        if (next == ArmsState::Idle) {
-            nextAnimation = &m_animArmsIdle;
-        }
-        else if (next == ArmsState::Running) {
-            nextAnimation = &m_animArmsWalk;
-        }
-        else if (next == ArmsState::Hanging) {
-            nextAnimation = &m_animArmsHanging;
-        }
-        else if (next == ArmsState::ImpactDamage) {
-            nextAnimation = &m_animArmsDamageLanding;
-            m_world->getEngine().PlayAudio(DamageImpact);
-        }
+    if (next.next != current) {
+        ysAnimationActionBinding *nextAnimation = getArmsAction(next.next);
 
         ysAnimationChannel::ActionSettings settings;
-        settings.FadeIn = nextFade;
+        settings.FadeIn = next.nextFade;
         settings.Speed = 1.0f;
         settings.Clip = true;
-        settings.LeftClip = nextClip;
+        settings.LeftClip = next.nextClip;
         settings.RightClip = nextAnimation->GetAction()->GetLength();
         m_armsChannel->AddSegment(nextAnimation, settings);
     }
 
-    if (queued != ArmsState::Undefined) {
-        ysAnimationActionBinding *queuedAnimation = nullptr;
-        if (queued == ArmsState::Idle) {
-            queuedAnimation = &m_animArmsIdle;
-        }
-        else if (queued == ArmsState::Running) {
-            queuedAnimation = &m_animArmsWalk;
-        }
-        else if (queued == ArmsState::Hanging) {
-            queuedAnimation = &m_animArmsHanging;
-        }
+    if (next.queued != PlayerArmsFsm::State::Undefined) {
+        ysAnimationActionBinding *queuedAnimation = getArmsAction(next.queued);
 
         ysAnimationChannel::ActionSettings settings;
-        settings.FadeIn = queuedFade;
+        settings.FadeIn = next.queuedFade;
         settings.Speed = 1.0f;
-        settings.LeftClip = queuedClip;
+        settings.LeftClip = next.queuedClip;
         settings.RightClip = queuedAnimation->GetAction()->GetLength();
         settings.Clip = true;
         m_armsChannel->QueueSegment(queuedAnimation, settings);
     }
 
-    m_armsState = next;
+    m_armsFsm.updateState(next.next);
 }
 
 void c_adv::Player::updateSoundEffects() {
@@ -774,6 +680,7 @@ void c_adv::Player::configureAssets(dbasic::AssetManager *am) {
     AnimLegsDamageLanding = am->GetAction("LegsDamageLanding");
     AnimArmsDamageLanding = am->GetAction("ArmsDamageLanding");
     AnimLegsFastFalling = am->GetAction("LegsHighFalling");
+    AnimArmsLaunch = am->GetAction("ArmsLaunch");
 
     AnimLegsWalk->SetLength(39.0f);
     AnimArmsWalk->SetLength(39.0f);
@@ -786,6 +693,7 @@ void c_adv::Player::configureAssets(dbasic::AssetManager *am) {
     AnimLegsDamageLanding->SetLength(250.0f);
     AnimArmsDamageLanding->SetLength(250.0f);
     AnimLegsFastFalling->SetLength(100.0f);
+    AnimArmsLaunch->SetLength(25.0f);
 
     CharacterRoot = am->GetSceneObject("CerealArmature");
 

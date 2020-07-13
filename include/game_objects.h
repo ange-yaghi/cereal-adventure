@@ -22,5 +22,6 @@
 #include "../include/fruit_bowl.h"
 #include "../include/fruit_projectile.h"
 #include "../include/toast_projectile.h"
+#include "../include/fan.h"
 
 #endif /* CEREAL_ADVENTURE_GAME_OBJECTS_H */

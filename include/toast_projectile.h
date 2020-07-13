@@ -37,7 +37,10 @@ namespace c_adv {
     protected:
         float m_age;
         float m_lifespan;
+        float m_timeAsGhost;
         bool m_dangerous;
+
+        dphysics::CollisionObject *m_collisionPrimitive;
 
         // Assets ----
     public:
