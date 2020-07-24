@@ -15,6 +15,7 @@ namespace c_adv {
             Hanging,
             ImpactDamage,
             Launching,
+            Dying,
             Undefined
         };
 

@@ -28,6 +28,7 @@ void c_adv::PlayerArmsFsm::nextState(FsmResults &result) {
     bool isActionComplete = m_player->isCurrentArmActionComplete();
     float horizontalVelocity = ysMath::GetX(velocity);
     bool isMoving = std::abs(horizontalVelocity) > 1.0f;
+    bool isAlive = m_player->isAlive();
 
     // FSM Output
     State next = current;
@@ -41,7 +42,11 @@ void c_adv::PlayerArmsFsm::nextState(FsmResults &result) {
     // FSM
     if (current == State::Idle) {
         if (onSurface) {
-            if (isHurt) {
+            if (!isAlive) {
+                next = State::Dying;
+                nextFade = 20.0f;
+            }
+            else if (isHurt) {
                 next = State::ImpactDamage;
                 nextFade = 20.0f;
             }
@@ -81,7 +86,11 @@ void c_adv::PlayerArmsFsm::nextState(FsmResults &result) {
     }
     else if (current == State::Running) {
         if (onSurface) {
-            if (isHurt) {
+            if (!isAlive) {
+                next = State::Dying;
+                nextFade = 20.0f;
+            }
+            else if (isHurt) {
                 next = State::ImpactDamage;
                 nextFade = 20.0f;
             }

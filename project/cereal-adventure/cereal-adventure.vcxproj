@@ -43,6 +43,7 @@
     <ClCompile Include="..\..\src\oven.cpp" />
     <ClCompile Include="..\..\src\player.cpp" />
     <ClCompile Include="..\..\src\player_arms_fsm.cpp" />
+    <ClCompile Include="..\..\src\player_legs_fsm.cpp" />
     <ClCompile Include="..\..\src\projectile_damage_component.cpp" />
     <ClCompile Include="..\..\src\realm.cpp" />
     <ClCompile Include="..\..\src\shelves.cpp" />
@@ -76,6 +77,7 @@
     <ClInclude Include="..\..\include\milk_carton.h" />
     <ClInclude Include="..\..\include\oven.h" />
     <ClInclude Include="..\..\include\player_arms_fsm.h" />
+    <ClInclude Include="..\..\include\player_legs_fsm.h" />
     <ClInclude Include="..\..\include\projectile_damage_component.h" />
     <ClInclude Include="..\..\include\single_shelf.h" />
     <ClInclude Include="..\..\include\sink.h" />

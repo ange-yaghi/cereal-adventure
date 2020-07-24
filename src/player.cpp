@@ -19,7 +19,9 @@ ysAnimationAction
     *c_adv::Player::AnimLegsDamageLanding = nullptr,
     *c_adv::Player::AnimArmsDamageLanding = nullptr,
     *c_adv::Player::AnimLegsFastFalling = nullptr,
-    *c_adv::Player::AnimArmsLaunch = nullptr;
+    *c_adv::Player::AnimArmsLaunch = nullptr,
+    *c_adv::Player::AnimArmsDie = nullptr,
+    *c_adv::Player::AnimLegsDie = nullptr;
 
 dbasic::AudioAsset
     *c_adv::Player::AudioFootstep01 = nullptr,
@@ -40,7 +42,7 @@ c_adv::Player::Player() {
     m_gripLink = nullptr;
     m_ledge = nullptr;
 
-    m_health = 10.0f;
+    m_health = 2.0f;
     m_ledgeGraspDistance = 1.5f;
     m_graspReady = false;
     m_launching = false;
@@ -72,6 +74,7 @@ void c_adv::Player::initialize() {
     m_walkComponent.initialize(this);
     m_projectileDamageComponent.initialize(this);
     m_armsFsm.initialize(this);
+    m_legsFsm.initialize(this);
 
     RigidBody.SetHint(dphysics::RigidBody::RigidBodyHint::Dynamic);
     RigidBody.SetInverseMass(1.0f);
@@ -109,6 +112,8 @@ void c_adv::Player::initialize() {
     m_renderSkeleton->BindAction(AnimLegsDamageLanding, &m_animLegsDamageLanding);
     m_renderSkeleton->BindAction(AnimLegsFastFalling, &m_animLegsFastFalling);
     m_renderSkeleton->BindAction(AnimArmsLaunch, &m_animArmsLaunch);
+    m_renderSkeleton->BindAction(AnimArmsDie, &m_animArmsDie);
+    m_renderSkeleton->BindAction(AnimLegsDie, &m_animLegsDie);
 
     m_legsChannel = m_renderSkeleton->AnimationMixer.NewChannel();
     m_armsChannel = m_renderSkeleton->AnimationMixer.NewChannel();
@@ -196,6 +201,10 @@ void c_adv::Player::render() {
     msg << "             \n";
 
     console->DrawGeneralText(msg.str().c_str());
+}
+
+bool c_adv::Player::isAlive() {
+    return m_health > 0.0f;
 }
 
 bool c_adv::Player::isHurt() {
@@ -370,6 +379,29 @@ ysAnimationActionBinding *c_adv::Player::getArmsAction(PlayerArmsFsm::State stat
         return &m_animArmsWalk;
     case PlayerArmsFsm::State::Launching:
         return &m_animArmsLaunch;
+    case PlayerArmsFsm::State::Dying:
+        return &m_animArmsDie;
+    default:
+        return nullptr;
+    }
+}
+
+ysAnimationActionBinding *c_adv::Player::getLegsAction(PlayerLegsFsm::State state) {
+    switch (state) {
+    case PlayerLegsFsm::State::Hanging:
+        return &m_animLegsHanging;
+    case PlayerLegsFsm::State::Idle:
+        return &m_animLegsIdle;
+    case PlayerLegsFsm::State::ImpactDamage:
+        return &m_animLegsDamageLanding;
+    case PlayerLegsFsm::State::Running:
+        return &m_animLegsWalk;
+    case PlayerLegsFsm::State::Dying:
+        return &m_animLegsDie;
+    case PlayerLegsFsm::State::Falling:
+        return &m_animLegsFalling;
+    case PlayerLegsFsm::State::FastFalling:
+        return &m_animLegsFastFalling;
     default:
         return nullptr;
     }
@@ -435,154 +467,37 @@ void c_adv::Player::updateAnimation(float dt) {
 }
 
 void c_adv::Player::legsAnimationFsm() {
-    ysVector velocity = RigidBody.GetVelocity();
-    float hMag = ysMath::GetX(velocity);
-    float fallSpeed = max(-ysMath::GetY(velocity), 0.0f);
-
-    LegsState current = m_legsState;
-    LegsState next = m_legsState;
-    LegsState queued = LegsState::Undefined;
-
-    float nextFade = 0.0f;
-    float queuedFade = 0.0f;
-    float queuedClip = 0.0f;
-    float nextOffset = 0.0f;
-
-    if (m_walkComponent.isOnSurface()) {
-        if (current == LegsState::Running) {
-            if (std::abs(hMag) < 1.0f) {
-                next = LegsState::Idle;
-                nextFade = 20.0f;
-            }
-            else {
-                next = LegsState::Running;
-                queued = LegsState::Running;
-                queuedFade = 0.0f;
-            }
-        }
-        else if (current == LegsState::Falling || current == LegsState::FastFalling) {
-            if (!isHurt()) {
-                if (std::abs(hMag) < 1.0f) {
-                    next = LegsState::Idle;
-                    nextFade = 20.0f;
-                }
-                else {
-                    next = LegsState::Running;
-                    nextFade = 20.0f;
-                }
-            }
-            else {
-                next = LegsState::ImpactDamage;
-                nextFade = 10.0f;
-            }
-        }
-        else if (current == LegsState::Idle) {
-            if (std::abs(hMag) > 1.0f) {
-                next = LegsState::Running;
-                nextFade = 20.0f;
-            }
-            else {
-                queued = LegsState::Idle;
-                queuedFade = 0.0f;
-            }
-        }
-        else if (current == LegsState::ImpactDamage) {
-            if (!isHurt()) {
-                next = LegsState::Idle;
-                nextFade = 20.0f;
-            }
-            else {
-                next = LegsState::ImpactDamage;
-            }
-        }
-    }
-    else if (!isHanging()) {
-        if (fallSpeed > 9.0f) {
-            next = LegsState::FastFalling;
-            nextFade = 40.0f;
-
-            queued = LegsState::FastFalling;
-            queuedFade = 0.0f;
-        }
-        else {
-            next = LegsState::Falling;
-            nextFade = 20.0f;
-
-            queued = LegsState::Falling;
-            queuedFade = 0.0f;
-        }
-    }
-    else {
-        next = LegsState::Hanging;
-        nextFade = 20.0f;
-
-        queued = LegsState::Hanging;
-        queuedFade = 0.0f;
-        queuedClip = 63.0f;
-    }
+    PlayerLegsFsm::State current = m_legsFsm.getState();
+    PlayerLegsFsm::FsmResults next;
+    m_legsFsm.nextState(next);
 
     m_legsChannel->ClearQueue();
 
-    if (next != current) {
-        ysAnimationActionBinding *nextAnimation = nullptr;
-        if (next == LegsState::Idle) {
-            nextAnimation = &m_animLegsIdle;
-        }
-        else if (next == LegsState::Running) {
-            nextAnimation = &m_animLegsWalk;
-        }
-        else if (next == LegsState::Falling) {
-            nextAnimation = &m_animLegsFalling;
-        }
-        else if (next == LegsState::Hanging) {
-            nextAnimation = &m_animLegsHanging;
-        }
-        else if (next == LegsState::ImpactDamage) {
-            nextAnimation = &m_animLegsDamageLanding;
-        }
-        else if (next == LegsState::FastFalling) {
-            nextAnimation = &m_animLegsFastFalling;
-        }
+    if (next.next != current) {
+        ysAnimationActionBinding *nextAnimation = getLegsAction(next.next);
 
         ysAnimationChannel::ActionSettings settings;
-        settings.FadeIn = nextFade;
+        settings.FadeIn = next.nextFade;
         settings.Speed = 1.0f;
-        if (nextOffset == 0) {
-            m_legsChannel->AddSegment(nextAnimation, settings);
-        }
-        else {
-            m_legsChannel->AddSegmentAtOffset(nextAnimation, nextOffset, settings);
-        }
+        settings.Clip = true;
+        settings.LeftClip = next.nextClip;
+        settings.RightClip = nextAnimation->GetAction()->GetLength();
+        m_legsChannel->AddSegment(nextAnimation, settings);
     }
 
-    if (queued != LegsState::Undefined) {
-        ysAnimationActionBinding *queuedAnimation = nullptr;
-        if (queued == LegsState::Idle) {
-            queuedAnimation = &m_animLegsIdle;
-        }
-        else if (queued == LegsState::Running) {
-            queuedAnimation = &m_animLegsWalk;
-        }
-        else if (queued == LegsState::Falling) {
-            queuedAnimation = &m_animLegsFalling;
-        }
-        else if (queued == LegsState::Hanging) {
-            queuedAnimation = &m_animLegsHanging;
-        }
-        else if (next == LegsState::FastFalling) {
-            queuedAnimation = &m_animLegsFastFalling;
-        }
+    if (next.queued != PlayerLegsFsm::State::Undefined) {
+        ysAnimationActionBinding *queuedAnimation = getLegsAction(next.queued);
 
         ysAnimationChannel::ActionSettings settings;
-        settings.FadeIn = queuedFade;
+        settings.FadeIn = next.queuedFade;
         settings.Speed = 1.0f;
-        settings.LeftClip = queuedClip;
+        settings.LeftClip = next.queuedClip;
         settings.RightClip = queuedAnimation->GetAction()->GetLength();
         settings.Clip = true;
         m_legsChannel->QueueSegment(queuedAnimation, settings);
     }
 
-    m_legsState = next;
+    m_legsFsm.updateState(next.next);
 }
 
 void c_adv::Player::rotationAnimationFsm() {
@@ -681,6 +596,8 @@ void c_adv::Player::configureAssets(dbasic::AssetManager *am) {
     AnimArmsDamageLanding = am->GetAction("ArmsDamageLanding");
     AnimLegsFastFalling = am->GetAction("LegsHighFalling");
     AnimArmsLaunch = am->GetAction("ArmsLaunch");
+    AnimArmsDie = am->GetAction("ArmsDie");
+    AnimLegsDie = am->GetAction("LegsDie");
 
     AnimLegsWalk->SetLength(39.0f);
     AnimArmsWalk->SetLength(39.0f);
@@ -694,6 +611,8 @@ void c_adv::Player::configureAssets(dbasic::AssetManager *am) {
     AnimArmsDamageLanding->SetLength(250.0f);
     AnimLegsFastFalling->SetLength(100.0f);
     AnimArmsLaunch->SetLength(25.0f);
+    AnimArmsDie->SetLength(240.0f);
+    AnimLegsDie->SetLength(240.0f);
 
     CharacterRoot = am->GetSceneObject("CerealArmature");
 

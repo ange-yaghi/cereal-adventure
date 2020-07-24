@@ -13,6 +13,7 @@ namespace c_adv {
     extern const ysVector DarkBlue;
     extern const ysVector Orange;
     extern const ysVector BeachYellow;
+    extern const ysVector BrightRed;
 
     extern const ysVector WallColor;
     extern const ysVector ObjectColor;

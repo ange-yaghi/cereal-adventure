@@ -171,6 +171,9 @@
     <ClCompile Include="..\..\src\fan.cpp">
       <Filter>Source Files\game-objects</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\player_legs_fsm.cpp">
+      <Filter>Source Files\game-objects\player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\delta.h">
@@ -295,6 +298,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\fan.h">
       <Filter>Header Files\game-objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\player_legs_fsm.h">
+      <Filter>Header Files\game-objects\player</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

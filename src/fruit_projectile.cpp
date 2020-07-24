@@ -43,7 +43,7 @@ void c_adv::FruitProjectile::initialize() {
 
 void c_adv::FruitProjectile::render() {
     m_world->getEngine().ResetBrdfParameters();
-    m_world->getEngine().SetBaseColor(DebugRed);
+    m_world->getEngine().SetBaseColor(Black);
 
     m_world->getEngine().SetObjectTransform(m_renderTransform.GetWorldTransform());
     m_world->getEngine().DrawModel(m_fruitAsset, 1.0f, nullptr);

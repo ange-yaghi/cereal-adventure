@@ -10,6 +10,7 @@
 #include "walk_component.h"
 #include "clock.h"
 #include "player_arms_fsm.h"
+#include "player_legs_fsm.h"
 
 namespace c_adv {
 
@@ -29,6 +30,7 @@ namespace c_adv {
             FastFalling,
             Hanging,
             ImpactDamage,
+            Dying,
             Undefined
         };
 
@@ -40,6 +42,7 @@ namespace c_adv {
         virtual void process(float dt);
         virtual void render();
 
+        bool isAlive();
         bool isHurt();
         bool isHanging();
         bool isGraspReady() const { return m_graspReady; }
@@ -58,6 +61,7 @@ namespace c_adv {
         void takeDamage(float damage);
 
         ysAnimationActionBinding *getArmsAction(PlayerArmsFsm::State state);
+        ysAnimationActionBinding *getLegsAction(PlayerLegsFsm::State state);
 
     protected:
         void updateMotion(float dt);
@@ -92,7 +96,9 @@ namespace c_adv {
             m_animArmsDamageLanding,
             m_animLegsDamageLanding,
             m_animLegsFastFalling,
-            m_animArmsLaunch;
+            m_animArmsLaunch,
+            m_animArmsDie,
+            m_animLegsDie;
 
         dbasic::RenderSkeleton *m_renderSkeleton;
         SpringConnector m_springConnector;
@@ -121,6 +127,7 @@ namespace c_adv {
         WalkComponent m_walkComponent;
 
         PlayerArmsFsm m_armsFsm;
+        PlayerLegsFsm m_legsFsm;
 
         LegsState m_legsState;
 
@@ -146,7 +153,9 @@ namespace c_adv {
             *AnimArmsDamageLanding,
             *AnimLegsDamageLanding,
             *AnimLegsFastFalling,
-            *AnimArmsLaunch;
+            *AnimArmsLaunch,
+            *AnimArmsDie,
+            *AnimLegsDie;
         
         static dbasic::AudioAsset
             *AudioFootstep01,
