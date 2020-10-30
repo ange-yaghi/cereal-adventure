@@ -42,7 +42,7 @@ c_adv::Player::Player() {
     m_gripLink = nullptr;
     m_ledge = nullptr;
 
-    m_health = 2.0f;
+    m_health = 20.0f;
     m_ledgeGraspDistance = 1.5f;
     m_graspReady = false;
     m_launching = false;
@@ -58,6 +58,9 @@ c_adv::Player::Player() {
     m_fallDamageMultiplier = 0.3f;
 
     m_lastMissReason = "";
+
+    m_bodyCollider = nullptr;
+    m_walkCollider = nullptr;
 }
 
 c_adv::Player::~Player() {
@@ -75,6 +78,7 @@ void c_adv::Player::initialize() {
     m_projectileDamageComponent.initialize(this);
     m_armsFsm.initialize(this);
     m_legsFsm.initialize(this);
+    m_deathComponent.initialize(this);
 
     RigidBody.SetHint(dphysics::RigidBody::RigidBodyHint::Dynamic);
     RigidBody.SetInverseMass(1.0f);
@@ -86,12 +90,18 @@ void c_adv::Player::initialize() {
     m_springConnector.setStiffnessTensor(ysMath::LoadVector(500.0f, 500.0f, 0.0f));
     m_springConnector.setPosition(RigidBody.Transform.GetWorldPosition());
 
-    dphysics::CollisionObject *bounds;
-    RigidBody.CollisionGeometry.NewBoxObject(&bounds);
-    bounds->SetMode(dphysics::CollisionObject::Mode::Fine);
-    bounds->GetAsBox()->HalfHeight = 1.48f;
-    bounds->GetAsBox()->HalfWidth = 0.4f;
+    RigidBody.CollisionGeometry.NewBoxObject(&m_bodyCollider);
+    m_bodyCollider->SetMode(dphysics::CollisionObject::Mode::Fine);
+    m_bodyCollider->GetAsBox()->HalfHeight = 1.0f;
+    m_bodyCollider->GetAsBox()->HalfWidth = 0.3f;
 
+    RigidBody.CollisionGeometry.NewBoxObject(&m_walkCollider);
+    m_walkCollider->SetMode(dphysics::CollisionObject::Mode::Fine);
+    m_walkCollider->SetRelativePosition(ysMath::LoadVector(0.0f, -1.15f, 0.0f));
+    m_walkCollider->GetAsBox()->HalfHeight = 0.3f;
+    m_walkCollider->GetAsBox()->HalfWidth = 0.3f;
+
+    dphysics::CollisionObject *bounds;
     RigidBody.CollisionGeometry.NewCircleObject(&bounds);
     bounds->SetMode(dphysics::CollisionObject::Mode::Sensor);
     bounds->GetAsCircle()->Radius = 4.0f;
@@ -134,8 +144,9 @@ void c_adv::Player::process(float dt) {
     m_fireDamageComponent.process(dt);
     m_walkComponent.process(dt);
     m_projectileDamageComponent.process(dt);
+    m_deathComponent.process(dt);
 
-    ysVector v = RigidBody.GetVelocity();
+    const ysVector v = RigidBody.GetVelocity();
     if (ysMath::GetY(v) > -m_terminalFallVelocity) {
         RigidBody.AddForceWorldSpace(
             ysMath::LoadVector(0.0f, -15.0f / RigidBody.GetInverseMass(), 0.0f),
@@ -158,18 +169,20 @@ void c_adv::Player::process(float dt) {
     m_debugDamageFlicker.update(dt);
 
     if (m_world->getEngine().ProcessKeyDown(ysKeyboard::KEY_0)) {
-        m_world->getEngine().PlayAudio(AudioFootstep01);
+        m_health = 0;
+    }
+    else if (m_world->getEngine().ProcessKeyDown(ysKeyboard::KEY_2)) {
+        m_health = 10;
     }
 
     updateSoundEffects();
+
+    updateCollisionBounds();
 }
 
 void c_adv::Player::render() {
     m_world->getEngine().ResetBrdfParameters();
     m_world->getEngine().DrawRenderSkeleton(m_renderSkeleton, 1.0f, (int)Layer::Player);
-
-    m_world->getEngine().ResetBrdfParameters();
-    m_world->getEngine().SetLit(false);
 
     if (!m_debugDamageIndicatorCooldown.ready() && m_debugDamageFlicker.getState()) {
         Material->SetDiffuseColor(ysMath::Lerp(DebugRed, White, 0.5f));
@@ -178,7 +191,18 @@ void c_adv::Player::render() {
         Material->SetDiffuseColor(White);
     }
 
-    m_world->getEngine().SetObjectTransform(ysMath::TranslationTransform(getGripLocationWorld()));
+    m_world->getEngine().ResetBrdfParameters();
+    m_world->getEngine().SetLit(true);
+    m_world->getEngine().SetBaseColor(DebugRed);
+
+    ysTransform *transform = &m_renderSkeleton->GetNode("Body")->Transform;
+    ysMatrix mat = ysMath::LoadMatrix(
+        m_bodyCollider->GetAsBox()->Orientation,
+        m_bodyCollider->GetAsBox()->Position);
+
+    const float hh = m_bodyCollider->GetAsBox()->HalfHeight;
+    const float hw = m_bodyCollider->GetAsBox()->HalfWidth;
+    m_world->getEngine().SetObjectTransform(mat);
 
     dbasic::Console *console = m_world->getEngine().GetConsole();
     console->MoveToOrigin();
@@ -203,16 +227,16 @@ void c_adv::Player::render() {
     console->DrawGeneralText(msg.str().c_str());
 }
 
-bool c_adv::Player::isAlive() {
+bool c_adv::Player::isAlive() const {
     return m_health > 0.0f;
 }
 
-bool c_adv::Player::isHurt() {
+bool c_adv::Player::isHurt() const {
     return !m_movementCooldown.ready();
 }
 
 bool c_adv::Player::isHanging() {
-    int collisionCount = RigidBody.GetCollisionCount();
+    const int collisionCount = RigidBody.GetCollisionCount();
 
     for (int i = 0; i < collisionCount; ++i) {
         dphysics::Collision *col = RigidBody.GetCollision(i);
@@ -278,14 +302,14 @@ void c_adv::Player::attemptGrip() {
 }
 
 c_adv::GameObject *c_adv::Player::findGrip() {
-    int collisionCount = RigidBody.GetCollisionCount();
+    const int collisionCount = RigidBody.GetCollisionCount();
 
     float closestLedgeDistance = FLT_MAX;
     GameObject *closestLedge = nullptr;
 
     ysVector gripLocation = getGripLocationWorld();
-    float gy = ysMath::GetY(gripLocation);
-    float gx = ysMath::GetX(gripLocation);
+    const float gy = ysMath::GetY(gripLocation);
+    const float gx = ysMath::GetX(gripLocation);
 
     for (int i = 0; i < collisionCount; ++i) {
         dphysics::Collision *col = RigidBody.GetCollision(i);
@@ -294,11 +318,11 @@ c_adv::GameObject *c_adv::Player::findGrip() {
         GameObject *ledge = getCollidingObject(col);
         if (col->m_sensor && !col->IsGhost()) {
             ysVector ledgePosition = ledge->RigidBody.Transform.GetWorldPosition();
-            float ly = ysMath::GetY(ledgePosition);
-            float lx = ysMath::GetX(ledgePosition);
+            const float ly = ysMath::GetY(ledgePosition);
+            const float lx = ysMath::GetX(ledgePosition);
 
             if (ly < gy) {
-                float d = distance(gripLocation, ledgePosition);
+                const float d = distance(gripLocation, ledgePosition);
                 if (d < closestLedgeDistance &&
                     std::abs(gx - lx) < 0.2f &&
                     std::abs(gy - ly) < m_ledgeGraspDistance) {
@@ -337,7 +361,7 @@ ysVector c_adv::Player::getGripLocationWorld() {
 void c_adv::Player::processImpactDamage() {
     const float VerticalThreshold = ysMath::Constants::SQRT_2 / 2;
 
-    int collisionCount = RigidBody.GetCollisionCount();
+    const int collisionCount = RigidBody.GetCollisionCount();
 
     for (int i = 0; i < collisionCount; ++i) {
         dphysics::Collision *col = RigidBody.GetCollision(i);
@@ -346,17 +370,52 @@ void c_adv::Player::processImpactDamage() {
         if (!col->m_sensor && !col->IsGhost()) {
             if (ysMath::GetY(col->m_normal) < VerticalThreshold) continue;
 
-            ysVector closingVelocity = col->GetContactVelocityWorld();
-            float mag = (&RigidBody == col->m_body1)
+            dphysics::RigidBody &other = getCollidingObject(col)->RigidBody;
+
+            const ysVector closingVelocity = col->GetContactVelocityWorld();
+            const float mag = (&RigidBody == col->m_body1)
                 ? ysMath::GetY(closingVelocity)
                 : -ysMath::GetY(closingVelocity);
 
-            if (mag < -m_fallDamageThreshold) {
+            if (mag < -m_fallDamageThreshold && other.GetInverseMass() < RigidBody.GetInverseMass()) {
                 takeDamage(abs(mag) - m_fallDamageThreshold);
                 m_movementCooldown.trigger();
             }
         }
     }
+}
+
+void c_adv::Player::updateCollisionBounds() {
+    ysTransform *prevParent = m_renderSkeleton->GetRoot()->Transform.GetParent();
+    m_renderSkeleton->GetRoot()->Transform.SetParent(&RigidBody.Transform);
+
+    ysTransform *transform = &m_renderSkeleton->GetNode("Body")->Transform;
+    const ysQuaternion worldOrientation = transform->GetWorldOrientation();
+
+    const ysVector worldPosition = ysMath::Mask(transform->GetWorldPosition(), ysMath::Constants::MaskOffZ);
+    const ysVector offset = transform->LocalToWorldDirection(ysMath::LoadVector(0.0f, 0.3f, 0.0f));
+    const ysVector localPosition = RigidBody.Transform.WorldToLocalSpace(ysMath::Add(worldPosition, offset));
+
+    const ysVector dir = ysMath::Constants::YAxis;
+    const ysVector t = ysMath::QuatTransform(worldOrientation, dir);
+
+    const float cosTheta = ysMath::GetScalar(ysMath::Dot(dir, t));
+    const float x_com = ysMath::GetX(t);
+    const float angle = (x_com > 0)
+        ? -std::acos(cosTheta)
+        : std::acos(cosTheta);
+    
+    ysQuaternion orientation = ysMath::LoadQuaternion(
+        angle,
+        ysMath::Constants::ZAxis
+    );
+
+    const ysQuaternion localOrientation = RigidBody.Transform.WorldToLocalOrientation(orientation);
+
+    m_bodyCollider->SetRelativeOrientation(localOrientation);
+    m_bodyCollider->SetRelativePosition(localPosition);
+
+    m_renderSkeleton->GetRoot()->Transform.SetParent(prevParent);
 }
 
 void c_adv::Player::takeDamage(float damage) {
@@ -418,42 +477,54 @@ void c_adv::Player::updateMotion(float dt) {
 
     m_launching = false;
 
-    if (m_walkComponent.isOnSurface()) {
-        bool brake = true;
-        if (m_movementCooldown.ready()) {
-            if (engine.ProcessKeyDown(ysKeyboard::KEY_SPACE)) {
-                if (engine.IsKeyDown(ysKeyboard::KEY_SHIFT)) {
-                    RigidBody.AddImpulseWorldSpace(ysMath::LoadVector(0.0f, 8.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
+    if (isAlive()) {
+        if (m_walkComponent.isOnSurface()) {
+            bool brake = true;
+            if (m_movementCooldown.ready()) {
+                if (engine.ProcessKeyDown(ysKeyboard::KEY_SPACE)) {
+                    if (engine.IsKeyDown(ysKeyboard::KEY_SHIFT)) {
+                        RigidBody.AddImpulseWorldSpace(
+                            ysMath::LoadVector(0.0f, 8.0f, 0.0f), 
+                            RigidBody.Transform.GetWorldPosition());
+                    }
+                    else {
+                        RigidBody.AddImpulseWorldSpace(
+                            ysMath::LoadVector(0.0f, 6.0f, 0.0f), 
+                            RigidBody.Transform.GetWorldPosition());
+                    }
                 }
-                else {
-                    RigidBody.AddImpulseWorldSpace(ysMath::LoadVector(0.0f, 6.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
-                }
-            }
 
-            if (engine.IsKeyDown(ysKeyboard::KEY_D)) {
+                if (engine.IsKeyDown(ysKeyboard::KEY_D)) {
+                    m_nextDirection = Direction::Forward;
+                    m_walkComponent.setWalkingRight(true);
+                }
+                else if (engine.IsKeyDown(ysKeyboard::KEY_A)) {
+                    m_nextDirection = Direction::Back;
+                    m_walkComponent.setWalkingLeft(true);
+                }
+            }
+        }
+        else if (isHanging()) {
+            if (engine.ProcessKeyDown(ysKeyboard::KEY_SPACE)) {
+                RigidBody.AddImpulseWorldSpace(
+                    ysMath::LoadVector(0.0f, 10.0f, 0.0f), 
+                    RigidBody.Transform.GetWorldPosition());
+                m_launching = true;
+            }
+        }
+        else {
+            if (engine.IsKeyDown(ysKeyboard::KEY_D) && ysMath::GetX(v) < 2.0f) {
+                RigidBody.AddForceWorldSpace(
+                    ysMath::LoadVector(10.0f, 0.0f, 0.0f), 
+                    RigidBody.Transform.GetWorldPosition());
                 m_nextDirection = Direction::Forward;
-                m_walkComponent.setWalkingRight(true);
             }
-            else if (engine.IsKeyDown(ysKeyboard::KEY_A)) {
+            else if (engine.IsKeyDown(ysKeyboard::KEY_A) && ysMath::GetX(v) > -2.0f) {
+                RigidBody.AddForceWorldSpace(
+                    ysMath::LoadVector(-10.0f, 0.0f, 0.0f), 
+                    RigidBody.Transform.GetWorldPosition());
                 m_nextDirection = Direction::Back;
-                m_walkComponent.setWalkingLeft(true);
             }
-        }
-    }
-    else if (isHanging()) {
-        if (engine.ProcessKeyDown(ysKeyboard::KEY_SPACE)) {
-            RigidBody.AddImpulseWorldSpace(ysMath::LoadVector(0.0f, 10.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
-            m_launching = true;
-        }
-    }
-    else {
-        if (engine.IsKeyDown(ysKeyboard::KEY_D) && ysMath::GetX(v) < 2.0f) {
-            RigidBody.AddForceWorldSpace(ysMath::LoadVector(10.0f, 0.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
-            m_nextDirection = Direction::Forward;
-        }
-        else if (engine.IsKeyDown(ysKeyboard::KEY_A) && ysMath::GetX(v) > -2.0f) {
-            RigidBody.AddForceWorldSpace(ysMath::LoadVector(-10.0f, 0.0f, 0.0f), RigidBody.Transform.GetWorldPosition());
-            m_nextDirection = Direction::Back;
         }
     }
 }
@@ -566,7 +637,12 @@ void c_adv::Player::updateSoundEffects() {
             playFootstep = true;
         }
 
-        dbasic::AudioAsset *const FootstepEffects[] = { AudioFootstep01, AudioFootstep02, AudioFootstep03, AudioFootstep04 };
+        dbasic::AudioAsset *const FootstepEffects[] = { 
+            AudioFootstep01, 
+            AudioFootstep02, 
+            AudioFootstep03, 
+            AudioFootstep04 
+        };
         dbasic::AudioAsset *randomFootstep = nullptr;
         if (playFootstep) {
             int randomIndex = ysMath::UniformRandomInt(4);
@@ -611,8 +687,8 @@ void c_adv::Player::configureAssets(dbasic::AssetManager *am) {
     AnimArmsDamageLanding->SetLength(250.0f);
     AnimLegsFastFalling->SetLength(100.0f);
     AnimArmsLaunch->SetLength(25.0f);
-    AnimArmsDie->SetLength(240.0f);
-    AnimLegsDie->SetLength(240.0f);
+    AnimArmsDie->SetLength(340.0f);
+    AnimLegsDie->SetLength(340.0f);
 
     CharacterRoot = am->GetSceneObject("CerealArmature");
 

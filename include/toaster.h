@@ -9,6 +9,9 @@ namespace c_adv {
 
     class Toaster : public GameObject {
     public:
+        static const float ToastSpread;
+
+    public:
         Toaster();
         ~Toaster();
 

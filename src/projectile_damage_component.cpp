@@ -15,6 +15,8 @@ void c_adv::ProjectileDamageComponent::initialize(Player *player) {
 }
 
 void c_adv::ProjectileDamageComponent::process(float dt) {
+    if (!m_player->isAlive()) return;
+
     int collisionCount = m_player->RigidBody.GetCollisionCount();
     for (int i = 0; i < collisionCount; ++i) {
         dphysics::Collision *collision = m_player->RigidBody.GetCollision(i);

@@ -26,6 +26,7 @@
     <ClCompile Include="..\..\src\colors.cpp" />
     <ClCompile Include="..\..\src\cooldown_timer.cpp" />
     <ClCompile Include="..\..\src\counter.cpp" />
+    <ClCompile Include="..\..\src\death_component.cpp" />
     <ClCompile Include="..\..\src\fan.cpp" />
     <ClCompile Include="..\..\src\fire_damage_component.cpp" />
     <ClCompile Include="..\..\src\fridge.cpp" />
@@ -67,6 +68,7 @@
     <ClInclude Include="..\..\include\ceiling_light_source.h" />
     <ClInclude Include="..\..\include\clock.h" />
     <ClInclude Include="..\..\include\colors.h" />
+    <ClInclude Include="..\..\include\death_component.h" />
     <ClInclude Include="..\..\include\fan.h" />
     <ClInclude Include="..\..\include\fire_damage_component.h" />
     <ClInclude Include="..\..\include\fridge.h" />

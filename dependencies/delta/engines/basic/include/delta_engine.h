@@ -9,6 +9,7 @@
 #include "model_asset.h"
 #include "audio_asset.h"
 #include "console.h"
+#include "font.h"
 
 #include "../../../physics/include/mass_spring_system.h"
 #include "../../../physics/include/rigid_body_system.h"
@@ -79,6 +80,7 @@ namespace dbasic {
         ysError DrawRenderSkeleton(RenderSkeleton *skeleton, float scale, int layer);
         ysError LoadTexture(ysTexture **image, const char *fname);
         ysError LoadAnimation(Animation **animation, const char *path, int start, int end);
+        ysError LoadFont(Font **font, const char *path, int size=4096);
 
         ysError PlayAudio(AudioAsset *audio);
 
@@ -122,10 +124,14 @@ namespace dbasic {
         // Input Device
         bool IsKeyDown(ysKeyboard::KEY_CODE key);
         bool ProcessKeyDown(ysKeyboard::KEY_CODE key);
+        bool ProcessKeyUp(ysKeyboard::KEY_CODE key);
 
+        bool ProcessMouseKeyDown(ysMouse::Button key);
+        bool ProcessMouseKeyUp(ysMouse::Button key);
         bool IsMouseKeyDown(ysMouse::Button key);
         int GetMouseWheel();
         void GetMousePos(int *x, int *y);
+        void GetOsMousePos(int *x, int *y);
 
         void SetCursorPositionLock(bool lock) { m_cursorPositionLocked = lock; }
         bool GetCursorPositionLock() { return m_cursorPositionLocked; }
@@ -154,10 +160,11 @@ namespace dbasic {
 
         void SetDrawTarget(DrawTarget target) { m_currentTarget = target; }
 
-        int GetScreenWidth();
-        int GetScreenHeight();
+        int GetScreenWidth() const;
+        int GetScreenHeight() const;
 
         Console *GetConsole() { return &m_console; }
+        UiRenderer *GetUiRenderer() { return &m_uiRenderer; }
 
         ysAudioDevice *GetAudioDevice() const { return m_audioDevice; }
         ysBreakdownTimer &GetBreakdownTimer() { return m_breakdownTimer; }
@@ -230,6 +237,7 @@ namespace dbasic {
         ysInputLayout *m_consoleInputLayout;
 
         // Text Support
+        UiRenderer m_uiRenderer;
         Console m_console;
 
         bool m_initialized;

@@ -7,6 +7,7 @@
 #include "spring_connector.h"
 #include "fire_damage_component.h"
 #include "projectile_damage_component.h"
+#include "death_component.h"
 #include "walk_component.h"
 #include "clock.h"
 #include "player_arms_fsm.h"
@@ -42,8 +43,8 @@ namespace c_adv {
         virtual void process(float dt);
         virtual void render();
 
-        bool isAlive();
-        bool isHurt();
+        bool isAlive() const;
+        bool isHurt() const;
         bool isHanging();
         bool isGraspReady() const { return m_graspReady; }
         bool isReadyToMove() const { return m_movementCooldown.ready(); }
@@ -72,6 +73,7 @@ namespace c_adv {
         void updateSoundEffects();
 
         void processImpactDamage();
+        void updateCollisionBounds();
 
     protected:
         float m_health;
@@ -125,11 +127,17 @@ namespace c_adv {
         FireDamageComponent m_fireDamageComponent;
         ProjectileDamageComponent m_projectileDamageComponent;
         WalkComponent m_walkComponent;
+        DeathComponent m_deathComponent;
 
         PlayerArmsFsm m_armsFsm;
         PlayerLegsFsm m_legsFsm;
 
         LegsState m_legsState;
+
+        // Physics
+    public:
+        dphysics::CollisionObject *m_bodyCollider;
+        dphysics::CollisionObject *m_walkCollider;
 
         // Movement parameters
     protected:

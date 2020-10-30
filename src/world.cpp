@@ -84,6 +84,7 @@ void c_adv::World::initialSpawn() {
 
     m_focus = m_mainRealm->spawn<Player>();
     m_focus->RigidBody.Transform.SetPosition(ysMath::LoadVector(0.0f, 3.0f, 0.0f));
+    m_focus->incrementReferenceCount();
 
     ysTransform root;
     dbasic::RenderSkeleton *level1 = m_assetManager.BuildRenderSkeleton(&root, m_assetManager.GetSceneObject("Level 1"));
@@ -164,6 +165,13 @@ void c_adv::World::process() {
     }
     else if (m_engine.IsKeyDown(ysKeyboard::KEY_BACK)) {
         m_cameraDistance = DefaultCameraDistance;
+    }
+
+    if (m_focus->isDead()) {
+        m_focus->decrementReferenceCount();
+        m_focus = m_mainRealm->spawn<Player>();
+        m_focus->RigidBody.Transform.SetPosition(ysMath::LoadVector(0.0f, 3.0f, 0.0f));
+        m_focus->incrementReferenceCount();
     }
 }
 

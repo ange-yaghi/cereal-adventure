@@ -19,6 +19,7 @@ c_adv::GameObject::GameObject() {
     m_lastPortal = nullptr;
     m_graceMode = false;
     m_real = false;
+    m_dead = false;
 
     m_referenceCount = 0;
 

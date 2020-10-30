@@ -29,9 +29,9 @@ void c_adv::WalkComponent::process(float dt) {
     checkSurfaceExists();
 
     bool groundCollision = false;
-    int collisionCount = rigidBody.GetCollisionCount();
+    const int collisionCount = rigidBody.GetCollisionCount();
 
-    ysVector v = rigidBody.GetVelocity();
+    const ysVector velocity = rigidBody.GetVelocity();
 
     for (int i = 0; i < collisionCount; ++i) {
         dphysics::Collision *col = rigidBody.GetCollision(i);
@@ -78,18 +78,18 @@ void c_adv::WalkComponent::process(float dt) {
     }
 
     if (m_walkingLeft || m_walkingRight) {
-        rigidBody.SetVelocity(ysMath::LoadVector(m_runVelocity, ysMath::GetY(v), 0.0f));
+        rigidBody.SetVelocity(ysMath::LoadVector(m_runVelocity, ysMath::GetY(velocity), 0.0f));
     }
     else if (isOnSurface()) {
         m_runVelocity = 0.0f;
-        if (std::abs(ysMath::GetX(v)) > 0.01f) {
-            forceAppliedToSurface = ysMath::GetX(v) * 10.0f;
+        if (std::abs(ysMath::GetX(velocity)) > 0.01f) {
+            forceAppliedToSurface = ysMath::GetX(velocity) * 10.0f;
             rigidBody.AddForceWorldSpace(
                 ysMath::LoadVector(-forceAppliedToSurface, 0.0f, 0.0f), 
                 rigidBody.Transform.GetWorldPosition());
         }
         else {
-            rigidBody.SetVelocity(ysMath::LoadVector(0.0f, ysMath::GetY(v), 0.0f));
+            rigidBody.SetVelocity(ysMath::LoadVector(0.0f, ysMath::GetY(velocity), 0.0f));
         }
     }
 

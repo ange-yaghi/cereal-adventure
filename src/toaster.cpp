@@ -6,6 +6,8 @@
 
 dbasic::ModelAsset *c_adv::Toaster::m_toasterAsset = nullptr;
 
+const float c_adv::Toaster::ToastSpread = 0.03f;
+
 c_adv::Toaster::Toaster() {
     /* void */
 }
@@ -31,7 +33,7 @@ void c_adv::Toaster::initialize() {
     bounds->SetCollidesWith(ProjectileCollisionLayer, false);
 
     m_clock.setHighTime(1.0f);
-    m_clock.setLowTime(1.0f);
+    m_clock.setLowTime(3.0f);
 }
 
 void c_adv::Toaster::render() {
@@ -51,9 +53,9 @@ void c_adv::Toaster::process(float dt) {
             ysMath::Add(RigidBody.Transform.GetWorldPosition(), ysMath::LoadVector(0.1f, 0.0f, 0.0f))
         );
 
-        float angle = 0.25f * (0.5f - ysMath::UniformRandom()) * ysMath::Constants::PI + ysMath::Constants::PI / 2;
-        float velocity = ysMath::UniformRandom() * 10.0f + 5.0f;
-        float angularVelocity = (0.5f - ysMath::UniformRandom()) * 5.0f;
+        const float angle = ToastSpread * (0.5f - ysMath::UniformRandom()) * ysMath::Constants::PI + ysMath::Constants::PI / 2;
+        const float velocity = ysMath::UniformRandom() * 10.0f + 5.0f;
+        const float angularVelocity = (0.5f - ysMath::UniformRandom()) * 5.0f;
 
         projectile->RigidBody.SetVelocity(
             ysMath::LoadVector(cos(angle) * velocity, sin(angle) * velocity, 0.0f));
