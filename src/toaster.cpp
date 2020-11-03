@@ -33,7 +33,7 @@ void c_adv::Toaster::initialize() {
     bounds->SetCollidesWith(ProjectileCollisionLayer, false);
 
     m_clock.setHighTime(1.0f);
-    m_clock.setLowTime(3.0f);
+    m_clock.setLowTime(10.0f);
 }
 
 void c_adv::Toaster::render() {

@@ -223,6 +223,7 @@ void c_adv::Player::render() {
     if (isHanging()) msg << "HANGING ";
     if (m_walkComponent.isOnSurface()) msg << "ON SURFACE ";
     msg << "             \n";
+    msg << "RUN FORCE V: " << m_walkComponent.getRunVelocity() << "                               \n";
 
     console->DrawGeneralText(msg.str().c_str());
 }
@@ -478,8 +479,18 @@ void c_adv::Player::updateMotion(float dt) {
     m_launching = false;
 
     if (isAlive()) {
+        if (m_movementCooldown.ready()) {
+            if (engine.IsKeyDown(ysKeyboard::KEY_D)) {
+                m_nextDirection = Direction::Forward;
+                m_walkComponent.setWalkingRight(true);
+            }
+            else if (engine.IsKeyDown(ysKeyboard::KEY_A)) {
+                m_nextDirection = Direction::Back;
+                m_walkComponent.setWalkingLeft(true);
+            }
+        }
+
         if (m_walkComponent.isOnSurface()) {
-            bool brake = true;
             if (m_movementCooldown.ready()) {
                 if (engine.ProcessKeyDown(ysKeyboard::KEY_SPACE)) {
                     if (engine.IsKeyDown(ysKeyboard::KEY_SHIFT)) {
@@ -492,15 +503,6 @@ void c_adv::Player::updateMotion(float dt) {
                             ysMath::LoadVector(0.0f, 6.0f, 0.0f), 
                             RigidBody.Transform.GetWorldPosition());
                     }
-                }
-
-                if (engine.IsKeyDown(ysKeyboard::KEY_D)) {
-                    m_nextDirection = Direction::Forward;
-                    m_walkComponent.setWalkingRight(true);
-                }
-                else if (engine.IsKeyDown(ysKeyboard::KEY_A)) {
-                    m_nextDirection = Direction::Back;
-                    m_walkComponent.setWalkingLeft(true);
                 }
             }
         }
@@ -627,7 +629,7 @@ void c_adv::Player::updateSoundEffects() {
     constexpr float Step1 = 22.0f;
 
     if (m_legsChannel->GetCurrentAction() == &m_animLegsWalk) {
-        float playhead = m_legsChannel->GetPlayhead();
+        const float playhead = m_legsChannel->GetPlayhead();
         bool playFootstep = false;
 
         if (playhead >= Step0 && m_lastRunPlayhead < Step0) {
@@ -645,7 +647,7 @@ void c_adv::Player::updateSoundEffects() {
         };
         dbasic::AudioAsset *randomFootstep = nullptr;
         if (playFootstep) {
-            int randomIndex = ysMath::UniformRandomInt(4);
+            const int randomIndex = ysMath::UniformRandomInt(4);
             randomFootstep = FootstepEffects[randomIndex];
 
             m_world->getEngine().PlayAudio(randomFootstep);

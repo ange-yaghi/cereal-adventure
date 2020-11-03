@@ -9,8 +9,9 @@ c_adv::WalkComponent::WalkComponent() {
 
     m_walkingRight = false;
     m_walkingLeft = false;
-    m_acceleration = 20.0f;
-    m_maxRunVelocity = 4.0f;
+    m_acceleration = 9.0f;
+    m_maxRunVelocity = 5.0f;
+    m_startVelocity = 1.0f;
     m_runVelocity = 0.0f;
     m_contactPoint = ysMath::Constants::Zero;
 }
@@ -40,7 +41,7 @@ void c_adv::WalkComponent::process(float dt) {
         if (m_object->getCollidingObject(col)->hasTag(GameObject::Tag::Ledge)) continue;
 
         if (!col->m_sensor && !col->IsGhost()) {
-            ysVector normal = (col->m_body1 == &rigidBody) ? col->m_normal : ysMath::Negate(col->m_normal);
+            const ysVector normal = (col->m_body1 == &rigidBody) ? col->m_normal : ysMath::Negate(col->m_normal);
             if (ysMath::GetScalar(ysMath::Dot(normal, ysMath::Constants::YAxis)) > 0.5f) {
                 groundCollision = true;
                 m_currentSurface = object;
@@ -61,37 +62,52 @@ void c_adv::WalkComponent::process(float dt) {
         m_currentSurface = nullptr;
     }
 
-    float impulseAppliedToSurface = 0.0f;
-    float forceAppliedToSurface = 0.0f;
-
+    float velocity_x = ysMath::GetX(velocity);
+    float velocity0 = velocity_x;
+    float velocity1 = velocity0;
     if (m_walkingRight) {
+        velocity0 = m_runVelocity;
         m_runVelocity += m_acceleration * dt;
-        if (m_runVelocity > m_maxRunVelocity) m_runVelocity = m_maxRunVelocity;
-
-        impulseAppliedToSurface = (-m_acceleration / rigidBody.GetInverseMass()) * dt;
+        if (m_runVelocity > m_maxRunVelocity) m_runVelocity = m_maxRunVelocity;      
     }
     else if (m_walkingLeft) {
+        velocity0 = m_runVelocity;
         m_runVelocity -= m_acceleration * dt;
         if (m_runVelocity < -m_maxRunVelocity) m_runVelocity = -m_maxRunVelocity;
-
-        impulseAppliedToSurface = (m_acceleration / rigidBody.GetInverseMass()) * dt;
+    }
+    else {
+        m_runVelocity = velocity_x;
     }
 
-    if (m_walkingLeft || m_walkingRight) {
-        rigidBody.SetVelocity(ysMath::LoadVector(m_runVelocity, ysMath::GetY(velocity), 0.0f));
-    }
-    else if (isOnSurface()) {
-        m_runVelocity = 0.0f;
-        if (std::abs(ysMath::GetX(velocity)) > 0.01f) {
-            forceAppliedToSurface = ysMath::GetX(velocity) * 10.0f;
-            rigidBody.AddForceWorldSpace(
-                ysMath::LoadVector(-forceAppliedToSurface, 0.0f, 0.0f), 
-                rigidBody.Transform.GetWorldPosition());
+    float forceAppliedToSurface = 0.0f;
+
+    if (isOnSurface()) {
+        rigidBody.AddImpulseLocalSpace(
+            ysMath::LoadVector(m_runVelocity - velocity_x, 0.0f, 0.0f), ysMath::Constants::Zero);
+
+        if (m_walkingLeft || m_walkingRight) {
+            velocity1 = m_runVelocity;
         }
         else {
-            rigidBody.SetVelocity(ysMath::LoadVector(0.0f, ysMath::GetY(velocity), 0.0f));
+            if (std::abs(velocity0) > 0.01f) {
+                forceAppliedToSurface = velocity0 * 10.0f;
+                rigidBody.AddForceWorldSpace(
+                    ysMath::LoadVector(-forceAppliedToSurface, 0.0f, 0.0f),
+                    rigidBody.Transform.GetWorldPosition());
+                velocity1 = m_runVelocity;
+            }
+            else {
+                rigidBody.SetVelocity(ysMath::LoadVector(0.0f, ysMath::GetY(velocity), 0.0f));
+                velocity1 = 0.0f;
+            }
         }
     }
+    else {
+        m_runVelocity = velocity_x;
+    }
+
+    const float effectiveAcceleration = (velocity1 - velocity0) / dt;
+    const float impulseAppliedToSurface = -(effectiveAcceleration / rigidBody.GetInverseMass()) * dt;
 
     if (m_currentSurface != nullptr) {
         m_currentSurface->RigidBody.AddForceWorldSpace(

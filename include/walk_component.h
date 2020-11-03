@@ -23,6 +23,8 @@ namespace c_adv {
         void setMaxRunVelocity(float maxRunVelocity) { m_maxRunVelocity = maxRunVelocity; }
         float getMaxRunVelocity() const { return m_maxRunVelocity; }
 
+        float getRunVelocity() const { return m_runVelocity; }
+
         void setAcceleration(float acceleration) { m_acceleration = acceleration; }
         float getAcceleration() const { return m_acceleration; }
 
@@ -46,6 +48,7 @@ namespace c_adv {
         GameObject *m_currentSurface;
         ysVector m_contactPoint;
         float m_runVelocity;
+        float m_startVelocity;
 
         void checkSurfaceExists();
         void changeSurface(GameObject *surface);

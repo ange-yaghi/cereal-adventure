@@ -29,7 +29,7 @@ void c_adv::FruitBowl::initialize() {
     bounds->GetAsBox()->Position = ysMath::Constants::Zero;
 
     m_clock.setHighTime(1.0f);
-    m_clock.setLowTime(0.01f);
+    m_clock.setLowTime(10.0f);
 }
 
 void c_adv::FruitBowl::render() {
@@ -41,11 +41,6 @@ void c_adv::FruitBowl::render() {
 }
 
 void c_adv::FruitBowl::process(float dt) {
-    if (m_world->getEngine().IsKeyDown(ysKeyboard::KEY_1)) {
-        m_clock.setLowTime(0.01f);
-    }
-    else m_clock.setLowTime(1.0f);
-
     m_clock.update(dt);
 
     if (m_clock.getState()) {
@@ -54,8 +49,8 @@ void c_adv::FruitBowl::process(float dt) {
             ysMath::Add(RigidBody.Transform.GetWorldPosition(), ysMath::LoadVector(0.0f, 1.0f, 0.0f))
         );
 
-        float angle = ysMath::UniformRandom() * ysMath::Constants::PI;
-        float velocity = ysMath::UniformRandom() * 10.0f + 5.0f;
+        const float angle = ysMath::UniformRandom() * ysMath::Constants::PI;
+        const float velocity = ysMath::UniformRandom() * 10.0f + 5.0f;
 
         projectile->RigidBody.SetVelocity(
             ysMath::LoadVector(cos(angle) * velocity, sin(angle) * velocity, 0.0f));

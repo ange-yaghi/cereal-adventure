@@ -22,7 +22,7 @@ void c_adv::FruitProjectile::initialize() {
     addTag(Tag::Projectile);
 
     RigidBody.SetHint(dphysics::RigidBody::RigidBodyHint::Dynamic);
-    RigidBody.SetInverseMass(1.0f / 0.1f);
+    RigidBody.SetInverseMass(1.0f / 0.01f);
     RigidBody.SetInverseInertiaTensor(RigidBody.GetRectangleTensor(m_radius * 2, m_radius * 2));
     RigidBody.SetRequestsInformation(true);
     RigidBody.SetMaterial(GenericFrictionMaterial);
