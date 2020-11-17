@@ -62,7 +62,7 @@ void c_adv::WalkComponent::process(float dt) {
         m_currentSurface = nullptr;
     }
 
-    float velocity_x = ysMath::GetX(velocity);
+    const float velocity_x = ysMath::GetX(velocity);
     float velocity0 = velocity_x;
     float velocity1 = velocity0;
     if (m_walkingRight) {

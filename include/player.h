@@ -52,8 +52,8 @@ namespace c_adv {
         bool isCurrentArmActionComplete() const { return m_armsChannel->IsActionComplete(); }
 
         void updateGrip();
-        void attemptGrip();
-        GameObject *findGrip();
+        bool attemptGrip();
+        GameObject *findGrip(bool &ready);
         void releaseGrip();
 
         ysVector getGripLocationLocal();

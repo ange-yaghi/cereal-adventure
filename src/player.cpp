@@ -265,12 +265,18 @@ void c_adv::Player::updateGrip() {
 
     if (!m_walkComponent.isOnSurface()) {
         if (engine.IsKeyDown(ysKeyboard::KEY_SHIFT)) {
+            bool ready = false;
             if (m_gripCooldown.ready()) {
-                m_gripCooldown.trigger();
-                attemptGrip();
+                ready = attemptGrip();
+
+                if (!ready || isGraspReady()) {
+                    m_gripCooldown.trigger();
+                }
             }
 
-            m_gripCooldown.lock();
+            if (!ready) {
+                m_gripCooldown.lock();
+            }
         }
     }
 
@@ -280,29 +286,37 @@ void c_adv::Player::updateGrip() {
     }
 }
 
-void c_adv::Player::attemptGrip() {
-    GameObject *closestLedge = findGrip();
+bool c_adv::Player::attemptGrip() {
+    bool ready = false;
+    GameObject *closestLedge = findGrip(ready);
 
     if (closestLedge != nullptr) {
-        m_ledge = closestLedge;
-        m_graspReady = true;
+        if (ready) {
+            m_ledge = closestLedge;
+            m_graspReady = true;
 
-        if (m_gripLink == nullptr) {
-            m_gripLink = m_realm->PhysicsSystem.CreateLink<dphysics::LedgeLink>(&this->RigidBody, &closestLedge->RigidBody);
+            if (m_gripLink == nullptr) {
+                m_gripLink = m_realm->PhysicsSystem.CreateLink<dphysics::LedgeLink>(&this->RigidBody, &closestLedge->RigidBody);
+                m_gripLink->SetAnchor(closestLedge->RigidBody.Transform.GetWorldPosition());
+                m_gripLink->SetGripLocal(getGripLocationLocal());
+            }
+
             m_gripLink->SetAnchor(closestLedge->RigidBody.Transform.GetWorldPosition());
-            m_gripLink->SetGripLocal(getGripLocationLocal());
-        }
 
-        m_gripLink->SetAnchor(closestLedge->RigidBody.Transform.GetWorldPosition());
+            return false;
+        }
+        else return true;
     }
     else {
         m_ledge = nullptr;
         m_graspReady = false;
         releaseGrip();
+
+        return false;
     }
 }
 
-c_adv::GameObject *c_adv::Player::findGrip() {
+c_adv::GameObject *c_adv::Player::findGrip(bool &ready) {
     const int collisionCount = RigidBody.GetCollisionCount();
 
     float closestLedgeDistance = FLT_MAX;
@@ -311,6 +325,8 @@ c_adv::GameObject *c_adv::Player::findGrip() {
     ysVector gripLocation = getGripLocationWorld();
     const float gy = ysMath::GetY(gripLocation);
     const float gx = ysMath::GetX(gripLocation);
+
+    ready = false;
 
     for (int i = 0; i < collisionCount; ++i) {
         dphysics::Collision *col = RigidBody.GetCollision(i);
@@ -324,9 +340,8 @@ c_adv::GameObject *c_adv::Player::findGrip() {
 
             if (ly < gy) {
                 const float d = distance(gripLocation, ledgePosition);
-                if (d < closestLedgeDistance &&
-                    std::abs(gx - lx) < 0.2f &&
-                    std::abs(gy - ly) < m_ledgeGraspDistance) {
+                if (d < closestLedgeDistance && d < m_ledgeGraspDistance) {
+                    ready = (std::abs(gx - lx) < 0.1f);
                     closestLedge = ledge;
                     closestLedgeDistance = d;
                 }
@@ -493,7 +508,7 @@ void c_adv::Player::updateMotion(float dt) {
         if (m_walkComponent.isOnSurface()) {
             if (m_movementCooldown.ready()) {
                 if (engine.ProcessKeyDown(ysKeyboard::KEY_SPACE)) {
-                    if (engine.IsKeyDown(ysKeyboard::KEY_SHIFT)) {
+                    if (engine.IsKeyDown(ysKeyboard::KEY_CONTROL)) {
                         RigidBody.AddImpulseWorldSpace(
                             ysMath::LoadVector(0.0f, 8.0f, 0.0f), 
                             RigidBody.Transform.GetWorldPosition());

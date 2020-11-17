@@ -54,6 +54,7 @@
     <ClCompile Include="..\..\src\static_art.cpp" />
     <ClCompile Include="..\..\src\stool_1.cpp" />
     <ClCompile Include="..\..\src\stove_hood.cpp" />
+    <ClCompile Include="..\..\src\table.cpp" />
     <ClCompile Include="..\..\src\test_obstacle.cpp" />
     <ClCompile Include="..\..\src\toaster.cpp" />
     <ClCompile Include="..\..\src\toast_projectile.cpp" />
@@ -99,6 +100,7 @@
     <ClInclude Include="..\..\include\static_art.h" />
     <ClInclude Include="..\..\include\stool_1.h" />
     <ClInclude Include="..\..\include\stove_hood.h" />
+    <ClInclude Include="..\..\include\table.h" />
     <ClInclude Include="..\..\include\test_obstacle.h" />
     <ClInclude Include="..\..\include\toaster.h" />
     <ClInclude Include="..\..\include\toast_projectile.h" />

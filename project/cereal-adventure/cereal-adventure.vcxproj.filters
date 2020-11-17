@@ -177,6 +177,9 @@
     <ClCompile Include="..\..\src\death_component.cpp">
       <Filter>Source Files\game-objects\player</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\table.cpp">
+      <Filter>Source Files\game-objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\delta.h">
@@ -307,6 +310,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\death_component.h">
       <Filter>Header Files\game-objects\player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\table.h">
+      <Filter>Header Files\game-objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

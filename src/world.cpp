@@ -14,6 +14,7 @@ c_adv::World::World() {
     m_focus = nullptr;
     m_mainRealm = nullptr;
     m_cameraDistance = DefaultCameraDistance;
+    m_respawnPosition = ysMath::Constants::Zero;
 }
 
 c_adv::World::~World() {
@@ -82,13 +83,13 @@ void c_adv::World::initialSpawn() {
     m_mainRealm = newRealm<Realm>();
     m_mainRealm->setIndoor(false);
 
-    m_focus = m_mainRealm->spawn<Player>();
-    m_focus->RigidBody.Transform.SetPosition(ysMath::LoadVector(0.0f, 3.0f, 0.0f));
-    m_focus->incrementReferenceCount();
-
     ysTransform root;
     dbasic::RenderSkeleton *level1 = m_assetManager.BuildRenderSkeleton(&root, m_assetManager.GetSceneObject("Level 1"));
     generateLevel(level1);
+
+    m_focus = m_mainRealm->spawn<Player>();
+    m_focus->RigidBody.Transform.SetPosition(m_respawnPosition);
+    m_focus->incrementReferenceCount();
 }
 
 void c_adv::World::run() {
@@ -149,7 +150,7 @@ void c_adv::World::render() {
 
 void c_adv::World::process() {
     // Limit min framerate to 30 fps
-    float dt = min(1 / 30.0f, getEngine().GetFrameLength());
+    const float dt = min(1 / 30.0f, getEngine().GetFrameLength());
 
     m_mainRealm->process(dt);
 
@@ -170,7 +171,7 @@ void c_adv::World::process() {
     if (m_focus->isDead()) {
         m_focus->decrementReferenceCount();
         m_focus = m_mainRealm->spawn<Player>();
-        m_focus->RigidBody.Transform.SetPosition(ysMath::LoadVector(0.0f, 3.0f, 0.0f));
+        m_focus->RigidBody.Transform.SetPosition(m_respawnPosition);
         m_focus->incrementReferenceCount();
     }
 }
@@ -240,8 +241,7 @@ void c_adv::World::generateLevel(dbasic::RenderSkeleton *hierarchy) {
             newSink->RigidBody.Transform.SetPosition(position);
         }
         else if (strcmp(sceneAsset->GetName(), "PlayerStart") == 0) {
-            ysVector position = node->Transform.GetWorldPosition();
-            m_focus->RigidBody.Transform.SetPosition(position);
+            m_respawnPosition = node->Transform.GetWorldPosition();
         }
         else if (strcmp(sceneAsset->GetName(), "LightSource::Ceiling") == 0) {
             ysVector position = node->Transform.GetWorldPosition();
@@ -262,6 +262,11 @@ void c_adv::World::generateLevel(dbasic::RenderSkeleton *hierarchy) {
             ysVector position = node->Transform.GetWorldPosition();
             Fan *fan = m_mainRealm->spawn<Fan>();
             fan->RigidBody.Transform.SetPosition(position);
+        }
+        else if (strcmp(sceneAsset->GetName(), "Table") == 0) {
+            ysVector position = node->Transform.GetWorldPosition();
+            Table *table = m_mainRealm->spawn<Table>();
+            table->RigidBody.Transform.SetPosition(position);
         }
         else if (sceneAsset->GetType() == ysObjectData::ObjectType::Instance) {
             ysVector position = node->Transform.GetWorldPosition();

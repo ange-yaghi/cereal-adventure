@@ -52,10 +52,15 @@ void c_adv::Fan::process(float dt) {
         if (col->m_sensor) {
             GameObject *obj = getCollidingObject(col);
 
-            float obj_y = ysMath::GetY(obj->RigidBody.Transform.GetWorldPosition());
-            float fan_y = ysMath::GetY(RigidBody.Transform.GetWorldPosition());
+            const ysVector position = RigidBody.Transform.GetWorldPosition();
+            const ysVector objPosition = obj->RigidBody.Transform.GetWorldPosition();
 
-            if (std::abs(obj_y - fan_y) < 1.5f) {
+            const float obj_x = ysMath::GetX(objPosition);
+            const float obj_y = ysMath::GetY(objPosition);
+            const float fan_x = ysMath::GetX(position);
+            const float fan_y = ysMath::GetY(position);
+
+            if (std::abs(obj_y - fan_y) < 1.5f && obj_x > fan_x) {
                 if (!obj->hasTag(GameObject::Tag::Dynamic)) continue;
                 if (ysMath::GetX(obj->RigidBody.GetVelocity()) > 15.0f) continue;
 

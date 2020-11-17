@@ -58,6 +58,7 @@ namespace c_adv {
         SpringConnector m_smoothCamera;
         SpringConnector m_smoothTarget;
 
+        ysVector m_respawnPosition;
         float m_cameraDistance;
 
     protected:
