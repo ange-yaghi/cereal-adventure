@@ -42,11 +42,12 @@ void c_adv::FruitProjectile::initialize() {
 }
 
 void c_adv::FruitProjectile::render() {
-    m_world->getEngine().ResetBrdfParameters();
-    m_world->getEngine().SetBaseColor(Black);
+    m_world->getShaders().ResetBrdfParameters();
+    m_world->getShaders().SetBaseColor(Black);
 
-    m_world->getEngine().SetObjectTransform(m_renderTransform.GetWorldTransform());
-    m_world->getEngine().DrawModel(m_fruitAsset, 1.0f, nullptr);
+    m_world->getShaders().SetObjectTransform(m_renderTransform.GetWorldTransform());
+    m_world->getShaders().ConfigureModel(1.0f);
+    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlag(), m_fruitAsset, nullptr);
 }
 
 void c_adv::FruitProjectile::process(float dt) {

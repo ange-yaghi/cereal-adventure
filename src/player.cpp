@@ -168,10 +168,10 @@ void c_adv::Player::process(float dt) {
     m_debugDamageIndicatorCooldown.update(dt);
     m_debugDamageFlicker.update(dt);
 
-    if (m_world->getEngine().ProcessKeyDown(ysKeyboard::KEY_0)) {
+    if (m_world->getEngine().ProcessKeyDown(ysKey::Code::Up)) {
         m_health = 0;
     }
-    else if (m_world->getEngine().ProcessKeyDown(ysKeyboard::KEY_2)) {
+    else if (m_world->getEngine().ProcessKeyDown(ysKey::Code::N2)) {
         m_health = 10;
     }
 
@@ -181,8 +181,8 @@ void c_adv::Player::process(float dt) {
 }
 
 void c_adv::Player::render() {
-    m_world->getEngine().ResetBrdfParameters();
-    m_world->getEngine().DrawRenderSkeleton(m_renderSkeleton, 1.0f, (int)Layer::Player);
+    m_world->getShaders().ResetBrdfParameters();
+    m_world->getEngine().DrawRenderSkeleton(m_world->getShaders().GetRegularFlag(), m_renderSkeleton, 1.0f, &m_world->getShaders(), (int)Layer::Player);
 
     if (!m_debugDamageIndicatorCooldown.ready() && m_debugDamageFlicker.getState()) {
         Material->SetDiffuseColor(ysMath::Lerp(DebugRed, White, 0.5f));
@@ -191,9 +191,9 @@ void c_adv::Player::render() {
         Material->SetDiffuseColor(White);
     }
 
-    m_world->getEngine().ResetBrdfParameters();
-    m_world->getEngine().SetLit(true);
-    m_world->getEngine().SetBaseColor(DebugRed);
+    m_world->getShaders().ResetBrdfParameters();
+    m_world->getShaders().SetLit(true);
+    m_world->getShaders().SetBaseColor(DebugRed);
 
     ysTransform *transform = &m_renderSkeleton->GetNode("Body")->Transform;
     ysMatrix mat = ysMath::LoadMatrix(
@@ -202,7 +202,7 @@ void c_adv::Player::render() {
 
     const float hh = m_bodyCollider->GetAsBox()->HalfHeight;
     const float hw = m_bodyCollider->GetAsBox()->HalfWidth;
-    m_world->getEngine().SetObjectTransform(mat);
+    m_world->getShaders().SetObjectTransform(mat);
 
     dbasic::Console *console = m_world->getEngine().GetConsole();
     console->MoveToOrigin();
@@ -264,7 +264,7 @@ void c_adv::Player::updateGrip() {
     }
 
     if (!m_walkComponent.isOnSurface()) {
-        if (engine.IsKeyDown(ysKeyboard::KEY_SHIFT)) {
+        if (engine.IsKeyDown(ysKey::Code::Shift)) {
             bool ready = false;
             if (m_gripCooldown.ready()) {
                 ready = attemptGrip();
@@ -280,7 +280,7 @@ void c_adv::Player::updateGrip() {
         }
     }
 
-    if (!engine.IsKeyDown(ysKeyboard::KEY_SHIFT)) {
+    if (!engine.IsKeyDown(ysKey::Code::Shift)) {
         m_gripCooldown.unlock();
         releaseGrip();
     }
@@ -495,11 +495,11 @@ void c_adv::Player::updateMotion(float dt) {
 
     if (isAlive()) {
         if (m_movementCooldown.ready()) {
-            if (engine.IsKeyDown(ysKeyboard::KEY_D)) {
+            if (engine.IsKeyDown(ysKey::Code::D)) {
                 m_nextDirection = Direction::Forward;
                 m_walkComponent.setWalkingRight(true);
             }
-            else if (engine.IsKeyDown(ysKeyboard::KEY_A)) {
+            else if (engine.IsKeyDown(ysKey::Code::A)) {
                 m_nextDirection = Direction::Back;
                 m_walkComponent.setWalkingLeft(true);
             }
@@ -507,8 +507,8 @@ void c_adv::Player::updateMotion(float dt) {
 
         if (m_walkComponent.isOnSurface()) {
             if (m_movementCooldown.ready()) {
-                if (engine.ProcessKeyDown(ysKeyboard::KEY_SPACE)) {
-                    if (engine.IsKeyDown(ysKeyboard::KEY_CONTROL)) {
+                if (engine.ProcessKeyDown(ysKey::Code::Space)) {
+                    if (engine.IsKeyDown(ysKey::Code::Control)) {
                         RigidBody.AddImpulseWorldSpace(
                             ysMath::LoadVector(0.0f, 8.0f, 0.0f), 
                             RigidBody.Transform.GetWorldPosition());
@@ -522,7 +522,7 @@ void c_adv::Player::updateMotion(float dt) {
             }
         }
         else if (isHanging()) {
-            if (engine.ProcessKeyDown(ysKeyboard::KEY_SPACE)) {
+            if (engine.ProcessKeyDown(ysKey::Code::Space)) {
                 RigidBody.AddImpulseWorldSpace(
                     ysMath::LoadVector(0.0f, 10.0f, 0.0f), 
                     RigidBody.Transform.GetWorldPosition());
@@ -530,13 +530,13 @@ void c_adv::Player::updateMotion(float dt) {
             }
         }
         else {
-            if (engine.IsKeyDown(ysKeyboard::KEY_D) && ysMath::GetX(v) < 2.0f) {
+            if (engine.IsKeyDown(ysKey::Code::D) && ysMath::GetX(v) < 2.0f) {
                 RigidBody.AddForceWorldSpace(
                     ysMath::LoadVector(10.0f, 0.0f, 0.0f), 
                     RigidBody.Transform.GetWorldPosition());
                 m_nextDirection = Direction::Forward;
             }
-            else if (engine.IsKeyDown(ysKeyboard::KEY_A) && ysMath::GetX(v) > -2.0f) {
+            else if (engine.IsKeyDown(ysKey::Code::A) && ysMath::GetX(v) > -2.0f) {
                 RigidBody.AddForceWorldSpace(
                     ysMath::LoadVector(-10.0f, 0.0f, 0.0f), 
                     RigidBody.Transform.GetWorldPosition());

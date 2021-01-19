@@ -31,5 +31,5 @@ void c_adv::CeilingLightSource::render() {
     light.FalloffEnabled = 1;
     light.Position = ysMath::GetVector4(RigidBody.Transform.GetWorldPosition());
 
-    m_world->getEngine().AddLight(light); 
+    m_world->getShaders().AddLight(light); 
 }

@@ -40,13 +40,14 @@ void c_adv::StoveHood::initialize() {
 }
 
 void c_adv::StoveHood::render() {
-    m_world->getEngine().ResetBrdfParameters();
+    m_world->getShaders().ResetBrdfParameters();
 
     ysVector color = ysMath::Lerp(ObjectColor, DebugRed, m_currentPower / m_maxPower);
-    m_world->getEngine().SetBaseColor(color);
+    m_world->getShaders().SetBaseColor(color);
 
-    m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
-    m_world->getEngine().DrawModel(m_stoveHoodAsset, 1.0f, nullptr);
+    m_world->getShaders().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
+    m_world->getShaders().ConfigureModel(1.0f);
+    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlag(), m_stoveHoodAsset, nullptr);
 }
 
 void c_adv::StoveHood::process(float dt) {

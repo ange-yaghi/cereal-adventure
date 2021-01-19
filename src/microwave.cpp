@@ -29,11 +29,12 @@ void c_adv::Microwave::initialize() {
 }
 
 void c_adv::Microwave::render() {
-    m_world->getEngine().ResetBrdfParameters();
-    m_world->getEngine().SetBaseColor(ObjectColor);
+    m_world->getShaders().ResetBrdfParameters();
+    m_world->getShaders().SetBaseColor(ObjectColor);
 
-    m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
-    m_world->getEngine().DrawModel(m_microwaveAsset, 1.0f, nullptr);
+    m_world->getShaders().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
+    m_world->getShaders().ConfigureModel(1.0f);
+    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlag(), m_microwaveAsset, nullptr);
 }
 
 void c_adv::Microwave::configureAssets(dbasic::AssetManager *am) {

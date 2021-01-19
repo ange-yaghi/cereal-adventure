@@ -28,6 +28,7 @@ namespace c_adv {
 
         dbasic::DeltaEngine &getEngine() { return m_engine; }
         dbasic::AssetManager &getAssetManager() { return m_assetManager; }
+        dbasic::DefaultShaders &getShaders() { return m_shaders; }
 
         AABB getCameraExtents() const;
 
@@ -62,6 +63,7 @@ namespace c_adv {
         float m_cameraDistance;
 
     protected:
+        dbasic::DefaultShaders m_shaders;
         dbasic::DeltaEngine m_engine;
         dbasic::AssetManager m_assetManager;
 

@@ -35,11 +35,12 @@ void c_adv::Fan::initialize() {
 }
 
 void c_adv::Fan::render() {
-    m_world->getEngine().ResetBrdfParameters();
-    m_world->getEngine().SetBaseColor(DebugRed);
+    m_world->getShaders().ResetBrdfParameters();
+    m_world->getShaders().SetBaseColor(DebugRed);
 
-    m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
-    m_world->getEngine().DrawModel(m_fanAsset, 1.0f, nullptr);
+    m_world->getShaders().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
+    m_world->getShaders().ConfigureModel(1.0f);
+    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlag(), m_fanAsset, nullptr);
 }
 
 void c_adv::Fan::process(float dt) {

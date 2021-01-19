@@ -1,17 +1,17 @@
+#ifndef YDS_OPENGL_SHADER_H
+#define YDS_OPENGL_SHADER_H
+
 #include "yds_shader.h"
 
-class ysOpenGLShader : public ysShader
-{
-
-	friend class ysOpenGLDevice;
+class ysOpenGLShader : public ysShader {
+    friend class ysOpenGLDevice;
 
 public:
-
-	ysOpenGLShader();
-	~ysOpenGLShader();
+    ysOpenGLShader();
+    ~ysOpenGLShader();
 
 protected:
-
-	unsigned int m_handle;
-
+    unsigned int m_handle;
 };
+
+#endif /* YDS_OPENGL_SHADER_H */

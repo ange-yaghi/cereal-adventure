@@ -70,7 +70,7 @@ public:
     virtual ysError CreateSubRenderTarget(ysRenderTarget **newTarget, ysRenderTarget *parent, int x, int y, int width, int height) = 0;
 
     // Resize a render target
-    virtual ysError ResizeRenderTarget(ysRenderTarget *target, int width, int height);
+    virtual ysError ResizeRenderTarget(ysRenderTarget *target, int width, int height, int pwidth, int pheight);
 
     // Enable/disable depth testing
     virtual ysError SetDepthTestEnabled(ysRenderTarget *target, bool enable);
@@ -200,13 +200,13 @@ protected:
 
 protected:
     // Object Holders
-    ysDynamicArray<ysRenderingContext, 4>	m_renderingContexts;
-    ysDynamicArray<ysRenderTarget, 4>		m_renderTargets;
-    ysDynamicArray<ysGPUBuffer, 16>			m_gpuBuffers;
-    ysDynamicArray<ysShader, 16>			m_shaders;
-    ysDynamicArray<ysShaderProgram, 8>		m_shaderPrograms;
-    ysDynamicArray<ysInputLayout, 16>		m_inputLayouts;
-    ysDynamicArray<ysTexture, 32>			m_textures;
+    ysDynamicArray<ysRenderingContext, 4>    m_renderingContexts;
+    ysDynamicArray<ysRenderTarget, 4>        m_renderTargets;
+    ysDynamicArray<ysGPUBuffer, 16>            m_gpuBuffers;
+    ysDynamicArray<ysShader, 16>            m_shaders;
+    ysDynamicArray<ysShaderProgram, 8>        m_shaderPrograms;
+    ysDynamicArray<ysInputLayout, 16>        m_inputLayouts;
+    ysDynamicArray<ysTexture, 32>            m_textures;
 
     // Active Objects
     ysRenderTarget *m_activeRenderTarget;
@@ -226,7 +226,7 @@ protected:
     unsigned int m_debugFlags;
 
     // Platform Dependant Constants
-    int	m_maxTextureSlots;
+    int    m_maxTextureSlots;
 };
 
 #endif /* YDS_DEVICE_H */

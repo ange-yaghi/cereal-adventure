@@ -132,8 +132,8 @@ public:
         return newObject;
     }
 
-    ysError Delete(int index, bool destroy = true, TYPE *replacement = NULL, bool preserveOrder = false) {
-        if (index >= m_nObjects || index < 0) return ysError::YDS_OUT_OF_BOUNDS;
+    ysError Delete(int index, bool destroy = true, TYPE *replacement = nullptr, bool preserveOrder = false) {
+        if (index >= m_nObjects || index < 0) return ysError::OutOfBounds;
 
         if (m_nObjects <= m_maxSize / 2) Condense();
 
@@ -143,10 +143,10 @@ public:
             ysAllocator::TypeFree<TYPE>(m_array[index], 1, true, target->GetAlignment());
         }
 
-        if (replacement == NULL) {
+        if (replacement == nullptr) {
             if (!preserveOrder) {
                 m_array[index] = m_array[m_nObjects - 1];
-                m_array[m_nObjects - 1] = NULL;
+                m_array[m_nObjects - 1] = nullptr;
             }
             else {
                 for (int i = index; i < m_nObjects - 1; i++) {
@@ -157,7 +157,7 @@ public:
                 }
 
                 // Just as a precaution
-                m_array[m_nObjects - 1] = NULL;
+                m_array[m_nObjects - 1] = nullptr;
             }
         }
         else {
@@ -170,11 +170,11 @@ public:
             sElement->SetIndex(index);
         }
 
-        if (replacement == NULL) {
+        if (replacement == nullptr) {
             m_nObjects--;
         }
 
-        return ysError::YDS_NO_ERROR;
+        return ysError::None;
     }
 
     inline TYPE *Get(int index) const {
@@ -192,7 +192,7 @@ public:
     void Clear(bool destroy = true) {
         if (destroy) {
             int nObjects = m_nObjects;
-            for (int i = nObjects - 1; i >= 0; i--) {
+            for (int i = nObjects - 1; i >= 0; --i) {
                 Delete(i);
             }
         }

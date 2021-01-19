@@ -3,18 +3,14 @@
 
 #include "yds_texture.h"
 
-class ysOpenGLTexture : public ysTexture
-{
-
-	friend class ysOpenGLDevice;
+class ysOpenGLTexture : public ysTexture {
+    friend class ysOpenGLDevice;
 
 public:
+    ysOpenGLTexture();
+    ~ysOpenGLTexture();
 
-	ysOpenGLTexture();
-	~ysOpenGLTexture();
-
-	unsigned int m_handle;
-
+    unsigned int m_handle;
 };
 
-#endif
+#endif /* YDS_OPENGL_TEXTURE_H */

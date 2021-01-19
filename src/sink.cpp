@@ -29,11 +29,12 @@ void c_adv::Sink::initialize() {
 }
 
 void c_adv::Sink::render() {
-    m_world->getEngine().ResetBrdfParameters();
-    m_world->getEngine().SetBaseColor(ObjectColor);
+    m_world->getShaders().ResetBrdfParameters();
+    m_world->getShaders().SetBaseColor(ObjectColor);
 
-    m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
-    m_world->getEngine().DrawModel(m_sinkAsset, 1.0f, nullptr);
+    m_world->getShaders().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
+    m_world->getShaders().ConfigureModel(1.0f);
+    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlag(), m_sinkAsset, nullptr);
 }
 
 void c_adv::Sink::configureAssets(dbasic::AssetManager *am) {

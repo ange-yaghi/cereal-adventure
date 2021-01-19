@@ -16,5 +16,6 @@ void c_adv::CerealAdventureApp::Run() {
     m_world.run();
 
     m_world.getAssetManager().Destroy();
+    m_world.getShaders().Destroy();
     m_world.getEngine().Destroy();
 }

@@ -29,11 +29,12 @@ void c_adv::Ledge::initialize() {
 }
 
 void c_adv::Ledge::render() {
-    m_world->getEngine().ResetBrdfParameters();
-    m_world->getEngine().SetBaseColor(ysColor::srgbiToLinear(255, 255, 0));
-    m_world->getEngine().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
-    m_world->getEngine().SetLit(false);
-    m_world->getEngine().DrawModel(m_ledgeAsset, 1.0f, nullptr, 0);
+    m_world->getShaders().ResetBrdfParameters();
+    m_world->getShaders().SetBaseColor(ysColor::srgbiToLinear(255, 255, 0));
+    m_world->getShaders().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
+    m_world->getShaders().SetLit(false);
+    m_world->getShaders().ConfigureModel(1.0f);
+    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlag(), m_ledgeAsset, nullptr, 0);
 }
 
 void c_adv::Ledge::configureAssets(dbasic::AssetManager *am) {

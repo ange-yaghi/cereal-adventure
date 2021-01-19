@@ -19,7 +19,7 @@ namespace c_adv {
         static void configureAssets(dbasic::AssetManager *am);
 
     protected:
-        static dbasic::ModelAsset *m_counterAsset;
+        static dbasic::ModelAsset *m_counterAsset; 
     };
 
 } /* namespace c_adv */

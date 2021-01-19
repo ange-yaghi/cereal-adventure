@@ -48,11 +48,12 @@ void c_adv::ToastProjectile::initialize() {
 }
 
 void c_adv::ToastProjectile::render() {
-    m_world->getEngine().ResetBrdfParameters();
-    m_world->getEngine().SetBaseColor(DebugRed);
+    m_world->getShaders().ResetBrdfParameters();
+    m_world->getShaders().SetBaseColor(DebugRed);
 
-    m_world->getEngine().SetObjectTransform(m_renderTransform.GetWorldTransform());
-    m_world->getEngine().DrawModel(m_toastAsset, 1.0f, nullptr);
+    m_world->getShaders().SetObjectTransform(m_renderTransform.GetWorldTransform());
+    m_world->getShaders().ConfigureModel(1.0f);
+    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlag(), m_toastAsset, nullptr);
 }
 
 void c_adv::ToastProjectile::process(float dt) {

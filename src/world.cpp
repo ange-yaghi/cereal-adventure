@@ -65,7 +65,7 @@ void c_adv::World::initialize(void *instance, ysContextObject::DeviceAPI api) {
     AssetLoader::loadAllAssets(dbasic::Path(assetPath), &m_assetManager);
 
     // Camera settings
-    m_engine.SetCameraMode(dbasic::DeltaEngine::CameraMode::Target);
+    m_shaders.SetCameraMode(dbasic::DefaultShaders::CameraMode::Target);
 
     m_smoothCamera.setPosition(ysMath::Constants::Zero);
     m_smoothCamera.setStiffnessTensor(ysMath::LoadVector(200.0f, 50.0f, 0.0f));
@@ -77,6 +77,9 @@ void c_adv::World::initialize(void *instance, ysContextObject::DeviceAPI api) {
 
     m_engine.SetCursorHidden(false);
     m_engine.SetCursorPositionLock(false);
+
+    m_engine.InitializeDefaultShaderSet(&m_shaders);
+    m_engine.SetShaderSet(m_shaders.GetShaderSet());
 }
 
 void c_adv::World::initialSpawn() {
@@ -111,39 +114,43 @@ void c_adv::World::frameTick() {
 
 c_adv::AABB c_adv::World::getCameraExtents() const {
     float cameraX, cameraY;
-    m_engine.GetCameraPosition(&cameraX, &cameraY);
+    m_shaders.GetCameraPosition(&cameraX, &cameraY);
 
-    float altitude = m_engine.GetCameraAltitude();
+    const float altitude = m_shaders.GetCameraAltitude();
 
-    float v, h;
-    float fov = m_engine.GetCameraFov();
-    float aspect = m_engine.GetCameraAspect();
+    const float fov = m_shaders.GetCameraFov();
+    const float aspect = m_shaders.GetCameraAspect();
 
-    v = std::tan(fov / 2) * altitude;
-    h = v * aspect;
+    const float v = std::tan(fov / 2) * altitude;
+    const float h = v * aspect;
 
     return { ysMath::LoadVector(-h + cameraX, -v + cameraY, 0.0f, 0.0f), ysMath::LoadVector(h + cameraX, v + cameraY) };
 }
 
 void c_adv::World::render() {
     float offset_x = 0.0f, offset_y = 0.0f;
-    if (m_engine.IsKeyDown(ysKeyboard::KEY_DOWN)) {
+    if (m_engine.IsKeyDown(ysKey::Code::Down)) {
         offset_y = -5.0f;
     }
-    else if (m_engine.IsKeyDown(ysKeyboard::KEY_UP)) {
+    else if (m_engine.IsKeyDown(ysKey::Code::Up)) {
         offset_y = 5.0f;
     }
 
-    ysVector focusPosition = m_focus->RigidBody.Transform.GetWorldPosition();
+    const ysVector focusPosition = m_focus->RigidBody.Transform.GetWorldPosition();
     m_smoothCamera.setTarget(focusPosition);
     m_smoothTarget.setTarget(ysMath::Add(focusPosition, ysMath::LoadVector(offset_x, offset_y, 0.0f)));
 
-    ysVector cameraTarget = m_smoothCamera.getPosition();
+    const ysVector cameraTarget = m_smoothCamera.getPosition();
 
-    m_engine.SetCameraPosition(ysMath::GetX(cameraTarget), ysMath::GetY(cameraTarget));
-    m_engine.SetCameraAltitude(m_cameraDistance);
-    m_engine.SetCameraTarget(m_smoothTarget.getPosition());
-    m_engine.SetCameraUp(ysMath::Constants::YAxis);
+    m_shaders.SetCameraPosition(ysMath::GetX(cameraTarget), ysMath::GetY(cameraTarget));
+    m_shaders.SetCameraAltitude(m_cameraDistance);
+    m_shaders.SetCameraTarget(m_smoothTarget.getPosition());
+    m_shaders.SetCameraUp(ysMath::Constants::YAxis);
+
+    m_shaders.SetScreenDimensions(m_engine.GetScreenWidth(), m_engine.GetScreenHeight());
+    m_shaders.CalculateCamera();
+
+    m_shaders.ResetLights();
 
     m_mainRealm->render();
 }
@@ -157,14 +164,14 @@ void c_adv::World::process() {
     m_smoothCamera.update(dt);
     m_smoothTarget.update(dt);
 
-    if (m_engine.IsKeyDown(ysKeyboard::KEY_SUBTRACT)) {
+    if (m_engine.IsKeyDown(ysKey::Code::Subtract)) {
         m_cameraDistance += 0.5f;
     }
-    else if (m_engine.IsKeyDown(ysKeyboard::KEY_ADD)) {
+    else if (m_engine.IsKeyDown(ysKey::Code::Add)) {
         m_cameraDistance -= 0.5f;
         if (m_cameraDistance < 1.0f) m_cameraDistance = 1.0f;
     }
-    else if (m_engine.IsKeyDown(ysKeyboard::KEY_BACK)) {
+    else if (m_engine.IsKeyDown(ysKey::Code::Back)) {
         m_cameraDistance = DefaultCameraDistance;
     }
 

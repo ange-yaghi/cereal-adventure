@@ -66,7 +66,7 @@ void c_adv::Realm::render() {
 
     ysVector4 ambient = WallColor;
     ambient.Scale(0.5f);
-    m_world->getEngine().SetAmbientLight(ambient);
+    m_world->getShaders().SetAmbientLight(ambient);
     
     dbasic::Light sun0;
     sun0.Position = ysVector4(10.0f, 10.0f, 10.0f);
@@ -76,7 +76,7 @@ void c_adv::Realm::render() {
     sun0.Attenuation0 = 0;
     sun0.Attenuation1 = 0;
     sun0.Direction = ysVector4(0.0f, 0.0f, 0.0f);
-    m_world->getEngine().AddLight(sun0);
+    m_world->getShaders().AddLight(sun0);
 
     dbasic::Light sun1;
     sun1.Position = ysVector4(57.0f, 10.0f, 10.0f);
@@ -86,7 +86,7 @@ void c_adv::Realm::render() {
     sun1.Attenuation0 = 0;
     sun1.Attenuation1 = 0;
     sun1.Direction = ysVector4(0.0f, 0.0f, 0.0f);
-    m_world->getEngine().AddLight(sun1);
+    m_world->getShaders().AddLight(sun1);
 
     dbasic::Light sun2;
     sun2.Position = ysVector4(30.0f, 10.0f, 10.0f);
@@ -96,7 +96,7 @@ void c_adv::Realm::render() {
     sun2.Attenuation0 = 0;
     sun2.Attenuation1 = 0;
     sun2.Direction = ysVector4(0.0f, 0.0f, 0.0f);
-    m_world->getEngine().AddLight(sun2);
+    m_world->getShaders().AddLight(sun2);
 
     dbasic::Light backLight;  
     backLight.Position = ysVector4(7.0f, 1.0f, 2.0f);    

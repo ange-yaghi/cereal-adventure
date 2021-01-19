@@ -38,11 +38,12 @@ void c_adv::Vase::initialize() {
 }
 
 void c_adv::Vase::render() {
-    m_world->getEngine().ResetBrdfParameters();
-    m_world->getEngine().SetBaseColor(DebugRed);
+    m_world->getShaders().ResetBrdfParameters();
+    m_world->getShaders().SetBaseColor(DebugRed);
 
-    m_world->getEngine().SetObjectTransform(m_renderTransform.GetWorldTransform());
-    m_world->getEngine().DrawModel(m_vaseAsset, 1.0f, nullptr);
+    m_world->getShaders().SetObjectTransform(m_renderTransform.GetWorldTransform());
+    m_world->getShaders().ConfigureModel(1.0f);
+    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlag(), m_vaseAsset, nullptr);
 }
 
 void c_adv::Vase::process(float dt) {
