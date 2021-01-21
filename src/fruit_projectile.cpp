@@ -47,7 +47,7 @@ void c_adv::FruitProjectile::render() {
 
     m_world->getShaders().SetObjectTransform(m_renderTransform.GetWorldTransform());
     m_world->getShaders().ConfigureModel(1.0f);
-    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlag(), m_fruitAsset, nullptr);
+    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_fruitAsset, nullptr);
 }
 
 void c_adv::FruitProjectile::process(float dt) {

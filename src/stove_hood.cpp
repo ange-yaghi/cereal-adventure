@@ -47,7 +47,7 @@ void c_adv::StoveHood::render() {
 
     m_world->getShaders().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
     m_world->getShaders().ConfigureModel(1.0f);
-    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlag(), m_stoveHoodAsset, nullptr);
+    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_stoveHoodAsset, nullptr);
 }
 
 void c_adv::StoveHood::process(float dt) {
@@ -64,7 +64,7 @@ void c_adv::StoveHood::process(float dt) {
         m_currentPower = max(m_currentPower, 0.0f);
     }
 
-    int collisionCount = RigidBody.GetCollisionCount();
+    const int collisionCount = RigidBody.GetCollisionCount();
     for (int i = 0; i < collisionCount; ++i) {
         dphysics::Collision *col = RigidBody.GetCollision(i);
 

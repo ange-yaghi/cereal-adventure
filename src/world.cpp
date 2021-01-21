@@ -78,8 +78,10 @@ void c_adv::World::initialize(void *instance, ysContextObject::DeviceAPI api) {
     m_engine.SetCursorHidden(false);
     m_engine.SetCursorPositionLock(false);
 
-    m_engine.InitializeDefaultShaderSet(&m_shaders);
-    m_engine.SetShaderSet(m_shaders.GetShaderSet());
+    m_engine.InitializeShaderSet(&m_shaderSet);
+    m_engine.InitializeDefaultShaders(&m_shaders, &m_shaderSet);
+    m_engine.InitializeConsoleShaders(&m_shaderSet);
+    m_engine.SetShaderSet(&m_shaderSet);
 }
 
 void c_adv::World::initialSpawn() {

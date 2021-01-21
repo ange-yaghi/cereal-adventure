@@ -34,7 +34,7 @@ void c_adv::Cabinet::render() {
 
     m_world->getShaders().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
     m_world->getShaders().ConfigureModel(1.0f);
-    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlag(), m_cabinetAsset, nullptr);
+    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_cabinetAsset, nullptr);
 }
 
 void c_adv::Cabinet::configureAssets(dbasic::AssetManager *am) {

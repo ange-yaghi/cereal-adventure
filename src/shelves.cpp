@@ -34,7 +34,7 @@ void c_adv::Shelves::render() {
 
     m_world->getShaders().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
     m_world->getShaders().ConfigureModel(1.0f);
-    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlag(), m_shelvesAsset, nullptr);
+    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_shelvesAsset, nullptr);
 }
 
 void c_adv::Shelves::configureAssets(dbasic::AssetManager *am) {

@@ -182,7 +182,7 @@ void c_adv::Player::process(float dt) {
 
 void c_adv::Player::render() {
     m_world->getShaders().ResetBrdfParameters();
-    m_world->getEngine().DrawRenderSkeleton(m_world->getShaders().GetRegularFlag(), m_renderSkeleton, 1.0f, &m_world->getShaders(), (int)Layer::Player);
+    m_world->getEngine().DrawRenderSkeleton(m_world->getShaders().GetRegularFlags(), m_renderSkeleton, 1.0f, &m_world->getShaders(), (int)Layer::Player);
 
     if (!m_debugDamageIndicatorCooldown.ready() && m_debugDamageFlicker.getState()) {
         Material->SetDiffuseColor(ysMath::Lerp(DebugRed, White, 0.5f));

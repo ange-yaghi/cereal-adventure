@@ -29,6 +29,7 @@ namespace c_adv {
         dbasic::DeltaEngine &getEngine() { return m_engine; }
         dbasic::AssetManager &getAssetManager() { return m_assetManager; }
         dbasic::DefaultShaders &getShaders() { return m_shaders; }
+        dbasic::ShaderSet &getShaderSet() { return m_shaderSet; }
 
         AABB getCameraExtents() const;
 
@@ -66,6 +67,7 @@ namespace c_adv {
         dbasic::DefaultShaders m_shaders;
         dbasic::DeltaEngine m_engine;
         dbasic::AssetManager m_assetManager;
+        dbasic::ShaderSet m_shaderSet;
 
         dbasic::Path m_assetPath;
     };
