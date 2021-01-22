@@ -55,7 +55,7 @@ void c_adv::TestObstacle::render() {
     m_world->getShaders().ResetBrdfParameters();
     m_world->getShaders().SetBaseColor(ysColor::srgbiToLinear(255, 255, 255));
     m_world->getShaders().ConfigureModel(1.0f);
-    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_obstacleMesh, nullptr);
+    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_obstacleMesh);
 }
 
 void c_adv::TestObstacle::configureAssets(dbasic::AssetManager *am) {

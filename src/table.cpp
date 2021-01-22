@@ -34,7 +34,7 @@ void c_adv::Table::render() {
 
     m_world->getShaders().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
     m_world->getShaders().ConfigureModel(1.0f);
-    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_tableAsset, nullptr);
+    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_tableAsset);
 }
 
 void c_adv::Table::configureAssets(dbasic::AssetManager *am) {

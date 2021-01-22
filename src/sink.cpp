@@ -34,7 +34,7 @@ void c_adv::Sink::render() {
 
     m_world->getShaders().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
     m_world->getShaders().ConfigureModel(1.0f);
-    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_sinkAsset, nullptr);
+    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_sinkAsset);
 }
 
 void c_adv::Sink::configureAssets(dbasic::AssetManager *am) {

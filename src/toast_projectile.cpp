@@ -53,7 +53,7 @@ void c_adv::ToastProjectile::render() {
 
     m_world->getShaders().SetObjectTransform(m_renderTransform.GetWorldTransform());
     m_world->getShaders().ConfigureModel(1.0f);
-    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_toastAsset, nullptr);
+    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_toastAsset);
 }
 
 void c_adv::ToastProjectile::process(float dt) {

@@ -34,7 +34,7 @@ void c_adv::Stool_1::render() {
 
     m_world->getShaders().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
     m_world->getShaders().ConfigureModel(1.0f);
-    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_stoolAsset, nullptr);
+    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_stoolAsset);
 }
 
 void c_adv::Stool_1::configureAssets(dbasic::AssetManager *am) {

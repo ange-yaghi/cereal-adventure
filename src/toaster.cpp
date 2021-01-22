@@ -42,7 +42,7 @@ void c_adv::Toaster::render() {
 
     m_world->getShaders().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
     m_world->getShaders().ConfigureModel(1.0f);
-    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_toasterAsset, nullptr);
+    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_toasterAsset);
 }
 
 void c_adv::Toaster::process(float dt) {

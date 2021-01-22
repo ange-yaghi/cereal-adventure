@@ -38,7 +38,7 @@ void c_adv::FruitBowl::render() {
 
     m_world->getShaders().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
     m_world->getShaders().ConfigureModel(1.0f);
-    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_fruitBowl, nullptr);
+    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_fruitBowl);
 }
 
 void c_adv::FruitBowl::process(float dt) {

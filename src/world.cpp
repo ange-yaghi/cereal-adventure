@@ -15,6 +15,7 @@ c_adv::World::World() {
     m_mainRealm = nullptr;
     m_cameraDistance = DefaultCameraDistance;
     m_respawnPosition = ysMath::Constants::Zero;
+    m_intermediateRenderTarget = nullptr;
 }
 
 c_adv::World::~World() {
@@ -61,7 +62,6 @@ void c_adv::World::initialize(void *instance, ysContextObject::DeviceAPI api) {
     m_engine.CreateGameWindow(settings);
 
     m_assetManager.SetEngine(&m_engine);
-
     AssetLoader::loadAllAssets(dbasic::Path(assetPath), &m_assetManager);
 
     // Camera settings
@@ -78,8 +78,35 @@ void c_adv::World::initialize(void *instance, ysContextObject::DeviceAPI api) {
     m_engine.SetCursorHidden(false);
     m_engine.SetCursorPositionLock(false);
 
+    // Shaders
+    ysDevice *device = m_engine.GetDevice();
+    device->CreateOffScreenRenderTarget(&m_intermediateRenderTarget, 320, 240, ysRenderTarget::Format::R8G8B8A8_UNORM);
+
     m_engine.InitializeShaderSet(&m_shaderSet);
-    m_engine.InitializeDefaultShaders(&m_shaders, &m_shaderSet);
+    m_shaders.Initialize(
+        &m_shaderSet,
+        m_intermediateRenderTarget,
+        m_engine.GetDefaultShaderProgram(),
+        m_engine.GetDefaultInputLayout());
+
+    ysInputLayout *saqInputLayout = m_engine.GetSaqInputLayout();
+    ysShader *saqVertex = m_engine.GetSaqVertexShader();
+    ysShader *saqPixel = m_engine.GetSaqPixelShader();
+    ysShaderProgram *saqProgram;
+    device->CreateShaderProgram(&saqProgram);
+    device->AttachShader(saqProgram, saqVertex);
+    device->AttachShader(saqProgram, saqPixel);
+    device->LinkProgram(saqProgram);
+
+    dbasic::ShaderStage *newStage;
+    m_shaderSet.NewStage("Final", &newStage);
+    newStage->AddInput(m_intermediateRenderTarget, 0);
+
+    newStage->SetInputLayout(saqInputLayout);
+    newStage->SetRenderTarget(m_engine.GetScreenRenderTarget());
+    newStage->SetShaderProgram(saqProgram);
+    newStage->SetType(dbasic::ShaderStage::Type::PostProcessing);
+
     m_engine.InitializeConsoleShaders(&m_shaderSet);
     m_engine.SetShaderSet(&m_shaderSet);
 }
@@ -152,7 +179,20 @@ void c_adv::World::render() {
     m_shaders.SetScreenDimensions(m_engine.GetScreenWidth(), m_engine.GetScreenHeight());
     m_shaders.CalculateCamera();
 
+    if (m_engine.ProcessKeyDown(ysKey::Code::R)) {
+        m_engine.GetDevice()->ResizeRenderTarget(
+            m_intermediateRenderTarget,
+            m_engine.GetScreenWidth(),
+            m_engine.GetScreenHeight(),
+            m_engine.GetScreenWidth(),
+            m_engine.GetScreenHeight());
+    }
+
     m_shaders.ResetLights();
+
+    const float clearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    m_engine.GetDevice()->SetRenderTarget(m_intermediateRenderTarget);
+    m_engine.GetDevice()->ClearBuffers(clearColor);
 
     m_mainRealm->render();
 }

@@ -63,6 +63,8 @@ namespace c_adv {
         ysVector m_respawnPosition;
         float m_cameraDistance;
 
+        ysRenderTarget *m_intermediateRenderTarget;
+
     protected:
         dbasic::DefaultShaders m_shaders;
         dbasic::DeltaEngine m_engine;
