@@ -42,7 +42,7 @@ void c_adv::Vase::render() {
     m_world->getShaders().SetBaseColor(DebugRed);
 
     m_world->getShaders().SetObjectTransform(m_renderTransform.GetWorldTransform());
-    m_world->getShaders().ConfigureModel(1.0f);
+    m_world->getShaders().ConfigureModel(1.0f, m_vaseAsset);
     m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_vaseAsset);
 }
 

@@ -80,7 +80,7 @@ void c_adv::World::initialize(void *instance, ysContextObject::DeviceAPI api) {
 
     // Shaders
     ysDevice *device = m_engine.GetDevice();
-    device->CreateOffScreenRenderTarget(&m_intermediateRenderTarget, 320, 240, ysRenderTarget::Format::R8G8B8A8_UNORM);
+    device->CreateOffScreenRenderTarget(&m_intermediateRenderTarget, 512, 240, ysRenderTarget::Format::R8G8B8A8_UNORM);
 
     m_engine.InitializeShaderSet(&m_shaderSet);
     m_shaders.Initialize(

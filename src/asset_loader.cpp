@@ -31,10 +31,15 @@ void c_adv::AssetLoader::createAllMaterials(dbasic::AssetManager *am) {
     dbasic::Material *playerMaterial = am->NewMaterial();
     playerMaterial->SetName("PlayerMaterial");
     playerMaterial->SetDiffuseColor(White);
+
+    dbasic::Material *counterMaterial = am->NewMaterial();
+    counterMaterial->SetName("CounterMaterial");
+    counterMaterial->SetDiffuseColor(White);
+    counterMaterial->SetDiffuseMap(am->GetTexture("CounterDiffuse")->GetTexture());
 }
 
 void c_adv::AssetLoader::loadAllTextures(const dbasic::Path &assetPath, dbasic::AssetManager *am) {
-    /* Load all textures here */
+    am->LoadTexture(getPath("textures/Counter_128.png", assetPath).c_str(), "CounterDiffuse");
 }
 
 void c_adv::AssetLoader::loadAllAssets(const dbasic::Path &assetPath, dbasic::AssetManager *am) {

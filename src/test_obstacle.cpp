@@ -54,7 +54,7 @@ void c_adv::TestObstacle::render() {
     m_world->getShaders().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
     m_world->getShaders().ResetBrdfParameters();
     m_world->getShaders().SetBaseColor(ysColor::srgbiToLinear(255, 255, 255));
-    m_world->getShaders().ConfigureModel(1.0f);
+    m_world->getShaders().ConfigureModel(1.0f, m_obstacleMesh);
     m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_obstacleMesh);
 }
 

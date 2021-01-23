@@ -52,7 +52,7 @@ void c_adv::ToastProjectile::render() {
     m_world->getShaders().SetBaseColor(DebugRed);
 
     m_world->getShaders().SetObjectTransform(m_renderTransform.GetWorldTransform());
-    m_world->getShaders().ConfigureModel(1.0f);
+    m_world->getShaders().ConfigureModel(1.0f, m_toastAsset);
     m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_toastAsset);
 }
 
