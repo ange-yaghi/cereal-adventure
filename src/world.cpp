@@ -65,7 +65,7 @@ void c_adv::World::initialize(void *instance, ysContextObject::DeviceAPI api) {
     AssetLoader::loadAllAssets(dbasic::Path(assetPath), &m_assetManager);
 
     // Camera settings
-    m_shaders.SetCameraMode(dbasic::DefaultShaders::CameraMode::Target);
+    m_shaders.SetCameraMode(Shaders::CameraMode::Target);
 
     m_smoothCamera.setPosition(ysMath::Constants::Zero);
     m_smoothCamera.setStiffnessTensor(ysMath::LoadVector(200.0f, 50.0f, 0.0f));
@@ -79,15 +79,20 @@ void c_adv::World::initialize(void *instance, ysContextObject::DeviceAPI api) {
     m_engine.SetCursorPositionLock(false);
 
     // Shaders
+    // PS1 - 512x240
+    // PS2 - 720x480
     ysDevice *device = m_engine.GetDevice();
     device->CreateOffScreenRenderTarget(&m_intermediateRenderTarget, 512, 240, ysRenderTarget::Format::R8G8B8A8_UNORM);
 
+    Shaders::Context shaderContext{};
+    shaderContext.Device = m_engine.GetDevice();
+    shaderContext.GeometryFormat = m_engine.GetGeometryFormat();
+    shaderContext.RenderTarget = m_intermediateRenderTarget;
+    shaderContext.ShaderPath = assetPath + "/shaders/";
+    shaderContext.ShaderSet = &m_shaderSet;
+
     m_engine.InitializeShaderSet(&m_shaderSet);
-    m_shaders.Initialize(
-        &m_shaderSet,
-        m_intermediateRenderTarget,
-        m_engine.GetDefaultShaderProgram(),
-        m_engine.GetDefaultInputLayout());
+    m_shaders.Initialize(shaderContext);
 
     ysInputLayout *saqInputLayout = m_engine.GetSaqInputLayout();
     ysShader *saqVertex = m_engine.GetSaqVertexShader();
@@ -109,6 +114,8 @@ void c_adv::World::initialize(void *instance, ysContextObject::DeviceAPI api) {
 
     m_engine.InitializeConsoleShaders(&m_shaderSet);
     m_engine.SetShaderSet(&m_shaderSet);
+
+    m_shaders.SetFarClip(200.0f);
 }
 
 void c_adv::World::initialSpawn() {

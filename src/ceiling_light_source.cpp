@@ -19,7 +19,7 @@ void c_adv::CeilingLightSource::initialize() {
 }
 
 void c_adv::CeilingLightSource::render() {
-    dbasic::Light light;
+    Light light;
     
     light.Active = 1;
     light.Attenuation0 = 0.8f;

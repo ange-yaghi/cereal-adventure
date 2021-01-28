@@ -47,6 +47,7 @@
     <ClCompile Include="..\..\src\player_legs_fsm.cpp" />
     <ClCompile Include="..\..\src\projectile_damage_component.cpp" />
     <ClCompile Include="..\..\src\realm.cpp" />
+    <ClCompile Include="..\..\src\shaders.cpp" />
     <ClCompile Include="..\..\src\shelves.cpp" />
     <ClCompile Include="..\..\src\single_shelf.cpp" />
     <ClCompile Include="..\..\src\sink.cpp" />
@@ -82,6 +83,8 @@
     <ClInclude Include="..\..\include\player_arms_fsm.h" />
     <ClInclude Include="..\..\include\player_legs_fsm.h" />
     <ClInclude Include="..\..\include\projectile_damage_component.h" />
+    <ClInclude Include="..\..\include\shaders.h" />
+    <ClInclude Include="..\..\include\shader_controls.h" />
     <ClInclude Include="..\..\include\single_shelf.h" />
     <ClInclude Include="..\..\include\sink.h" />
     <ClInclude Include="..\..\include\spring_connector.h" />

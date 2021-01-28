@@ -6,6 +6,7 @@
 #include "delta.h"
 #include "realm.h"
 #include "spring_connector.h"
+#include "shaders.h"
 
 #include <vector>
 #include <string>
@@ -28,7 +29,7 @@ namespace c_adv {
 
         dbasic::DeltaEngine &getEngine() { return m_engine; }
         dbasic::AssetManager &getAssetManager() { return m_assetManager; }
-        dbasic::DefaultShaders &getShaders() { return m_shaders; }
+        Shaders &getShaders() { return m_shaders; }
         dbasic::ShaderSet &getShaderSet() { return m_shaderSet; }
 
         AABB getCameraExtents() const;
@@ -66,7 +67,7 @@ namespace c_adv {
         ysRenderTarget *m_intermediateRenderTarget;
 
     protected:
-        dbasic::DefaultShaders m_shaders;
+        Shaders m_shaders;
         dbasic::DeltaEngine m_engine;
         dbasic::AssetManager m_assetManager;
         dbasic::ShaderSet m_shaderSet;

@@ -52,6 +52,12 @@
     <Filter Include="Source Files\game-objects\fruit-bowl">
       <UniqueIdentifier>{c3463737-38dd-4202-b030-990f4266ec12}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\shaders">
+      <UniqueIdentifier>{9d9f32ab-bc2c-4d04-85d1-568be99beb5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\shaders">
+      <UniqueIdentifier>{aa62b379-b12c-421c-8bf3-31e0d3477f42}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -179,6 +185,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\table.cpp">
       <Filter>Source Files\game-objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\shaders.cpp">
+      <Filter>Source Files\shaders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -313,6 +322,12 @@
     </ClInclude>
     <ClInclude Include="..\..\include\table.h">
       <Filter>Header Files\game-objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\shaders.h">
+      <Filter>Header Files\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\shader_controls.h">
+      <Filter>Header Files\shaders</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

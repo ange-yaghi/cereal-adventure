@@ -31,15 +31,61 @@ void c_adv::AssetLoader::createAllMaterials(dbasic::AssetManager *am) {
     dbasic::Material *playerMaterial = am->NewMaterial();
     playerMaterial->SetName("PlayerMaterial");
     playerMaterial->SetDiffuseColor(White);
+    playerMaterial->SetDiffuseMap(am->GetTexture("PlayerDiffuse")->GetTexture());
 
     dbasic::Material *counterMaterial = am->NewMaterial();
     counterMaterial->SetName("CounterMaterial");
     counterMaterial->SetDiffuseColor(White);
     counterMaterial->SetDiffuseMap(am->GetTexture("CounterDiffuse")->GetTexture());
+    counterMaterial->SetAoMap(am->GetTexture("CounterAO")->GetTexture());
+
+    dbasic::Material *toasterMaterial = am->NewMaterial();
+    toasterMaterial->SetName("ToasterMaterial");
+    toasterMaterial->SetDiffuseColor(White);
+    toasterMaterial->SetDiffuseMap(am->GetTexture("Toaster_Diffuse")->GetTexture());
+    toasterMaterial->SetAoMap(am->GetTexture("Toaster_AO")->GetTexture());
+
+    dbasic::Material *cabinetMaterial = am->NewMaterial();
+    cabinetMaterial->SetName("CabinetMaterial");
+    cabinetMaterial->SetDiffuseColor(White);
+    cabinetMaterial->SetDiffuseMap(am->GetTexture("Cabinet_Diffuse")->GetTexture());
+    cabinetMaterial->SetAoMap(am->GetTexture("Cabinet_AO")->GetTexture());
+
+    dbasic::Material *skyboxMaterial = am->NewMaterial();
+    skyboxMaterial->SetName("SkyBox");
+    skyboxMaterial->SetDiffuseColor(White);
+    skyboxMaterial->SetDiffuseMap(am->GetTexture("SkyBox_Diffuse")->GetTexture());
+    skyboxMaterial->SetLit(false);
+
+    dbasic::Material *distantOfficeBuildingsMaterial = am->NewMaterial();
+    distantOfficeBuildingsMaterial->SetName("DistantOfficeBuildings");
+    distantOfficeBuildingsMaterial->SetDiffuseColor(ysColor::srgbiToLinear(0xD5C4C8));
+    distantOfficeBuildingsMaterial->SetLit(false);
+
+    dbasic::Material *distantHousesMaterial = am->NewMaterial();
+    distantHousesMaterial->SetName("DistantHouses");
+    distantHousesMaterial->SetDiffuseColor(ysColor::srgbiToLinear(0x2A1F50));
+    distantHousesMaterial->SetLit(false);
+
+    dbasic::Material *distantHousesMiddleMaterial = am->NewMaterial();
+    distantHousesMiddleMaterial->SetName("DistantHousesMiddle");
+    distantHousesMiddleMaterial->SetDiffuseColor(ysColor::srgbiToLinear(0x998FDD));
+    distantHousesMiddleMaterial->SetLit(false);
 }
 
 void c_adv::AssetLoader::loadAllTextures(const dbasic::Path &assetPath, dbasic::AssetManager *am) {
-    am->LoadTexture(getPath("textures/Counter_128.png", assetPath).c_str(), "CounterDiffuse");
+    am->LoadTexture(getPath("textures/Counter_128_v2.png", assetPath).c_str(), "CounterDiffuse");
+    am->LoadTexture(getPath("textures/Counter_AO_128.png", assetPath).c_str(), "CounterAO");
+
+    am->LoadTexture(getPath("textures/Toaster_Diffuse_64.png", assetPath).c_str(), "Toaster_Diffuse");
+    am->LoadTexture(getPath("textures/Toaster_AO_64.png", assetPath).c_str(), "Toaster_AO");
+
+    am->LoadTexture(getPath("textures/Cabinet_Diffuse_128.png", assetPath).c_str(), "Cabinet_Diffuse");
+    am->LoadTexture(getPath("textures/Cabinet_AO_128.png", assetPath).c_str(), "Cabinet_AO");
+
+    am->LoadTexture(getPath("cereal-box/PlayerTexture_128x128_v2.png", assetPath).c_str(), "PlayerDiffuse");
+
+    am->LoadTexture(getPath("textures/SkyBox_Diffuse.png", assetPath).c_str(), "SkyBox_Diffuse");
 }
 
 void c_adv::AssetLoader::loadAllAssets(const dbasic::Path &assetPath, dbasic::AssetManager *am) {
