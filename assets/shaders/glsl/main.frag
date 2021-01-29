@@ -2,10 +2,12 @@
 
 layout(binding = 0) uniform sampler2D diffuseTex;
 layout(binding = 1) uniform sampler2D aoTex;
+layout(binding = 2) uniform sampler2DShadow shadowMap0;
 
 out vec4 out_Color;
 
 in vec4 ex_Pos;
+in vec4 ex_ShadowMap0;
 in vec2 ex_Tex;
 in vec3 ex_Normal;
 
@@ -15,13 +17,20 @@ struct Light {
 	vec4 Direction;
 	float Attenuation0;
 	float Attenuation1;
+	float FalloffStart;
+	float FalloffScale;
 	int FalloffEnabled;
 	int Active;
+	int ShadowMap;
 };
 
 layout (binding = 0) uniform ScreenVariables {
 	mat4 CameraView;
 	mat4 Projection;
+
+	mat4 ShadowMap0View;
+	mat4 ShadowMap0Projection;
+
 	vec4 CameraEye;
 	
 	vec4 FogColor;
@@ -82,7 +91,7 @@ float f_specular(vec3 i, vec3 o, vec3 h, vec3 normal, float F0, float power, flo
 	float o_dot_h = dot(o, h);
 	float s = pow5(1 - o_dot_h);
 	float F = F0_scaled + s * (1 - F0_scaled);
-
+	
 	return clamp(pow(intensity, specularPower) * F * power, 0.0, 1.0);
 }
 
@@ -144,6 +153,17 @@ void main(void) {
 	float roughness = 0.5;
 	float power = 1.0;
 
+	float calculatedDepth = ex_ShadowMap0.z / ex_ShadowMap0.w;
+	float shadow0ActualDepth;
+	vec3 shadowMapUV = ex_ShadowMap0.xyz / ex_ShadowMap0.w;
+	shadowMapUV += vec3(1.0, 1.0, 1.0);
+	shadowMapUV *= 0.5;
+	shadowMapUV.z -= 0.005;
+	
+	if (shadowMapUV.x > 1.0 || shadowMapUV.x < 0.0) shadow0ActualDepth = 0.0;
+	else if (shadowMapUV.y > 1.0 || shadowMapUV.y < 0.0) shadow0ActualDepth = 0.0;
+	else shadow0ActualDepth = texture(shadowMap0, shadowMapUV);
+
 	if (ColorReplace == 0) {
 		vec4 diffuse = texture(diffuseTex, ex_Tex).rgba;
 		baseColor = vec4(srgbToLinear(diffuse.rgb), diffuse.a) * BaseColor;
@@ -175,7 +195,8 @@ void main(void) {
 			if (Lights[li].Active == 0) continue;
 
 			vec3 i = Lights[li].Position.xyz - ex_Pos.xyz;
-			float inv_dist = 1.0 / length(i);
+			float dist = length(i);
+			float inv_dist = 1.0 / dist;
 			i *= inv_dist;
 
 			float cos_theta_i = dot(i, normal);
@@ -184,16 +205,16 @@ void main(void) {
 			if (cos_theta_o < 0) continue;
 
 			vec3 h = normalize(i + o);
-			vec3 diffuse = 
+			vec3 diffuse =
 				f_diffuse(i, o, h, normal, DiffuseMix, DiffuseRoughness) 
 					* baseColor.rgb * Lights[li].Color.rgb;
-			vec3 specular = 
+			vec3 specular =
 				f_specular(i, o, h, normal, IncidentSpecular, SpecularMix, SpecularPower) 
 					* Lights[li].Color.rgb;
 			vec3 metallic = vec3(0.0, 0.0, 0.0);
 
 			if (Metallic > 0) {
-				metallic = 
+				metallic =
 					f_specular(i, o, h, normal, FullSpecular, 1, SpecularPower) 
 						* Lights[li].Color.rgb * baseColor.rgb;
 			}
@@ -211,13 +232,18 @@ void main(void) {
 
 			float falloff = 1.0;
 			if (Lights[li].FalloffEnabled == 1) {
-				falloff = (inv_dist * inv_dist);
+				const float invFalloffDist = 1 / max((dist - Lights[li].FalloffStart) / Lights[li].FalloffScale  + 1.0, 1.0);
+				falloff = (invFalloffDist * invFalloffDist);
 			}
 
 			vec3 bsdf = mix(
 				diffuse + specular,
 				metallic,
 				Metallic);
+
+			if (Lights[li].ShadowMap != -1) {
+				falloff *= shadow0ActualDepth;
+			}
 
 			totalLighting += falloff * bsdf * spotAttenuation * spotAttenuation * spotAttenuation;
 		}

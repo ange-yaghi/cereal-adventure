@@ -93,6 +93,7 @@ namespace c_adv {
         void SetScreenDimensions(float width, float height);
 
         void CalculateCamera();
+        void CalculateShadowLightProjections();
 
         void SetNearClip(float nearClip) { m_nearClip = nearClip; }
         float GetNearClip() const { return m_nearClip; }
@@ -114,7 +115,12 @@ namespace c_adv {
         void SetDiffuseTexture(ysTexture *texture);
         void SetAoTexture(ysTexture *texture);
 
+        void SetShadowDepth(float depth) { m_shadowDepth = depth; }
+        float GetShadowDepth() const { return m_shadowDepth; }
+
     protected:
+        ShadowMapScreenVariables m_shadowMapScreenVariables;
+        ShadowMapObjectVariables m_shadowMapObjectVariables;
         ShaderScreenVariables m_shaderScreenVariables;
         ShaderObjectVariables m_shaderObjectVariables;
         LightingControls m_lightingControls;
@@ -126,9 +132,15 @@ namespace c_adv {
         float m_nearClip;
         float m_farClip;
 
+        float m_shadowDepth;
+
         ysVector m_cameraPosition;
         ysVector m_cameraTarget;
         ysVector m_cameraUp;
+
+        ysVector m_shadowLightPosition;
+        ysVector m_shadowLightTarget;
+        ysVector m_shadowLightUp;
 
         float m_screenWidth;
         float m_screenHeight;
@@ -138,16 +150,22 @@ namespace c_adv {
         dbasic::TextureHandle m_mainStageDiffuseTexture;
         dbasic::TextureHandle m_aoTexture;
 
+        ysShader *m_shadowVertexShader;
         ysShader *m_vertexShader;
         ysShader *m_fragmentShader;
         ysShaderProgram *m_mainShaderProgram;
+        ysShaderProgram *m_shadowMapShaderProgram;
 
+        ysInputLayout *m_shadowInputLayout;
         ysInputLayout *m_inputLayout;
 
         ysDevice *m_device;
 
     protected:
+        ysRenderTarget *m_shadowMap0;
+
         dbasic::ShaderStage *m_mainStage;
+        dbasic::ShaderStage *m_shadowMap0Stage;
     };
 
 } /* namespace dbasic */

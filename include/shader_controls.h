@@ -5,6 +5,16 @@
 
 namespace c_adv {
 
+    struct ShadowMapScreenVariables {
+        ysMatrix CameraView = ysMath::Constants::Identity;
+        ysMatrix Projection = ysMath::Constants::Identity;
+    };
+
+    struct ShadowMapObjectVariables {
+        ysMatrix Transform = ysMath::Constants::Identity;
+        float Scale[4] = { 1.0f, 1.0f, 1.0f };
+    };
+
     struct ShaderObjectVariables {
         ysMatrix Transform = ysMath::Constants::Identity;
 
@@ -33,6 +43,9 @@ namespace c_adv {
         ysMatrix CameraView = ysMath::Constants::Identity;
         ysMatrix Projection = ysMath::Constants::Identity;
 
+        ysMatrix Shadow0CameraView = ysMath::Constants::Identity;
+        ysMatrix Shadow0Projection = ysMath::Constants::Identity;
+
         ysVector4 Eye = { 0.0f, 0.0f, 0.0f };
 
         ysVector4 FogColor = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -48,8 +61,13 @@ namespace c_adv {
         ysVector4 Direction = { 0.0f, 0.0f, -1.0f, 1.0f };
         float Attenuation0 = 0.0f;
         float Attenuation1 = 0.0f;
+        float FalloffStart = 0.0f;
+        float FalloffScale = 1.0f;
         int FalloffEnabled = 1;
         int Active = 0;
+        int ShadowMap = -1;
+        
+        int Padding[1];
     };
 
     struct LightingControls {

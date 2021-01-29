@@ -18,6 +18,7 @@
 #include "../include/sink.h"
 #include "../include/static_art.h"
 #include "../include/ceiling_light_source.h"
+#include "../include/window_light_source.h"
 #include "../include/stove_hood.h"
 #include "../include/fruit_bowl.h"
 #include "../include/fruit_projectile.h"

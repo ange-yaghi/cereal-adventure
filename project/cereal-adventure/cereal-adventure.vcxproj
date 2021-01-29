@@ -61,6 +61,7 @@
     <ClCompile Include="..\..\src\toast_projectile.cpp" />
     <ClCompile Include="..\..\src\vase.cpp" />
     <ClCompile Include="..\..\src\walk_component.cpp" />
+    <ClCompile Include="..\..\src\window_light_source.cpp" />
     <ClCompile Include="..\..\src\world.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -109,6 +110,7 @@
     <ClInclude Include="..\..\include\toast_projectile.h" />
     <ClInclude Include="..\..\include\vase.h" />
     <ClInclude Include="..\..\include\walk_component.h" />
+    <ClInclude Include="..\..\include\window_light_source.h" />
     <ClInclude Include="..\..\include\world.h" />
   </ItemGroup>
   <ItemGroup>

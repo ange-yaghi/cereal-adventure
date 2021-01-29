@@ -189,6 +189,9 @@
     <ClCompile Include="..\..\src\shaders.cpp">
       <Filter>Source Files\shaders</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\window_light_source.cpp">
+      <Filter>Source Files\game-objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\delta.h">
@@ -328,6 +331,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\shader_controls.h">
       <Filter>Header Files\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\window_light_source.h">
+      <Filter>Header Files\game-objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

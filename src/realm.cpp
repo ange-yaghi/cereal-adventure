@@ -65,49 +65,28 @@ void c_adv::Realm::render() {
     m_world->getEngine().SetClearColor(ysColor::linearToSrgb(SkyBlue));
 
     ysVector4 ambient = WallColor;
-    ambient.Scale(0.5f);
+    ambient.Scale(0.1f);
     m_world->getShaders().SetAmbientLight(ambient);
     
-    Light sun0;
-    sun0.Position = ysVector4(10.0f, 10.0f, 10.0f);
-    sun0.Color = ysVector4(255 / 255.0f, 255 / 255.0f, 255 / 255.0f, 0.0f);
-    sun0.Color.Scale(80.0f);
-    sun0.FalloffEnabled = 1;
-    sun0.Attenuation0 = 0;
-    sun0.Attenuation1 = 0;
-    sun0.Direction = ysVector4(0.0f, 0.0f, 0.0f);
-    m_world->getShaders().AddLight(sun0);
+    Light light{};
 
-    Light sun1;
-    sun1.Position = ysVector4(57.0f, 10.0f, 10.0f);
-    sun1.Color = ysVector4(255 / 255.0f, 255 / 255.0f, 255 / 255.0f, 0.0f);
-    sun1.Color.Scale(80.0f);
-    sun1.FalloffEnabled = 1;
-    sun1.Attenuation0 = 0;
-    sun1.Attenuation1 = 0;
-    sun1.Direction = ysVector4(0.0f, 0.0f, 0.0f);
-    m_world->getShaders().AddLight(sun1);
+    light.Active = 1;
+    light.Color = ysColor::srgbiToLinear(255, 197, 143);
+    light.Color.Scale(1.0f);
 
-    Light sun2;
-    sun2.Position = ysVector4(30.0f, 10.0f, 10.0f);
-    sun2.Color = ysVector4(255 / 255.0f, 255 / 255.0f, 255 / 255.0f, 0.0f);
-    sun2.Color.Scale(80.0f);
-    sun2.FalloffEnabled = 1;
-    sun2.Attenuation0 = 0;
-    sun2.Attenuation1 = 0;
-    sun2.Direction = ysVector4(0.0f, 0.0f, 0.0f);
-    m_world->getShaders().AddLight(sun2);
+    light.Attenuation0 = -1.0f;
+    light.Attenuation1 = 0.4f;
+    light.Direction = ysVector4(0.0f, 0.0f, 1.0f, 0.0f);
+    light.FalloffEnabled = 1;
+    light.FalloffStart = 2.0f;
+    light.FalloffScale = 5.0f;
+    light.Position = ysMath::GetVector4(ysMath::LoadVector(-5.0f, 0.0f, 10.0f));
+    light.ShadowMap = 0;
 
-    Light backLight;  
-    backLight.Position = ysVector4(7.0f, 1.0f, 2.0f);    
-    backLight.Color = ysVector4(43 / 255.0f, 209 / 255.0f, 252 / 255.0f, 0.0f);
-    backLight.Color.Scale(4.0f);
-    backLight.FalloffEnabled = 1;
+    m_world->getShaders().AddLight(light);
 
     AABB cameraExtents = m_world->getCameraExtents();
-
     int visibleObjects = 0;
-
     for (GameObject *g : m_gameObjects) {
         if (g->getDeletionFlag()) continue;
         AABB extents = g->getVisualBounds();

@@ -5,12 +5,17 @@ layout(location=1) in vec2 in_Tex;
 layout(location=2) in vec4 in_Normal;
 
 out vec4 ex_Pos;
+out vec4 ex_ShadowMap0;
 out vec2 ex_Tex;
 out vec3 ex_Normal;
 
 layout (binding = 0) uniform ScreenVariables {
 	mat4 CameraView;
 	mat4 Projection;
+
+	mat4 ShadowMap0View;
+	mat4 ShadowMap0Projection;
+
 	vec4 CameraEye;
 	
 	vec4 FogColor;
@@ -44,6 +49,10 @@ void main(void) {
 
 	inputPos = inputPos * Transform;
 	ex_Pos = inputPos;
+
+	ex_ShadowMap0 = inputPos;
+	ex_ShadowMap0 = ex_ShadowMap0 * ShadowMap0View;
+	ex_ShadowMap0 = ex_ShadowMap0 * ShadowMap0Projection;
 
 	inputPos = inputPos * CameraView;
 	inputPos = inputPos * Projection;

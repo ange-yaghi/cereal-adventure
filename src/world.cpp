@@ -185,6 +185,14 @@ void c_adv::World::render() {
 
     m_shaders.SetScreenDimensions(m_engine.GetScreenWidth(), m_engine.GetScreenHeight());
     m_shaders.CalculateCamera();
+    m_shaders.CalculateShadowLightProjections();
+
+    if (m_engine.IsKeyDown(ysKey::Code::T)) {
+        m_shaders.SetShadowDepth(m_shaders.GetShadowDepth() + 1.1f);
+    }
+    else if (m_engine.IsKeyDown(ysKey::Code::Y)) {
+        m_shaders.SetShadowDepth(m_shaders.GetShadowDepth() - 1.1f);
+    }
 
     if (m_engine.ProcessKeyDown(ysKey::Code::R)) {
         m_engine.GetDevice()->ResizeRenderTarget(
@@ -302,6 +310,11 @@ void c_adv::World::generateLevel(dbasic::RenderSkeleton *hierarchy) {
         else if (strcmp(sceneAsset->GetName(), "LightSource::Ceiling") == 0) {
             ysVector position = node->Transform.GetWorldPosition();
             CeilingLightSource *newLight = m_mainRealm->spawn<CeilingLightSource>();
+            newLight->RigidBody.Transform.SetPosition(position);
+        }
+        else if (strcmp(sceneAsset->GetName(), "LightSource::Window") == 0) {
+            ysVector position = node->Transform.GetWorldPosition();
+            WindowLightSource *newLight = m_mainRealm->spawn<WindowLightSource>();
             newLight->RigidBody.Transform.SetPosition(position);
         }
         else if (strcmp(sceneAsset->GetName(), "StoveHood") == 0) {

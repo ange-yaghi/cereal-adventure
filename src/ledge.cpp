@@ -34,7 +34,7 @@ void c_adv::Ledge::render() {
     m_world->getShaders().SetObjectTransform(RigidBody.Transform.GetWorldTransform());
     m_world->getShaders().SetLit(false);
     m_world->getShaders().ConfigureModel(1.0f, m_ledgeAsset);
-    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_ledgeAsset, 0);
+    //m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_ledgeAsset, 0);
 }
 
 void c_adv::Ledge::configureAssets(dbasic::AssetManager *am) {
