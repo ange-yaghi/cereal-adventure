@@ -67,9 +67,15 @@ void c_adv::Realm::render() {
     ysVector4 ambient = WallColor;
     ambient.Scale(0.1f);
     m_world->getShaders().SetAmbientLight(ambient);
+
+    const int shadowMap = m_world->getShaders().AddPerspectiveShadowMap(
+        ysMath::LoadVector(-5.0f, 0.0f, 10.0f),
+        ysMath::Constants::Zero,
+        ysMath::Constants::YAxis,
+        ysMath::Constants::PI / 3,
+        1.0f, 2.0f, 400.0f);
     
     Light light{};
-
     light.Active = 1;
     light.Color = ysColor::srgbiToLinear(255, 197, 143);
     light.Color.Scale(1.0f);
@@ -81,7 +87,7 @@ void c_adv::Realm::render() {
     light.FalloffStart = 2.0f;
     light.FalloffScale = 5.0f;
     light.Position = ysMath::GetVector4(ysMath::LoadVector(-5.0f, 0.0f, 10.0f));
-    light.ShadowMap = 0;
+    light.ShadowMap = shadowMap;
 
     m_world->getShaders().AddLight(light);
 

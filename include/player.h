@@ -181,6 +181,7 @@ namespace c_adv {
         std::string m_lastMissReason;
         CooldownTimer m_debugDamageIndicatorCooldown;
         Clock m_debugDamageFlicker;
+        bool m_consoleEnabled;
     };
 
 } /* namespace c_adv */

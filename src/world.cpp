@@ -185,7 +185,6 @@ void c_adv::World::render() {
 
     m_shaders.SetScreenDimensions(m_engine.GetScreenWidth(), m_engine.GetScreenHeight());
     m_shaders.CalculateCamera();
-    m_shaders.CalculateShadowLightProjections();
 
     if (m_engine.IsKeyDown(ysKey::Code::T)) {
         m_shaders.SetShadowDepth(m_shaders.GetShadowDepth() + 1.1f);
@@ -210,6 +209,8 @@ void c_adv::World::render() {
     m_engine.GetDevice()->ClearBuffers(clearColor);
 
     m_mainRealm->render();
+
+    m_shaders.Update();
 }
 
 void c_adv::World::process() {

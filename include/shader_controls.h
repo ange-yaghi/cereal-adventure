@@ -10,6 +10,10 @@ namespace c_adv {
         ysMatrix Projection = ysMath::Constants::Identity;
     };
 
+    struct AllShadowMapScreenVariables {
+        ShadowMapScreenVariables ScreenVariables[8];
+    };
+
     struct ShadowMapObjectVariables {
         ysMatrix Transform = ysMath::Constants::Identity;
         float Scale[4] = { 1.0f, 1.0f, 1.0f };

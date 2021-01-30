@@ -22,6 +22,8 @@ namespace c_adv {
             std::string ShaderPath;
         };
 
+        static const int MaxShadowMaps = 8;
+
     public:
         Shaders();
         virtual ~Shaders();
@@ -30,6 +32,7 @@ namespace c_adv {
         ysError Destroy();
 
         virtual ysError UseMaterial(dbasic::Material *material);
+        void Update();
 
         void ResetBrdfParameters();
         void SetBaseColor(const ysVector &color);
@@ -63,6 +66,25 @@ namespace c_adv {
 
         ysError AddLight(const Light &light);
         void ResetLights();
+
+        int AddPerspectiveShadowMap(
+            const ysVector &source,
+            const ysVector &target,
+            const ysVector &up,
+            float fov,
+            float aspect,
+            float nearClip,
+            float farClip);
+
+        int AddOrthographicShadowMap(
+            const ysVector &source,
+            const ysVector &target,
+            const ysVector &up,
+            float width,
+            float height,
+            float nearClip,
+            float farClip);
+
         ysError SetAmbientLight(const ysVector4 &ambient);
 
         void SetCameraPosition(float x, float y);
@@ -93,7 +115,6 @@ namespace c_adv {
         void SetScreenDimensions(float width, float height);
 
         void CalculateCamera();
-        void CalculateShadowLightProjections();
 
         void SetNearClip(float nearClip) { m_nearClip = nearClip; }
         float GetNearClip() const { return m_nearClip; }
@@ -119,8 +140,10 @@ namespace c_adv {
         float GetShadowDepth() const { return m_shadowDepth; }
 
     protected:
-        ShadowMapScreenVariables m_shadowMapScreenVariables;
-        ShadowMapObjectVariables m_shadowMapObjectVariables;
+        AllShadowMapScreenVariables *m_shadowMapScreenVariables;
+        ShadowMapObjectVariables *m_shadowMapObjectVariables;
+        int m_shadowMapCount;
+
         ShaderScreenVariables m_shaderScreenVariables;
         ShaderObjectVariables m_shaderObjectVariables;
         LightingControls m_lightingControls;
@@ -162,10 +185,10 @@ namespace c_adv {
         ysDevice *m_device;
 
     protected:
-        ysRenderTarget *m_shadowMap0;
-
         dbasic::ShaderStage *m_mainStage;
-        dbasic::ShaderStage *m_shadowMap0Stage;
+        dbasic::ShaderStage **m_shadowMapStages;
+
+        ysRenderTarget **m_shadowMaps;
     };
 
 } /* namespace dbasic */

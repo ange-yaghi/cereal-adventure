@@ -1,11 +1,16 @@
 #version 420
 
+struct ShadowMapInput {
+	mat4 CameraView;
+	mat4 Projection;
+};
+
 layout(location=0) in vec4 in_Position;
 layout(location=1) in vec2 in_Tex;
 layout(location=2) in vec4 in_Normal;
 
 out vec4 ex_Pos;
-out vec4 ex_ShadowMap0;
+out vec4 ex_ShadowMapPos[8];
 out vec2 ex_Tex;
 out vec3 ex_Normal;
 
@@ -44,15 +49,21 @@ layout (binding = 1) uniform ObjectVariables {
 	int Lit;
 };
 
+layout (binding = 3) uniform ShadowMapVariables {
+	ShadowMapInput ShadowMapInputs[8];
+};
+
 void main(void) {
 	vec4 inputPos = vec4(in_Position.xyz * Scale.xyz, 1.0);
 
 	inputPos = inputPos * Transform;
 	ex_Pos = inputPos;
 
-	ex_ShadowMap0 = inputPos;
-	ex_ShadowMap0 = ex_ShadowMap0 * ShadowMap0View;
-	ex_ShadowMap0 = ex_ShadowMap0 * ShadowMap0Projection;
+	for (int i = 0; i < 8; ++i) {
+		ex_ShadowMapPos[i] = inputPos;
+		ex_ShadowMapPos[i] = ex_ShadowMapPos[i] * ShadowMapInputs[i].CameraView;
+		ex_ShadowMapPos[i] = ex_ShadowMapPos[i] * ShadowMapInputs[i].Projection;
+	}
 
 	inputPos = inputPos * CameraView;
 	inputPos = inputPos * Projection;

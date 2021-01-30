@@ -2,12 +2,12 @@
 
 layout(binding = 0) uniform sampler2D diffuseTex;
 layout(binding = 1) uniform sampler2D aoTex;
-layout(binding = 2) uniform sampler2DShadow shadowMap0;
+layout(binding = 2) uniform sampler2DShadow shadowMaps[8];
 
 out vec4 out_Color;
 
 in vec4 ex_Pos;
-in vec4 ex_ShadowMap0;
+in vec4 ex_ShadowMapPos[8];
 in vec2 ex_Tex;
 in vec3 ex_Normal;
 
@@ -144,6 +144,19 @@ vec3 srgbToLinear(vec3 v) {
 }
 
 void main(void) {
+	float shadowMapValues[8];
+	for (int i = 0; i < 8; ++i) {
+		float calculatedDepth = ex_ShadowMapPos[i].z / ex_ShadowMapPos[i].w;
+		vec3 shadowMapUV = ex_ShadowMapPos[i].xyz / ex_ShadowMapPos[i].w;
+		shadowMapUV += vec3(1.0, 1.0, 1.0);
+		shadowMapUV *= 0.5;
+		shadowMapUV.z -= 0.001;
+		
+		if (shadowMapUV.x > 1.0 || shadowMapUV.x < 0.0) shadowMapValues[i] = 0.0;
+		else if (shadowMapUV.y > 1.0 || shadowMapUV.y < 0.0) shadowMapValues[i] = 0.0;
+		else shadowMapValues[i] = texture(shadowMaps[i], shadowMapUV);
+	}
+
 	const float FullSpecular = 1 / 0.08;
 
 	vec3 totalLighting = vec3(1.0, 1.0, 1.0);
@@ -152,17 +165,6 @@ void main(void) {
 	vec4 baseColor;
 	float roughness = 0.5;
 	float power = 1.0;
-
-	float calculatedDepth = ex_ShadowMap0.z / ex_ShadowMap0.w;
-	float shadow0ActualDepth;
-	vec3 shadowMapUV = ex_ShadowMap0.xyz / ex_ShadowMap0.w;
-	shadowMapUV += vec3(1.0, 1.0, 1.0);
-	shadowMapUV *= 0.5;
-	shadowMapUV.z -= 0.005;
-	
-	if (shadowMapUV.x > 1.0 || shadowMapUV.x < 0.0) shadow0ActualDepth = 0.0;
-	else if (shadowMapUV.y > 1.0 || shadowMapUV.y < 0.0) shadow0ActualDepth = 0.0;
-	else shadow0ActualDepth = texture(shadowMap0, shadowMapUV);
 
 	if (ColorReplace == 0) {
 		vec4 diffuse = texture(diffuseTex, ex_Tex).rgba;
@@ -242,7 +244,7 @@ void main(void) {
 				Metallic);
 
 			if (Lights[li].ShadowMap != -1) {
-				falloff *= shadow0ActualDepth;
+				falloff *= shadowMapValues[Lights[li].ShadowMap];
 			}
 
 			totalLighting += falloff * bsdf * spotAttenuation * spotAttenuation * spotAttenuation;

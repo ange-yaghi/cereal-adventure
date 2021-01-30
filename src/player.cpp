@@ -54,13 +54,15 @@ c_adv::Player::Player() {
     m_lastRunPlayhead = 0.0f;
 
     m_terminalFallVelocity = 15.0f;
-    m_fallDamageThreshold = 12.0f;
+    m_fallDamageThreshold = 13.0f;
     m_fallDamageMultiplier = 0.3f;
 
     m_lastMissReason = "";
 
     m_bodyCollider = nullptr;
     m_walkCollider = nullptr;
+
+    m_consoleEnabled = false;
 }
 
 c_adv::Player::~Player() {
@@ -168,11 +170,9 @@ void c_adv::Player::process(float dt) {
     m_debugDamageIndicatorCooldown.update(dt);
     m_debugDamageFlicker.update(dt);
 
-    if (m_world->getEngine().ProcessKeyDown(ysKey::Code::Up)) {
-        m_health = 0;
-    }
-    else if (m_world->getEngine().ProcessKeyDown(ysKey::Code::N2)) {
-        m_health = 10;
+    if (m_world->getEngine().ProcessKeyDown(ysKey::Code::F1)) {
+        m_world->getEngine().GetConsole()->Clear();
+        m_consoleEnabled = !m_consoleEnabled;
     }
 
     updateSoundEffects();
@@ -203,29 +203,32 @@ void c_adv::Player::render() {
     const float hh = m_bodyCollider->GetAsBox()->HalfHeight;
     const float hw = m_bodyCollider->GetAsBox()->HalfWidth;
     m_world->getShaders().SetObjectTransform(mat);
+    
+    if (m_consoleEnabled) {
+        dbasic::Console *console = m_world->getEngine().GetConsole();
+        console->Clear();
+        console->MoveToOrigin();
 
-    dbasic::Console *console = m_world->getEngine().GetConsole();
-    console->MoveToOrigin();
+        std::stringstream msg;
+        ysVector position = RigidBody.Transform.GetWorldPosition();
+        msg << "////// Delta Game Engine ///////" << "\n";
+        msg << "Pos " << ysMath::GetX(position) << "/" << ysMath::GetY(position) << "          \n";
+        msg << "V   " << ysMath::GetX(RigidBody.GetVelocity()) << "/" << ysMath::GetY(RigidBody.GetVelocity()) << "             \n";
+        msg << "FPS " << m_world->getEngine().GetAverageFramerate() << "          \n";
+        msg << "AO/DO/VI: " <<
+            m_realm->getAliveObjectCount() << "/" <<
+            m_realm->getDeadObjectCount() << "/" <<
+            m_realm->getVisibleObjectCount() << "          \n";
+        msg << "Health: " << m_health << "              \n";
+        msg << "Last Miss: " << m_lastMissReason << "              \n";
+        msg << "Status: ";
+        if (isHanging()) msg << "HANGING ";
+        if (m_walkComponent.isOnSurface()) msg << "ON SURFACE ";
+        msg << "             \n";
+        msg << "RUN FORCE V: " << m_walkComponent.getRunVelocity() << "                               \n";
 
-    std::stringstream msg;
-    ysVector position = RigidBody.Transform.GetWorldPosition();
-    msg << "////// Delta Game Engine ///////" << "\n";
-    msg << "Pos " << ysMath::GetX(position) << "/" << ysMath::GetY(position) << "          \n";
-    msg << "V   " << ysMath::GetX(RigidBody.GetVelocity()) << "/" << ysMath::GetY(RigidBody.GetVelocity()) << "             \n";
-    msg << "FPS " << m_world->getEngine().GetAverageFramerate() << "          \n";
-    msg << "AO/DO/VI: " << 
-        m_realm->getAliveObjectCount() << "/" << 
-        m_realm->getDeadObjectCount() << "/" << 
-        m_realm->getVisibleObjectCount() << "          \n";
-    msg << "Health: " << m_health << "              \n";
-    msg << "Last Miss: " << m_lastMissReason << "              \n";
-    msg << "Status: ";
-    if (isHanging()) msg << "HANGING ";
-    if (m_walkComponent.isOnSurface()) msg << "ON SURFACE ";
-    msg << "             \n";
-    msg << "RUN FORCE V: " << m_walkComponent.getRunVelocity() << "                               \n";
-
-    console->DrawGeneralText(msg.str().c_str());
+        console->DrawGeneralText(msg.str().c_str());
+    }
 }
 
 bool c_adv::Player::isAlive() const {
@@ -384,7 +387,7 @@ void c_adv::Player::processImpactDamage() {
         // TODO: check if hanging or not
 
         if (!col->m_sensor && !col->IsGhost()) {
-            if (ysMath::GetY(col->m_normal) < VerticalThreshold) continue;
+            if (std::abs(ysMath::GetY(col->m_normal)) < VerticalThreshold) continue;
 
             dphysics::RigidBody &other = getCollidingObject(col)->RigidBody;
 
