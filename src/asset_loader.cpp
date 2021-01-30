@@ -71,6 +71,29 @@ void c_adv::AssetLoader::createAllMaterials(dbasic::AssetManager *am) {
     distantHousesMiddleMaterial->SetName("DistantHousesMiddle");
     distantHousesMiddleMaterial->SetDiffuseColor(ysColor::srgbiToLinear(0x998FDD));
     distantHousesMiddleMaterial->SetLit(false);
+
+    dbasic::Material *windowMaterial = am->NewMaterial();
+    windowMaterial->SetName("WindowFrame");
+    windowMaterial->SetDiffuseColor(White);
+    windowMaterial->SetDiffuseMap(am->GetTexture("WindowFrame_Diffuse")->GetTexture());
+    windowMaterial->SetAoMap(am->GetTexture("WindowFrame_AO")->GetTexture());
+
+    dbasic::Material *fridgeMaterial = am->NewMaterial();
+    fridgeMaterial->SetName("Fridge");
+    fridgeMaterial->SetDiffuseColor(White);
+    fridgeMaterial->SetDiffuseMap(am->GetTexture("Fridge_Diffuse")->GetTexture());
+    fridgeMaterial->SetAoMap(am->GetTexture("Fridge_AO")->GetTexture());
+
+    dbasic::Material *floorMaterial = am->NewMaterial();
+    floorMaterial->SetName("Floor");
+    floorMaterial->SetDiffuseColor(White);
+    floorMaterial->SetDiffuseMap(am->GetTexture("Floor_Diffuse")->GetTexture());
+    floorMaterial->SetAoMap(am->GetTexture("Floor_AO")->GetTexture());
+
+    dbasic::Material *toastMaterial = am->NewMaterial();
+    toastMaterial->SetName("Toast");
+    toastMaterial->SetDiffuseColor(White);
+    toastMaterial->SetDiffuseMap(am->GetTexture("Toast_Diffuse")->GetTexture());
 }
 
 void c_adv::AssetLoader::loadAllTextures(const dbasic::Path &assetPath, dbasic::AssetManager *am) {
@@ -82,6 +105,17 @@ void c_adv::AssetLoader::loadAllTextures(const dbasic::Path &assetPath, dbasic::
 
     am->LoadTexture(getPath("textures/Cabinet_Diffuse_128.png", assetPath).c_str(), "Cabinet_Diffuse");
     am->LoadTexture(getPath("textures/Cabinet_AO_128.png", assetPath).c_str(), "Cabinet_AO");
+
+    am->LoadTexture(getPath("textures/WindowFrame_Diffuse_128.png", assetPath).c_str(), "WindowFrame_Diffuse");
+    am->LoadTexture(getPath("textures/WindowFrame_AO_128.png", assetPath).c_str(), "WindowFrame_AO");
+
+    am->LoadTexture(getPath("textures/Fridge_Diffuse_128.png", assetPath).c_str(), "Fridge_Diffuse");
+    am->LoadTexture(getPath("textures/Fridge_AO_128.png", assetPath).c_str(), "Fridge_AO");
+
+    am->LoadTexture(getPath("textures/Floor_Diffuse_2048.png", assetPath).c_str(), "Floor_Diffuse");
+    am->LoadTexture(getPath("textures/Floor_AO_2048.png", assetPath).c_str(), "Floor_AO");
+
+    am->LoadTexture(getPath("textures/Toast_Diffuse_64.png", assetPath).c_str(), "Toast_Diffuse");
 
     am->LoadTexture(getPath("cereal-box/PlayerTexture_128x128_v2.png", assetPath).c_str(), "PlayerDiffuse");
 

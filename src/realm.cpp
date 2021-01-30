@@ -65,7 +65,7 @@ void c_adv::Realm::render() {
     m_world->getEngine().SetClearColor(ysColor::linearToSrgb(SkyBlue));
 
     ysVector4 ambient = WallColor;
-    ambient.Scale(0.1f);
+    ambient.Scale(1.0f);
     m_world->getShaders().SetAmbientLight(ambient);
 
     const int shadowMap = m_world->getShaders().AddPerspectiveShadowMap(
@@ -90,6 +90,26 @@ void c_adv::Realm::render() {
     light.ShadowMap = shadowMap;
 
     m_world->getShaders().AddLight(light);
+
+    const int exteriorShadowMap = m_world->getShaders().AddOrthographicShadowMap(
+        ysMath::LoadVector(-1.43702f, 9.70642f, -5.5321f),
+        ysMath::LoadVector(5.01104f, 2.80569f, 0.285909f),
+        ysMath::Constants::YAxis,
+        5.0f, 5.0f, 2.0f, 400.0f);
+
+    Light sun{};
+    sun.Active = 1;
+    sun.Color = ysColor::srgbiToLinear(255, 255, 255);
+    sun.Color.Scale(1.0f);
+
+    sun.Attenuation0 = -1.0f;
+    sun.Attenuation1 = 0.4f;
+    sun.Direction = ysVector4(0.0f, 0.0f, 1.0f, 0.0f);
+    sun.FalloffEnabled = 0;
+    sun.Position = ysMath::GetVector4(ysMath::LoadVector(-1.43702f, 9.70642f, -5.5321f));
+    sun.ShadowMap = exteriorShadowMap;
+
+    m_world->getShaders().AddLight(sun);
 
     AABB cameraExtents = m_world->getCameraExtents();
     int visibleObjects = 0;
