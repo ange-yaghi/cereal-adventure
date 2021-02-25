@@ -227,7 +227,7 @@ void c_adv::World::process() {
     }
     else if (m_engine.IsKeyDown(ysKey::Code::Add)) {
         m_cameraDistance -= 0.5f;
-        if (m_cameraDistance < 1.0f) m_cameraDistance = 1.0f;
+        //if (m_cameraDistance < 1.0f) m_cameraDistance = 1.0f;
     }
     else if (m_engine.IsKeyDown(ysKey::Code::Back)) {
         m_cameraDistance = DefaultCameraDistance;

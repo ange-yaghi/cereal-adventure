@@ -106,4 +106,6 @@ def run(args, argument_template, clean_directories, new_directories, resources, 
 
 
 if __name__ == "__main__":
+    
+
     run(sys.argv, [], [], [], [])
