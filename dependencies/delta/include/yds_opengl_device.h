@@ -69,6 +69,8 @@ public:
 
     // Textures 
     virtual ysError CreateTexture(ysTexture **texture, const char *fname);
+    virtual ysError CreateTexture(ysTexture **texture, int width, int height, const unsigned char *buffer);
+    virtual ysError UpdateTexture(ysTexture *texture, const unsigned char *buffer);
     virtual ysError CreateAlphaTexture(ysTexture **texture, int width, int height, const unsigned char *buffer);
     virtual ysError DestroyTexture(ysTexture *&texture);
     virtual ysError UseTexture(ysTexture *texture, int slot);
@@ -105,7 +107,6 @@ protected:
     // Hidden functionality
     ysError CreateOpenGLOffScreenRenderTarget(ysRenderTarget *target, int width, int height, ysRenderTarget::Format format, bool colorData, bool depthBuffer);
     ysError DestroyOpenGLRenderTarget(ysRenderTarget *target);
-
 };
 
 #endif /* YDS_OPENGL_DEVICE_H */

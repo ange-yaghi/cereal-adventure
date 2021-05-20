@@ -88,7 +88,7 @@ namespace dbasic {
             int baseIndex, int baseVertex, int faceCount, bool depthTest = true, int layer = 0);
         ysError LoadTexture(ysTexture **image, const char *fname);
         ysError LoadAnimation(Animation **animation, const char *path, int start, int end);
-        ysError LoadFont(Font **font, const char *path, int size = 4096);
+        ysError LoadFont(Font **font, const char *path, int size = 4096, int fontSize = 64);
 
         ysError PlayAudio(AudioAsset *audio);
 
@@ -97,9 +97,7 @@ namespace dbasic {
         bool IsOpen() const { return m_gameWindow->IsOpen(); }
 
         void SetWindowSize(int width, int height);
-
         void SetConsoleColor(const ysVector &v);
-        void SetClearColor(const ysVector &v);
 
         // Input Device
         bool IsKeyDown(ysKey::Code key);
@@ -118,6 +116,9 @@ namespace dbasic {
 
         void SetCursorHidden(bool hidden) { m_cursorHidden = hidden; }
         bool GetCursorHidden() const { return m_cursorHidden; }
+
+        void SetConsoleEnabled(bool enabled) { m_consoleEnabled = enabled; }
+        bool IsConsoleEnabled() const { return m_consoleEnabled; }
 
         float GetFrameLength();
         float GetAverageFramerate();
@@ -212,6 +213,7 @@ namespace dbasic {
     protected:
         // Settings
         float m_clearColor[4];
+        bool m_consoleEnabled;
 
         // Cursor
         bool m_cursorPositionLocked;

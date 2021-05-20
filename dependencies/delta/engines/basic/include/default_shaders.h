@@ -47,6 +47,7 @@ namespace dbasic {
         void SetFogNear(float fogNear);
         void SetFogFar(float fogFar);
         void SetFogColor(const ysVector &color);
+        void SetClearColor(const ysVector &color);
 
         virtual void SetObjectTransform(const ysMatrix &mat);
         void SetPositionOffset(const ysVector &position);
@@ -87,6 +88,7 @@ namespace dbasic {
         void SetScreenDimensions(float width, float height);
 
         void CalculateCamera();
+        void CalculateUiCamera();
 
         void SetNearClip(float nearClip) { m_nearClip = nearClip; }
         float GetNearClip() const { return m_nearClip; }
