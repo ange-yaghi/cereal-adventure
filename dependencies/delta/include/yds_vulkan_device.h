@@ -1,12 +1,12 @@
 #ifndef YDS_VULKAN_DEVICE_H
 #define YDS_VULKAN_DEVICE_H
 
-#include "yds_window.h"
-#include "yds_opengl_context.h"
 #include "yds_device.h"
 
-// External libraries forward declarations
-struct SDL_Surface;
+#include "yds_window.h"
+#include "yds_vulkan_context.h"
+
+#include "yds_vulkan_decl.h"
 
 class ysVulkanDevice : public ysDevice {
 public:
@@ -77,6 +77,16 @@ public:
     virtual ysError UseRenderTargetAsTexture(ysRenderTarget *renderTarget, int slot);
 
     virtual void Draw(int numFaces, int indexOffset, int vertexOffset);
+
+    VkInstance GetInstance() const { return m_instance; }
+
+protected:
+    ysError CreateVulkanInstance();
+    ysError CreateVulkanDevice(VkSurfaceKHR surface);
+
+protected:
+    VkInstance m_instance;
+    VkDevice m_device;
 };
 
 #endif /* YDS_VULKAN_DEVICE_H */
