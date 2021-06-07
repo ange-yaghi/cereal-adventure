@@ -38,6 +38,6 @@ void c_adv::Counter::render() {
     m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_counterAsset);
 }
 
-void c_adv::Counter::configureAssets(dbasic::AssetManager *am) {
+void c_adv::Counter::getAssets(dbasic::AssetManager *am) {
     m_counterAsset = am->GetModelAsset("Counter_1");
 }

@@ -9,21 +9,24 @@ namespace c_adv {
         ~CooldownTimer();
 
         void trigger();
-        bool ready() const { return !m_triggered && !m_locked; }
+        bool ready() const { return !m_triggered && m_enabled; }
+        bool active() const { return m_triggered && m_enabled; }
         void update(float dt);
 
         void setCooldownPeriod(float t) { m_cooldownPeriod = t; }
         float getCooldownPeriod() const { return m_cooldownPeriod; }
 
-        void lock() { m_locked = true; }
-        void unlock() { m_locked = false; }
+        float get() const { return m_timer / m_cooldownPeriod; }
+
+        void enable() { m_enabled = true; }
+        void disable() { m_enabled = false; }
 
     protected:
         float m_timer;
         float m_cooldownPeriod;
 
         bool m_triggered;
-        bool m_locked;
+        bool m_enabled;
     };
 
 } /* namespace c_adv */

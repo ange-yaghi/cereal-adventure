@@ -51,6 +51,7 @@ ysError c_adv::Shaders::Initialize(const Context &context) {
     YDS_ERROR_DECLARE("Initialize");
 
     YDS_NESTED_ERROR_CALL(context.ShaderSet->NewStage("ShaderStage::Main", &m_mainStage));
+    YDS_NESTED_ERROR_CALL(context.ShaderSet->NewStage("ShaderStage::UI", &m_uiStage));
 
     if (context.Device->GetAPI() == ysDevice::DeviceAPI::DirectX11) {
         /* void */
@@ -124,6 +125,25 @@ ysError c_adv::Shaders::Initialize(const Context &context) {
         m_mainStage->AddInput(m_shadowMaps[i], 2 + i);
     }
 
+    m_uiStage->SetClearColor(ysMath::Constants::Zero);
+    m_uiStage->SetInputLayout(m_inputLayout);
+    m_uiStage->SetRenderTarget(context.UiRenderTarget);
+    m_uiStage->SetShaderProgram(m_mainShaderProgram);
+    m_uiStage->SetType(dbasic::ShaderStage::Type::FullPass);
+    m_uiStage->SetFlagBit(10);
+
+    YDS_NESTED_ERROR_CALL(m_uiStage->NewConstantBuffer<ShaderScreenVariables>(
+        "Buffer::ScreenData", 0, dbasic::ShaderStage::ConstantBufferBinding::BufferType::SceneData, &m_uiShaderScreenVariables));
+    YDS_NESTED_ERROR_CALL(m_uiStage->NewConstantBuffer<ShaderObjectVariables>(
+        "Buffer::ObjectData", 1, dbasic::ShaderStage::ConstantBufferBinding::BufferType::ObjectData, &m_shaderObjectVariables));
+    YDS_NESTED_ERROR_CALL(m_uiStage->NewConstantBuffer<LightingControls>(
+        "Buffer::LightingData", 2, dbasic::ShaderStage::ConstantBufferBinding::BufferType::SceneData, &m_lightingControls));
+    YDS_NESTED_ERROR_CALL(m_uiStage->NewConstantBuffer<AllShadowMapScreenVariables>(
+        "Buffer::ShadowMapData", 3, dbasic::ShaderStage::ConstantBufferBinding::BufferType::SceneData, m_shadowMapScreenVariables));
+
+    m_uiStage->AddTextureInput(0, &m_mainStageDiffuseTexture);
+    m_uiStage->AddTextureInput(1, &m_aoTexture);
+
     m_device = context.Device;
 
     ConfigureFlags(0, 1);
@@ -186,7 +206,6 @@ void c_adv::Shaders::Update() {
 
 void c_adv::Shaders::ResetBrdfParameters() {
     static const ShaderObjectVariables defaults{};
-
     m_shaderObjectVariables.BaseColor = defaults.BaseColor;
     m_shaderObjectVariables.AoMap = defaults.AoMap;
     m_shaderObjectVariables.DiffuseMix = defaults.DiffuseMix;

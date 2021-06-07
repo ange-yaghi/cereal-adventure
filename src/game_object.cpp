@@ -42,6 +42,10 @@ void c_adv::GameObject::process(float dt) {
     }
 }
 
+void c_adv::GameObject::getAssets(dbasic::AssetManager *am) {
+    /* void */
+}
+
 void c_adv::GameObject::onCarry() {
     /* void */
 }
@@ -111,9 +115,15 @@ void c_adv::GameObject::setGraceMode(bool graceMode) {
     RigidBody.SetGhost(graceMode);
 }
 
+dbasic::AssetManager &c_adv::GameObject::getAssetManager() const {
+    return m_world->getAssetManager();
+}
+
 void c_adv::GameObject::initialize() {
     RigidBody.SetOwner((void *)this);
     m_real = true;
+
+    getAssets(&getAssetManager());
 }
 
 void c_adv::GameObject::destroy() {

@@ -278,13 +278,13 @@ void c_adv::Player::updateGrip() {
             }
 
             if (!ready) {
-                m_gripCooldown.lock();
+                m_gripCooldown.disable();
             }
         }
     }
 
     if (!engine.IsKeyDown(ysKey::Code::Shift)) {
-        m_gripCooldown.unlock();
+        m_gripCooldown.enable();
         releaseGrip();
     }
 }
@@ -678,7 +678,7 @@ void c_adv::Player::updateSoundEffects() {
     }
 }
 
-void c_adv::Player::configureAssets(dbasic::AssetManager *am) {
+void c_adv::Player::getAssets(dbasic::AssetManager *am) {
     AnimLegsWalk = am->GetAction("LegsRun");
     AnimArmsWalk = am->GetAction("ArmsRun");
     AnimLegsIdle = am->GetAction("LegsIdle");

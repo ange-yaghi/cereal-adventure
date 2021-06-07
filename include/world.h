@@ -51,6 +51,7 @@ namespace c_adv {
         }
 
     protected:
+        void renderUi();
         void updateRealms();
 
         std::vector<Realm *> m_realms;
@@ -65,6 +66,7 @@ namespace c_adv {
         float m_cameraDistance;
 
         ysRenderTarget *m_intermediateRenderTarget;
+        ysRenderTarget *m_guiRenderTarget;
 
     protected:
         Shaders m_shaders;
@@ -73,6 +75,8 @@ namespace c_adv {
         dbasic::ShaderSet m_shaderSet;
 
         dbasic::Path m_assetPath;
+
+        dbasic::StageEnableFlags m_uiStageFlags;
     };
 
 } /* namespace c_adv */

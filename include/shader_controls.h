@@ -63,7 +63,7 @@ namespace c_adv {
         ysVector4 Position = { 0.0f, 0.0f, 0.0f, 1.0f };
         ysVector4 Color = { 0.0f, 0.0f, 0.0f, 1.0f };
         ysVector4 Direction = { 0.0f, 0.0f, -1.0f, 1.0f };
-        float Attenuation0 = 0.0f;
+        float Attenuation0 = -1.0f;
         float Attenuation1 = 0.0f;
         float FalloffStart = 0.0f;
         float FalloffScale = 1.0f;

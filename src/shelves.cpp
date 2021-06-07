@@ -37,6 +37,6 @@ void c_adv::Shelves::render() {
     m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_shelvesAsset);
 }
 
-void c_adv::Shelves::configureAssets(dbasic::AssetManager *am) {
+void c_adv::Shelves::getAssets(dbasic::AssetManager *am) {
     m_shelvesAsset = am->GetModelAsset("Shelves");
 }

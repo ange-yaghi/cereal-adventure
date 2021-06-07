@@ -16,6 +16,7 @@ c_adv::World::World() {
     m_cameraDistance = DefaultCameraDistance;
     m_respawnPosition = ysMath::Constants::Zero;
     m_intermediateRenderTarget = nullptr;
+    m_uiStageFlags = 0x0;
 }
 
 c_adv::World::~World() {
@@ -83,11 +84,13 @@ void c_adv::World::initialize(void *instance, ysContextObject::DeviceAPI api) {
     // PS2 - 720x480
     ysDevice *device = m_engine.GetDevice();
     device->CreateOffScreenRenderTarget(&m_intermediateRenderTarget, 512, 240, ysRenderTarget::Format::R8G8B8A8_UNORM);
+    device->CreateOffScreenRenderTarget(&m_guiRenderTarget, 512, 240, ysRenderTarget::Format::R8G8B8A8_UNORM, true, false);
 
     Shaders::Context shaderContext{};
     shaderContext.Device = m_engine.GetDevice();
     shaderContext.GeometryFormat = m_engine.GetGeometryFormat();
     shaderContext.RenderTarget = m_intermediateRenderTarget;
+    shaderContext.UiRenderTarget = m_guiRenderTarget;
     shaderContext.ShaderPath = assetPath + "/shaders/";
     shaderContext.ShaderSet = &m_shaderSet;
 
@@ -103,10 +106,12 @@ void c_adv::World::initialize(void *instance, ysContextObject::DeviceAPI api) {
     device->AttachShader(saqProgram, saqPixel);
     device->LinkProgram(saqProgram);
 
-    dbasic::ShaderStage *newStage;
-    m_shaderSet.NewStage("Final", &newStage);
-    newStage->AddInput(m_intermediateRenderTarget, 0);
+    m_uiStageFlags = m_shaders.GetUiStageFlags();
 
+    dbasic::ShaderStage *newStage;
+    m_shaderSet.NewStage("Game Final", &newStage);
+    newStage->AddInput(m_intermediateRenderTarget, 0);
+    newStage->AddInput(m_guiRenderTarget, 1);
     newStage->SetInputLayout(saqInputLayout);
     newStage->SetRenderTarget(m_engine.GetScreenRenderTarget());
     newStage->SetShaderProgram(saqProgram);
@@ -211,6 +216,8 @@ void c_adv::World::render() {
     m_mainRealm->render();
 
     m_shaders.Update();
+
+    renderUi();
 }
 
 void c_adv::World::process() {
@@ -242,6 +249,12 @@ void c_adv::World::process() {
 }
 
 void c_adv::World::generateLevel(dbasic::RenderSkeleton *hierarchy) {
+    // TEMP
+    CollectibleItem *item = m_mainRealm->spawn<CollectibleItem>();
+    item->RigidBody.Transform.SetPosition(ysMath::LoadVector(3, 2, 0));
+    item->setAsset(m_assetManager.GetModelAsset("Cabinet"));
+    // END TEMP
+
     for (int i = 0; i < hierarchy->GetNodeCount(); ++i) {
         dbasic::RenderNode *node = hierarchy->GetNode(i);
         dbasic::SceneObjectAsset *sceneAsset = node->GetSceneAsset();
@@ -348,6 +361,21 @@ void c_adv::World::generateLevel(dbasic::RenderSkeleton *hierarchy) {
             newStaticArt->RigidBody.Transform.SetOrientation(orientation);
         }
     }
+}
+
+void c_adv::World::renderUi() {
+    m_shaders.uiShaderScreenVariables().Projection =
+        ysMath::OrthographicProjection(m_engine.GetScreenWidth(), m_engine.GetScreenHeight(), 0.0f, 1.0f);
+    m_shaders.uiShaderScreenVariables().CameraView = ysMath::LoadIdentity();
+
+    m_shaders.ResetBrdfParameters();
+    m_shaders.SetColorReplace(true);
+    m_shaders.SetLit(false);
+    m_shaders.SetObjectTransform(ysMath::TranslationTransform(ysMath::LoadVector(0.0f, 0.0f, 0.1f)));
+    m_shaders.SetBaseColor(ysMath::LoadVector(1.0f, 0.0f, 1.0f, 1.0f));
+
+    m_shaders.ConfigureBox(100, 100);
+    m_engine.DrawBox(m_uiStageFlags);
 }
 
 void c_adv::World::updateRealms() {

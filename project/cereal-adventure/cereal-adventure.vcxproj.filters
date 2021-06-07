@@ -58,6 +58,12 @@
     <Filter Include="Source Files\shaders">
       <UniqueIdentifier>{aa62b379-b12c-421c-8bf3-31e0d3477f42}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\game-objects\collectible">
+      <UniqueIdentifier>{c7e9022a-6611-4f12-a424-a9d1a6543c95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\game-objects\collectible">
+      <UniqueIdentifier>{8b7d9567-8455-4c38-b48a-0f28d1f36381}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -191,6 +197,15 @@
     </ClCompile>
     <ClCompile Include="..\..\src\window_light_source.cpp">
       <Filter>Source Files\game-objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\collectible_item.cpp">
+      <Filter>Source Files\game-objects\collectible</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wave_generator.cpp">
+      <Filter>Source Files\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wrapping_timer.cpp">
+      <Filter>Source Files\utilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -334,6 +349,15 @@
     </ClInclude>
     <ClInclude Include="..\..\include\window_light_source.h">
       <Filter>Header Files\game-objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\collectible_item.h">
+      <Filter>Header Files\game-objects\collectible</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\wave_generator.h">
+      <Filter>Header Files\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\wrapping_timer.h">
+      <Filter>Header Files\utilities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

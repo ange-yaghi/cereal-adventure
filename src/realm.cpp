@@ -62,8 +62,6 @@ void c_adv::Realm::process(float dt) {
 }
  
 void c_adv::Realm::render() {
-    m_world->getEngine().SetClearColor(ysColor::linearToSrgb(SkyBlue));
-
     ysVector4 ambient = WallColor;
     ambient.Scale(1.0f);
     m_world->getShaders().SetAmbientLight(ambient);

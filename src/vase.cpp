@@ -63,6 +63,6 @@ void c_adv::Vase::process(float dt) {
         RigidBody.Transform.GetWorldPosition());
 }
 
-void c_adv::Vase::configureAssets(dbasic::AssetManager *am) {
+void c_adv::Vase::getAssets(dbasic::AssetManager *am) {
     m_vaseAsset = am->GetModelAsset("Vase");
 }

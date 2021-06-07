@@ -60,6 +60,6 @@ void c_adv::FruitBowl::process(float dt) {
     }
 }
 
-void c_adv::FruitBowl::configureAssets(dbasic::AssetManager *am) {
+void c_adv::FruitBowl::getAssets(dbasic::AssetManager *am) {
     m_fruitBowl = am->GetModelAsset("FruitBowl");
 }

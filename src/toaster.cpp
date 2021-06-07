@@ -68,6 +68,6 @@ void c_adv::Toaster::process(float dt) {
     }
 }
 
-void c_adv::Toaster::configureAssets(dbasic::AssetManager *am) {
+void c_adv::Toaster::getAssets(dbasic::AssetManager *am) {
     m_toasterAsset = am->GetModelAsset("Toaster");
 }

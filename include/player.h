@@ -145,7 +145,7 @@ namespace c_adv {
 
         // Assets ----
     public:
-        static void configureAssets(dbasic::AssetManager *am);
+        virtual void getAssets(dbasic::AssetManager *am);
 
     protected:
         static ysAnimationAction

@@ -25,5 +25,6 @@
 #include "../include/toast_projectile.h"
 #include "../include/fan.h"
 #include "../include/table.h"
+#include "../include/collectible_item.h"
 
 #endif /* CEREAL_ADVENTURE_GAME_OBJECTS_H */

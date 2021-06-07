@@ -72,6 +72,6 @@ void c_adv::Fan::process(float dt) {
     }
 }
 
-void c_adv::Fan::configureAssets(dbasic::AssetManager *am) {
+void c_adv::Fan::getAssets(dbasic::AssetManager *am) {
     m_fanAsset = am->GetModelAsset("Fan");
 }

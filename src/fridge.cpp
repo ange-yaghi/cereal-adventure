@@ -37,6 +37,6 @@ void c_adv::Fridge::render() {
     m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_fridgeAsset);
 }
 
-void c_adv::Fridge::configureAssets(dbasic::AssetManager *am) {
+void c_adv::Fridge::getAssets(dbasic::AssetManager *am) {
     m_fridgeAsset = am->GetModelAsset("Fridge");
 }

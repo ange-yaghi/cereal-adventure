@@ -85,6 +85,6 @@ void c_adv::StoveHood::process(float dt) {
     }
 }
 
-void c_adv::StoveHood::configureAssets(dbasic::AssetManager *am) {
+void c_adv::StoveHood::getAssets(dbasic::AssetManager *am) {
     m_stoveHoodAsset = am->GetModelAsset("StoveHood");
 }

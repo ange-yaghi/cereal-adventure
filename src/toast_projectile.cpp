@@ -104,6 +104,6 @@ void c_adv::ToastProjectile::checkHitObstacle() {
     }
 }
 
-void c_adv::ToastProjectile::configureAssets(dbasic::AssetManager *am) {
+void c_adv::ToastProjectile::getAssets(dbasic::AssetManager *am) {
     m_toastAsset = am->GetModelAsset("Toast");
 }

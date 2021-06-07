@@ -4,7 +4,7 @@ c_adv::CooldownTimer::CooldownTimer() {
     m_cooldownPeriod = 0.0f;
     m_triggered = false;
     m_timer = 0.0f;
-    m_locked = false;
+    m_enabled = true;
 }
 
 c_adv::CooldownTimer::~CooldownTimer() {
@@ -14,6 +14,8 @@ c_adv::CooldownTimer::~CooldownTimer() {
 void c_adv::CooldownTimer::trigger() {
     m_triggered = true;
     m_timer = 0.0f;
+
+    enable();
 }
 
 void c_adv::CooldownTimer::update(float dt) {
@@ -21,5 +23,8 @@ void c_adv::CooldownTimer::update(float dt) {
 
     m_timer += dt;
 
-    if (m_timer >= m_cooldownPeriod) m_triggered = false;
+    if (m_timer >= m_cooldownPeriod) {
+        m_triggered = false;
+        m_timer = m_cooldownPeriod;
+    }
 }

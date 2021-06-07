@@ -37,6 +37,6 @@ void c_adv::Microwave::render() {
     m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_microwaveAsset);
 }
 
-void c_adv::Microwave::configureAssets(dbasic::AssetManager *am) {
+void c_adv::Microwave::getAssets(dbasic::AssetManager *am) {
     m_microwaveAsset = am->GetModelAsset("Microwave");
 }

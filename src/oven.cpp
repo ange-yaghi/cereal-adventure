@@ -66,7 +66,7 @@ bool c_adv::Oven::isDangerous(const ysVector &p_world) {
     return ysMath::GetY(local) > HalfHeight - 0.1f;
 }
 
-void c_adv::Oven::configureAssets(dbasic::AssetManager *am) {
+void c_adv::Oven::getAssets(dbasic::AssetManager *am) {
     m_ovenAsset = am->GetModelAsset("Oven");
 }
 

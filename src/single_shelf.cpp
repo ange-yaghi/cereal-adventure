@@ -37,6 +37,6 @@ void c_adv::SingleShelf::render() {
     m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_singleShelfAsset);
 }
 
-void c_adv::SingleShelf::configureAssets(dbasic::AssetManager *am) {
+void c_adv::SingleShelf::getAssets(dbasic::AssetManager *am) {
     m_singleShelfAsset = am->GetModelAsset("SingleShelf");
 }

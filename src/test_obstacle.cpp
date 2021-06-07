@@ -58,6 +58,6 @@ void c_adv::TestObstacle::render() {
     m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_obstacleMesh);
 }
 
-void c_adv::TestObstacle::configureAssets(dbasic::AssetManager *am) {
+void c_adv::TestObstacle::getAssets(dbasic::AssetManager *am) {
     m_obstacleMesh = am->GetModelAsset("TestObstacle");
 }

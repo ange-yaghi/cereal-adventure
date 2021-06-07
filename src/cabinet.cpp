@@ -37,6 +37,6 @@ void c_adv::Cabinet::render() {
     m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_cabinetAsset);
 }
 
-void c_adv::Cabinet::configureAssets(dbasic::AssetManager *am) {
+void c_adv::Cabinet::getAssets(dbasic::AssetManager *am) {
     m_cabinetAsset = am->GetModelAsset("Cabinet");
 }

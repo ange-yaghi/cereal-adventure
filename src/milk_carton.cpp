@@ -46,6 +46,6 @@ void c_adv::MilkCarton::process(float dt) {
         RigidBody.Transform.GetWorldPosition());
 }
 
-void c_adv::MilkCarton::configureAssets(dbasic::AssetManager *am) {
+void c_adv::MilkCarton::getAssets(dbasic::AssetManager *am) {
     m_placeholderAsset = am->GetModelAsset("MilkCarton");
 }

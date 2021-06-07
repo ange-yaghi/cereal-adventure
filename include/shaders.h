@@ -18,6 +18,7 @@ namespace c_adv {
             ysDevice *Device;
             dbasic::ShaderSet *ShaderSet;
             ysRenderTarget *RenderTarget;
+            ysRenderTarget *UiRenderTarget;
             const ysRenderGeometryFormat *GeometryFormat;
             std::string ShaderPath;
         };
@@ -139,11 +140,16 @@ namespace c_adv {
         void SetShadowDepth(float depth) { m_shadowDepth = depth; }
         float GetShadowDepth() const { return m_shadowDepth; }
 
+        dbasic::StageEnableFlags GetUiStageFlags() const { return m_uiStage->GetFlags(); }
+
+        ShaderScreenVariables &uiShaderScreenVariables() { return m_uiShaderScreenVariables; }
+
     protected:
         AllShadowMapScreenVariables *m_shadowMapScreenVariables;
         ShadowMapObjectVariables *m_shadowMapObjectVariables;
         int m_shadowMapCount;
 
+        ShaderScreenVariables m_uiShaderScreenVariables;
         ShaderScreenVariables m_shaderScreenVariables;
         ShaderObjectVariables m_shaderObjectVariables;
         LightingControls m_lightingControls;
@@ -186,6 +192,7 @@ namespace c_adv {
 
     protected:
         dbasic::ShaderStage *m_mainStage;
+        dbasic::ShaderStage *m_uiStage;
         dbasic::ShaderStage **m_shadowMapStages;
 
         ysRenderTarget **m_shadowMaps;

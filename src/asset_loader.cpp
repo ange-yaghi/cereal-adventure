@@ -1,6 +1,5 @@
 #include "../include/asset_loader.h"
 
-#include "../include/game_objects.h"
 #include "../include/colors.h"
 
 c_adv::AssetLoader::AssetLoader() {
@@ -134,29 +133,6 @@ void c_adv::AssetLoader::loadAllAssets(const dbasic::Path &assetPath, dbasic::As
     am->LoadAnimationFile(getPath("cereal-box/cereal_box_new_run.dimo", assetPath).c_str());
 
     am->ResolveNodeHierarchy();
-
-    /* Connect all assets to classes */
-    Player::configureAssets(am);
-    TestObstacle::configureAssets(am);
-    Ledge::configureAssets(am);
-    Counter::configureAssets(am);
-    Toaster::configureAssets(am);
-    Shelves::configureAssets(am);
-    MilkCarton::configureAssets(am);
-    Fridge::configureAssets(am);
-    Stool_1::configureAssets(am);
-    Microwave::configureAssets(am);
-    Oven::configureAssets(am);
-    SingleShelf::configureAssets(am);
-    Vase::configureAssets(am);
-    Cabinet::configureAssets(am);
-    Sink::configureAssets(am);
-    StoveHood::configureAssets(am);
-    FruitBowl::configureAssets(am);
-    FruitProjectile::configureAssets(am);
-    ToastProjectile::configureAssets(am);
-    Fan::configureAssets(am);
-    Table::configureAssets(am);
 }
 
 void c_adv::AssetLoader::loadAllAudioAssets(const dbasic::Path &assetPath, dbasic::AssetManager *am) {

@@ -5,6 +5,8 @@
 
 #include "delta.h"
 
+#define GET_ASSET(static_var, method) (static_var) = ((static_var) == nullptr) ? (method) : (static_var);
+
 namespace c_adv {
 
     class World;
@@ -51,11 +53,14 @@ namespace c_adv {
         void setWorld(World *world) { m_world = world; }
         World *getWorld() const { return m_world; }
 
+        dbasic::AssetManager &getAssetManager() const;
+
         virtual void initialize();
         virtual void destroy();
         virtual void resetAccumulators();
         virtual void render();
         virtual void process(float dt);
+        virtual void getAssets(dbasic::AssetManager *am);
 
         virtual void onCarry();
         virtual void onDrop();

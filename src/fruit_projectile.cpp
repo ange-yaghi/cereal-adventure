@@ -96,6 +96,6 @@ bool c_adv::FruitProjectile::checkHitObstacle() {
     return false;
 }
 
-void c_adv::FruitProjectile::configureAssets(dbasic::AssetManager *am) {
+void c_adv::FruitProjectile::getAssets(dbasic::AssetManager *am) {
     m_fruitAsset = am->GetModelAsset("FruitProjectile");
 }

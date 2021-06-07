@@ -37,7 +37,7 @@ void c_adv::Table::render() {
     m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_tableAsset);
 }
 
-void c_adv::Table::configureAssets(dbasic::AssetManager *am) {
+void c_adv::Table::getAssets(dbasic::AssetManager *am) {
     m_tableAsset = am->GetModelAsset("Table");
 }
 

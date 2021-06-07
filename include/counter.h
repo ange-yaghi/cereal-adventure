@@ -16,7 +16,7 @@ namespace c_adv {
 
         // Assets ----
     public:
-        static void configureAssets(dbasic::AssetManager *am);
+        void getAssets(dbasic::AssetManager *am);
 
     protected:
         static dbasic::ModelAsset *m_counterAsset; 
