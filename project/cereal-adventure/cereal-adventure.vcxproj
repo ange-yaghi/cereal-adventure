@@ -60,6 +60,7 @@
     <ClCompile Include="..\..\src\test_obstacle.cpp" />
     <ClCompile Include="..\..\src\toaster.cpp" />
     <ClCompile Include="..\..\src\toast_projectile.cpp" />
+    <ClCompile Include="..\..\src\ui.cpp" />
     <ClCompile Include="..\..\src\vase.cpp" />
     <ClCompile Include="..\..\src\walk_component.cpp" />
     <ClCompile Include="..\..\src\wave_generator.cpp" />
@@ -112,6 +113,7 @@
     <ClInclude Include="..\..\include\test_obstacle.h" />
     <ClInclude Include="..\..\include\toaster.h" />
     <ClInclude Include="..\..\include\toast_projectile.h" />
+    <ClInclude Include="..\..\include\ui.h" />
     <ClInclude Include="..\..\include\vase.h" />
     <ClInclude Include="..\..\include\walk_component.h" />
     <ClInclude Include="..\..\include\wave_generator.h" />

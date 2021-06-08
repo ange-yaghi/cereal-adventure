@@ -7,6 +7,7 @@
 #include "realm.h"
 #include "spring_connector.h"
 #include "shaders.h"
+#include "ui.h"
 
 #include <vector>
 #include <string>
@@ -30,6 +31,7 @@ namespace c_adv {
         dbasic::DeltaEngine &getEngine() { return m_engine; }
         dbasic::AssetManager &getAssetManager() { return m_assetManager; }
         Shaders &getShaders() { return m_shaders; }
+        Ui &getUi() { return m_ui; }
         dbasic::ShaderSet &getShaderSet() { return m_shaderSet; }
 
         AABB getCameraExtents() const;
@@ -50,6 +52,8 @@ namespace c_adv {
             return newObject;
         }
 
+        dbasic::StageEnableFlags getUiStageFlags() const { return m_uiStageFlags; }
+
     protected:
         void renderUi();
         void updateRealms();
@@ -67,6 +71,8 @@ namespace c_adv {
 
         ysRenderTarget *m_intermediateRenderTarget;
         ysRenderTarget *m_guiRenderTarget;
+
+        Ui m_ui;
 
     protected:
         Shaders m_shaders;

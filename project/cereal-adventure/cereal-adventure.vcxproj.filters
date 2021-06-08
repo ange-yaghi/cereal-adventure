@@ -64,6 +64,12 @@
     <Filter Include="Source Files\game-objects\collectible">
       <UniqueIdentifier>{8b7d9567-8455-4c38-b48a-0f28d1f36381}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\ui">
+      <UniqueIdentifier>{35b3f4dd-eae8-4a50-91b7-6bef3ea9c5db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ui">
+      <UniqueIdentifier>{f4476796-70fa-42f4-9a59-e20a79b24e3c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -206,6 +212,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\wrapping_timer.cpp">
       <Filter>Source Files\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ui.cpp">
+      <Filter>Source Files\ui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -358,6 +367,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\wrapping_timer.h">
       <Filter>Header Files\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\ui.h">
+      <Filter>Header Files\ui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

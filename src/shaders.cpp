@@ -216,6 +216,7 @@ void c_adv::Shaders::ResetBrdfParameters() {
     m_shaderObjectVariables.Metallic = defaults.Metallic;
     m_shaderObjectVariables.SpecularMix = defaults.SpecularMix;
     m_shaderObjectVariables.SpecularPower = defaults.SpecularPower;
+    m_shaderObjectVariables.FogEffect = 0.0f;
 }
 
 void c_adv::Shaders::SetBaseColor(const ysVector &color) {
@@ -535,6 +536,7 @@ void c_adv::Shaders::ConfigureModel(float scale, dbasic::ModelAsset *model) {
 
 void c_adv::Shaders::SetDiffuseTexture(ysTexture *texture) {
     m_mainStage->BindTexture(texture, m_mainStageDiffuseTexture);
+    m_uiStage->BindTexture(texture, m_mainStageDiffuseTexture);
 }
 
 void c_adv::Shaders::SetAoTexture(ysTexture *texture) {

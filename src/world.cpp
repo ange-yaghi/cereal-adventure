@@ -121,6 +121,7 @@ void c_adv::World::initialize(void *instance, ysContextObject::DeviceAPI api) {
     m_engine.SetShaderSet(&m_shaderSet);
 
     m_shaders.SetFarClip(200.0f);
+    m_ui.setWorld(this);
 }
 
 void c_adv::World::initialSpawn() {
@@ -246,6 +247,8 @@ void c_adv::World::process() {
         m_focus->RigidBody.Transform.SetPosition(m_respawnPosition);
         m_focus->incrementReferenceCount();
     }
+
+    m_ui.process(dt);
 }
 
 void c_adv::World::generateLevel(dbasic::RenderSkeleton *hierarchy) {
@@ -367,15 +370,10 @@ void c_adv::World::renderUi() {
     m_shaders.uiShaderScreenVariables().Projection =
         ysMath::OrthographicProjection(m_engine.GetScreenWidth(), m_engine.GetScreenHeight(), 0.0f, 1.0f);
     m_shaders.uiShaderScreenVariables().CameraView = ysMath::LoadIdentity();
+    m_shaders.uiShaderScreenVariables().FogNear = 100.0f;
+    m_shaders.uiShaderScreenVariables().FogFar = 101.0f;
 
-    m_shaders.ResetBrdfParameters();
-    m_shaders.SetColorReplace(true);
-    m_shaders.SetLit(false);
-    m_shaders.SetObjectTransform(ysMath::TranslationTransform(ysMath::LoadVector(0.0f, 0.0f, 0.1f)));
-    m_shaders.SetBaseColor(ysMath::LoadVector(1.0f, 0.0f, 1.0f, 1.0f));
-
-    m_shaders.ConfigureBox(100, 100);
-    m_engine.DrawBox(m_uiStageFlags);
+    m_ui.render();
 }
 
 void c_adv::World::updateRealms() {

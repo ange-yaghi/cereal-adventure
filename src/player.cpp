@@ -133,11 +133,6 @@ void c_adv::Player::initialize() {
 
     m_gripCooldown.setCooldownPeriod(0.0f);
     m_movementCooldown.setCooldownPeriod(4.0f);
-    m_debugDamageIndicatorCooldown.setCooldownPeriod(0.3f);
-
-    m_debugDamageFlicker.setLowTime(0.1f);
-    m_debugDamageFlicker.setHighTime(0.1f);
-    m_debugDamageFlicker.setInverted(true);
 }
 
 void c_adv::Player::process(float dt) {
@@ -147,6 +142,10 @@ void c_adv::Player::process(float dt) {
     m_walkComponent.process(dt);
     m_projectileDamageComponent.process(dt);
     m_deathComponent.process(dt);
+
+    if (m_world->getEngine().ProcessKeyDown(ysKey::Code::T)) {
+        takeDamage(1.0f);
+    }
 
     const ysVector v = RigidBody.GetVelocity();
     if (ysMath::GetY(v) > -m_terminalFallVelocity) {
@@ -167,8 +166,6 @@ void c_adv::Player::process(float dt) {
 
     m_gripCooldown.update(dt);
     m_movementCooldown.update(dt);
-    m_debugDamageIndicatorCooldown.update(dt);
-    m_debugDamageFlicker.update(dt);
 
     if (m_world->getEngine().ProcessKeyDown(ysKey::Code::F1)) {
         m_world->getEngine().GetConsole()->Clear();
@@ -176,21 +173,14 @@ void c_adv::Player::process(float dt) {
     }
 
     updateSoundEffects();
-
     updateCollisionBounds();
+
+    m_world->getUi().setPlayerHealth(m_health / 20.0f);
 }
 
 void c_adv::Player::render() {
     m_world->getShaders().ResetBrdfParameters();
     m_world->getEngine().DrawRenderSkeleton(m_world->getShaders().GetRegularFlags(), m_renderSkeleton, 1.0f, &m_world->getShaders(), (int)Layer::Player);
-
-    if (!m_debugDamageIndicatorCooldown.ready() && m_debugDamageFlicker.getState()) {
-        Material->SetDiffuseColor(ysMath::Lerp(DebugRed, White, 0.5f));
-    }
-    else {
-        Material->SetDiffuseColor(White);
-    }
-
     m_world->getShaders().ResetBrdfParameters();
     m_world->getShaders().SetLit(true);
     m_world->getShaders().SetBaseColor(DebugRed);
@@ -438,8 +428,7 @@ void c_adv::Player::updateCollisionBounds() {
 }
 
 void c_adv::Player::takeDamage(float damage) {
-    m_debugDamageIndicatorCooldown.trigger();
-    m_debugDamageFlicker.reset();
+    m_world->getUi().triggerDamage(min(20.0f, damage) / 20.0f);
 
     releaseGrip();
     m_health -= damage;

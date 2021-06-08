@@ -119,6 +119,8 @@ void c_adv::AssetLoader::loadAllTextures(const dbasic::Path &assetPath, dbasic::
     am->LoadTexture(getPath("cereal-box/PlayerTexture_128x128_v2.png", assetPath).c_str(), "PlayerDiffuse");
 
     am->LoadTexture(getPath("textures/SkyBox_Diffuse.png", assetPath).c_str(), "SkyBox_Diffuse");
+    am->LoadTexture(getPath("post-processing/health_overlay_v2.png", assetPath).c_str(), "Health_Overlay");
+    am->LoadTexture(getPath("post-processing/damage_overlay.png", assetPath).c_str(), "Damage_Overlay");
 }
 
 void c_adv::AssetLoader::loadAllAssets(const dbasic::Path &assetPath, dbasic::AssetManager *am) {

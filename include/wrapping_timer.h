@@ -11,6 +11,7 @@ namespace c_adv {
         void update(float dt);
         float get() const { return (m_timer / m_period); }
 
+        void adjustPeriod(float period);
         void setPeriod(float period) { m_period = period; }
         float getPeriod() const { return m_period; }
 

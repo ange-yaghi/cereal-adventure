@@ -13,3 +13,10 @@ void c_adv::WrappingTimer::update(float dt) {
     m_timer += dt;
     while (m_timer > m_period) m_timer -= m_period;
 }
+
+void c_adv::WrappingTimer::adjustPeriod(float period) {
+    const float s = get();
+
+    m_period = period;
+    m_timer = s * m_period;
+}
