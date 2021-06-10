@@ -20,15 +20,15 @@ void c_adv::PlayerArmsFsm::nextState(FsmResults &result) {
 
     // FSM inputs
     State current = m_currentState;
-    bool onSurface = m_player->m_walkComponent.isOnSurface();
-    bool isHurt = m_player->isHurt();
-    bool isHanging = m_player->isHanging();
-    bool isGraspReady = m_player->isGraspReady();
-    bool isLaunching = m_player->isLaunching();
-    bool isActionComplete = m_player->isCurrentArmActionComplete();
-    float horizontalVelocity = ysMath::GetX(velocity);
-    bool isMoving = std::abs(horizontalVelocity) > 1.0f;
-    bool isAlive = m_player->isAlive();
+    const bool onSurface = m_player->m_walkComponent.isOnSurface();
+    const bool isHurt = m_player->isHurt();
+    const bool isHanging = m_player->isHanging();
+    const bool isGraspReady = m_player->isGraspReady();
+    const bool isLaunching = m_player->isLaunching();
+    const bool isActionComplete = m_player->isCurrentArmActionComplete();
+    const float horizontalVelocity = ysMath::GetX(velocity);
+    const bool isMoving = std::abs(horizontalVelocity) > 1.0f;
+    const bool isAlive = m_player->isAlive();
 
     // FSM Output
     State next = current;
@@ -38,6 +38,7 @@ void c_adv::PlayerArmsFsm::nextState(FsmResults &result) {
     float nextClip = 0.0f;
     float queuedFade = 0.0f;
     float queuedClip = 0.0f;
+    float speed = 1.0f;
 
     // FSM
     if (current == State::Idle) {
@@ -69,7 +70,7 @@ void c_adv::PlayerArmsFsm::nextState(FsmResults &result) {
         }
         else if (isGraspReady) {
             next = State::Hanging;
-            nextFade = 10.0f;
+            nextFade = 5.0f;
             nextClip = 10.0f;
 
             queued = State::Hanging;
@@ -145,6 +146,7 @@ void c_adv::PlayerArmsFsm::nextState(FsmResults &result) {
             else {
                 next = State::Launching;
                 nextFade = 1.0f;
+                speed = 1.5f;
             }
         }
         else if (isGraspReady) {
@@ -219,4 +221,5 @@ void c_adv::PlayerArmsFsm::nextState(FsmResults &result) {
     result.queued = queued;
     result.queuedClip = queuedClip;
     result.queuedFade = queuedFade;
+    result.speed = speed;
 }

@@ -43,7 +43,7 @@ c_adv::Player::Player() {
     m_ledge = nullptr;
 
     m_health = 20.0f;
-    m_ledgeGraspDistance = 1.5f;
+    m_ledgeGraspDistance = 0.7f;
     m_graspReady = false;
     m_launching = false;
 
@@ -157,7 +157,7 @@ void c_adv::Player::process(float dt) {
     m_springConnector.setTarget(RigidBody.Transform.GetWorldPosition());
     m_springConnector.update(dt);
 
-    m_renderTransform.SetPosition(m_springConnector.getPosition());
+    m_renderTransform.SetPosition(RigidBody.Transform.GetWorldPosition());
     m_renderTransform.SetOrientation(RigidBody.Transform.GetWorldOrientation());
 
     processImpactDamage();
@@ -180,19 +180,22 @@ void c_adv::Player::process(float dt) {
 
 void c_adv::Player::render() {
     m_world->getShaders().ResetBrdfParameters();
-    m_world->getEngine().DrawRenderSkeleton(m_world->getShaders().GetRegularFlags(), m_renderSkeleton, 1.0f, &m_world->getShaders(), (int)Layer::Player);
+    m_world->getEngine().DrawRenderSkeleton(
+        m_world->getShaders().GetRegularFlags(),
+        m_renderSkeleton,
+        1.0f,
+        &m_world->getShaders(),
+        (int)Layer::Player);
+
     m_world->getShaders().ResetBrdfParameters();
-    m_world->getShaders().SetLit(true);
+    m_world->getShaders().SetLit(false);
     m_world->getShaders().SetBaseColor(DebugRed);
+    m_world->getShaders().SetColorReplace(true);
 
-    ysTransform *transform = &m_renderSkeleton->GetNode("Body")->Transform;
-    ysMatrix mat = ysMath::LoadMatrix(
-        m_bodyCollider->GetAsBox()->Orientation,
-        m_bodyCollider->GetAsBox()->Position);
-
-    const float hh = m_bodyCollider->GetAsBox()->HalfHeight;
-    const float hw = m_bodyCollider->GetAsBox()->HalfWidth;
+    const ysMatrix mat = ysMath::TranslationTransform(getGripLocationWorld());
     m_world->getShaders().SetObjectTransform(mat);
+    m_world->getShaders().SetScale(m_ledgeGraspDistance, m_ledgeGraspDistance, m_ledgeGraspDistance);
+    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), Sphere);
     
     if (m_consoleEnabled) {
         dbasic::Console *console = m_world->getEngine().GetConsole();
@@ -231,7 +234,6 @@ bool c_adv::Player::isHurt() const {
 
 bool c_adv::Player::isHanging() {
     const int collisionCount = RigidBody.GetCollisionCount();
-
     for (int i = 0; i < collisionCount; ++i) {
         dphysics::Collision *col = RigidBody.GetCollision(i);
         if (!getCollidingObject(col)->hasTag(Tag::Ledge)) continue;
@@ -371,7 +373,6 @@ void c_adv::Player::processImpactDamage() {
     const float VerticalThreshold = ysMath::Constants::SQRT_2 / 2;
 
     const int collisionCount = RigidBody.GetCollisionCount();
-
     for (int i = 0; i < collisionCount; ++i) {
         dphysics::Collision *col = RigidBody.GetCollision(i);
         // TODO: check if hanging or not
@@ -609,7 +610,7 @@ void c_adv::Player::armsAnimationFsm() {
 
         ysAnimationChannel::ActionSettings settings;
         settings.FadeIn = next.nextFade;
-        settings.Speed = 1.0f;
+        settings.Speed = next.speed;
         settings.Clip = true;
         settings.LeftClip = next.nextClip;
         settings.RightClip = nextAnimation->GetAction()->GetLength();
@@ -621,7 +622,7 @@ void c_adv::Player::armsAnimationFsm() {
 
         ysAnimationChannel::ActionSettings settings;
         settings.FadeIn = next.queuedFade;
-        settings.Speed = 1.0f;
+        settings.Speed = next.speed;
         settings.LeftClip = next.queuedClip;
         settings.RightClip = queuedAnimation->GetAction()->GetLength();
         settings.Clip = true;

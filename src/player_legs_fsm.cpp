@@ -19,17 +19,17 @@ void c_adv::PlayerLegsFsm::nextState(FsmResults &result) {
     ysVector velocity = m_player->RigidBody.GetVelocity();
 
     // FSM inputs
-    State current = m_currentState;
-    bool onSurface = m_player->m_walkComponent.isOnSurface();
-    bool isHurt = m_player->isHurt();
-    bool isHanging = m_player->isHanging();
-    bool isGraspReady = m_player->isGraspReady();
-    bool isLaunching = m_player->isLaunching();
-    bool isActionComplete = m_player->isCurrentArmActionComplete();
-    float horizontalVelocity = ysMath::GetX(velocity);
-    float fallSpeed = max(-ysMath::GetY(velocity), 0.0f);
-    bool isMoving = std::abs(horizontalVelocity) > 1.0f;
-    bool isAlive = m_player->isAlive();
+    const State current = m_currentState;
+    const bool onSurface = m_player->m_walkComponent.isOnSurface();
+    const bool isHurt = m_player->isHurt();
+    const bool isHanging = m_player->isHanging();
+    const bool isGraspReady = m_player->isGraspReady();
+    const bool isLaunching = m_player->isLaunching();
+    const bool isActionComplete = m_player->isCurrentArmActionComplete();
+    const float horizontalVelocity = ysMath::GetX(velocity);
+    const float fallSpeed = max(-ysMath::GetY(velocity), 0.0f);
+    const bool isMoving = std::abs(horizontalVelocity) > 1.0f;
+    const bool isAlive = m_player->isAlive();
 
     // FSM Output
     State next = current;

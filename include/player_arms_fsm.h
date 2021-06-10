@@ -27,6 +27,7 @@ namespace c_adv {
             float nextClip;
             float queuedFade;
             float queuedClip;
+            float speed;
         };
 
     public:
