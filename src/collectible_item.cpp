@@ -78,7 +78,7 @@ void c_adv::CollectibleItem::render() {
     Light glowLamp{};
     glowLamp.Active = 1;
     glowLamp.FalloffEnabled = 1;
-    glowLamp.Color = ysVector4(glow + collectionGlow, glow + collectionGlow, glow + collectionGlow); glowLamp.Color.Scale(2.0f);
+    glowLamp.Color = ysVector4(glow + collectionGlow, glow + collectionGlow, glow + collectionGlow); glowLamp.Color.Scale(10.0f);
     glowLamp.Position = ysMath::GetVector4(renderTransform.GetWorldPosition());
 
     m_world->getShaders().AddLight(glowLamp);

@@ -143,6 +143,36 @@ vec3 srgbToLinear(vec3 v) {
 	);
 }
 
+vec3 hableTonemapPartial(vec3 s) {
+	const float A = 0.15f;
+	const float B = 0.50f;
+	const float C = 0.10f;
+	const float D = 0.20f;
+	const float E = 0.02f;
+	const float F = 0.30f;
+
+	return ((s * (A * s + C * B) + D * E) / (s * (A * s + B) + D * F)) - E/F;
+}
+
+vec3 hableTonemap(vec3 input) {
+	const float exposureBias = 2.0f;
+	const vec3 mapped = hableTonemapPartial(exposureBias * input);
+
+	const vec3 W = vec3(11.3f);
+	const vec3 whiteScale = vec3(1.0f) / hableTonemapPartial(W);
+	return mapped * whiteScale;
+}
+
+vec3 aces_approx(vec3 v) {
+    v *= 0.6f;
+    float a = 2.51f;
+    float b = 0.03f;
+    float c = 2.43f;
+    float d = 0.59f;
+    float e = 0.14f;
+    return clamp((v*(a*v+b))/(v*(c*v+d)+e), 0.0f, 1.0f);
+}
+
 void main(void) {
 	float shadowMapValues[8];
 	for (int i = 0; i < 8; ++i) {
@@ -262,8 +292,9 @@ void main(void) {
 
 	out_Color = vec4(
 		linearToSrgb(
-			mix(
-				totalLighting.rgb * ao,
-				FogColor.rgb,
-				fogAttenuation * FogEffect)), baseColor.a);
+			hableTonemap(
+				mix(
+					totalLighting.rgb * ao,
+					FogColor.rgb,
+					fogAttenuation * FogEffect))), baseColor.a);
 }

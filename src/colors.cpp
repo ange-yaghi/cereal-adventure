@@ -14,5 +14,5 @@ const ysVector c_adv::Tan = ysColor::srgbiToLinear(0xe4d1ba);
 const ysVector c_adv::TanGreen = ysColor::srgbiToLinear(0xd0d6c5);
 const ysVector c_adv::SkyBlue = ysColor::srgbiToLinear(0x44c8f5);
 
-const ysVector c_adv::WallColor = ysColor::srgbiToLinear(0x8B705C);
+const ysVector c_adv::WallColor = ysColor::srgbiToLinear(0xAA, 0x99, 0x99);
 const ysVector c_adv::ObjectColor = c_adv::Tan;

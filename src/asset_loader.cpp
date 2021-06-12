@@ -98,6 +98,10 @@ void c_adv::AssetLoader::createAllMaterials(dbasic::AssetManager *am) {
     intelMaterial->SetName("Intel");
     intelMaterial->SetDiffuseColor(White);
     intelMaterial->SetDiffuseMap(am->GetTexture("Intel_Diffuse")->GetTexture());
+
+    dbasic::Material *wallMaterial = am->NewMaterial();
+    wallMaterial->SetName("Level1Wall");
+    wallMaterial->SetDiffuseColor(ysColor::srgbiToLinear(0x00, 0x00, 0x00));
 }
 
 void c_adv::AssetLoader::loadAllTextures(const dbasic::Path &assetPath, dbasic::AssetManager *am) {
