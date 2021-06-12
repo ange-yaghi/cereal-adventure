@@ -5,6 +5,7 @@
 #include "../include/toast_projectile.h"
 
 dbasic::ModelAsset *c_adv::Toaster::m_toasterAsset = nullptr;
+dbasic::AudioAsset *c_adv::Toaster::m_launchAudio = nullptr;
 
 const float c_adv::Toaster::ToastSpread = 0.03f;
 
@@ -34,6 +35,10 @@ void c_adv::Toaster::initialize() {
 
     m_clock.setHighTime(1.0f);
     m_clock.setLowTime(10.0f);
+    m_clock.setEnabled(false);
+
+    m_warmupTimer.setCooldownPeriod(ysMath::UniformRandom() * 3.0f);
+    m_warmupTimer.trigger();
 }
 
 void c_adv::Toaster::render() {
@@ -47,8 +52,15 @@ void c_adv::Toaster::render() {
 
 void c_adv::Toaster::process(float dt) {
     m_clock.update(dt);
+    m_warmupTimer.update(dt);
+
+    if (m_warmupTimer.ready()) {
+        m_clock.setEnabled(true);
+    }
 
     if (m_clock.getState()) {
+        m_world->getEngine().PlayAudio(m_launchAudio);
+
         ToastProjectile *projectile = getRealm()->spawn<ToastProjectile>();
         projectile->RigidBody.Transform.SetPosition(
             ysMath::Add(RigidBody.Transform.GetWorldPosition(), ysMath::LoadVector(0.1f, 0.0f, 0.0f))
@@ -70,4 +82,5 @@ void c_adv::Toaster::process(float dt) {
 
 void c_adv::Toaster::getAssets(dbasic::AssetManager *am) {
     m_toasterAsset = am->GetModelAsset("Toaster");
+    m_launchAudio = am->GetAudioAsset("Toaster::Launch");
 }

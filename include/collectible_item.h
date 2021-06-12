@@ -40,6 +40,7 @@ namespace c_adv {
         CooldownTimer m_collectionTimer;
 
         dbasic::ModelAsset *m_asset;
+        dbasic::AudioAsset *m_audio;
     };
 
 } /* namespace c_adv */

@@ -71,6 +71,10 @@ namespace c_adv {
         void rotationAnimationFsm();
         void armsAnimationFsm();
         void updateSoundEffects();
+        void onJump();
+        void onLand();
+
+        void playFootstepSound();
 
         void processImpactDamage();
         void updateCollisionBounds();
@@ -80,6 +84,7 @@ namespace c_adv {
         float m_terminalFallVelocity;
         float m_fallDamageThreshold;
         float m_fallDamageMultiplier;
+        float m_landingVelocityThreshold;
         
         bool m_graspReady;
         bool m_launching;
@@ -121,6 +126,7 @@ namespace c_adv {
 
         // Sound effect internals
         float m_lastRunPlayhead;
+        CooldownTimer m_footstepCooldown;
 
         // Components
     public:
@@ -170,6 +176,10 @@ namespace c_adv {
             *AudioFootstep02,
             *AudioFootstep03,
             *AudioFootstep04,
+            *AudioJump01,
+            *AudioJump02,
+            *AudioDamage01,
+            *AudioDamage02,
             *DamageImpact;
 
         static dbasic::SceneObjectAsset *CharacterRoot;

@@ -11,6 +11,7 @@ namespace c_adv {
         void trigger();
         bool ready() const { return !m_triggered && m_enabled; }
         bool active() const { return m_triggered && m_enabled; }
+        bool enabled() const { return m_enabled; }
         void update(float dt);
 
         void setCooldownPeriod(float t) { m_cooldownPeriod = t; }

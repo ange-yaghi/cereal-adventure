@@ -142,7 +142,18 @@ void c_adv::AssetLoader::loadAllAudioAssets(const dbasic::Path &assetPath, dbasi
     am->LoadAudioFile(getPath("audio/cereal_box_Footstep_02.wav", assetPath).c_str(), "CerealBox::Footstep02");
     am->LoadAudioFile(getPath("audio/cereal_box_Footstep_03.wav", assetPath).c_str(), "CerealBox::Footstep03");
     am->LoadAudioFile(getPath("audio/cereal_box_Footstep_04.wav", assetPath).c_str(), "CerealBox::Footstep04");
+
     am->LoadAudioFile(getPath("audio/cereal_box_damage_impact.wav", assetPath).c_str(), "CerealBox::DamageImpact");
+
+    am->LoadAudioFile(getPath("audio/cereal_box_Jump_01.wav", assetPath).c_str(), "CerealBox::Jump01");
+    am->LoadAudioFile(getPath("audio/cereal_box_Jump_02.wav", assetPath).c_str(), "CerealBox::Jump02");
+
+    am->LoadAudioFile(getPath("audio/cereal_box_Damage_01.wav", assetPath).c_str(), "CerealBox::Damage01");
+    am->LoadAudioFile(getPath("audio/cereal_box_Damage_02.wav", assetPath).c_str(), "CerealBox::Damage02");
+
+    am->LoadAudioFile(getPath("audio/collection/collection_mysterious.wav", assetPath).c_str(), "Collection::Mysterious");
+    am->LoadAudioFile(getPath("audio/toaster/toaster_launch.wav", assetPath).c_str(), "Toaster::Launch");
+
 }
 
 std::string c_adv::AssetLoader::getPath(const char *path, const dbasic::Path &assetPath) {

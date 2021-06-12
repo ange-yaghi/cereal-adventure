@@ -15,7 +15,7 @@ c_adv::CollectibleItem::~CollectibleItem() {
 void c_adv::CollectibleItem::initialize() {
     GameObject::initialize();
 
-    m_collectionTimer.setCooldownPeriod(0.2f);
+    m_collectionTimer.setCooldownPeriod(0.3f);
     m_collectionTimer.disable();
 
     m_emissionWave.setPeriod(1.0f);
@@ -35,6 +35,8 @@ void c_adv::CollectibleItem::initialize() {
     bounds->SetMode(dphysics::CollisionObject::Mode::Sensor);
     bounds->GetAsCircle()->Position = ysMath::Constants::Zero;
     bounds->GetAsCircle()->Radius = 4.0f;
+    
+    m_audio = m_world->getAssetManager().GetAudioAsset("Collection::Mysterious");
 }
 
 void c_adv::CollectibleItem::render() {
@@ -105,7 +107,7 @@ void c_adv::CollectibleItem::process(float dt) {
 }
 
 void c_adv::CollectibleItem::collidingWithPlayerCheck() {
-    if (m_collectionTimer.active()) return;
+    if (m_collectionTimer.enabled()) return;
 
     bool collidingWithPlayer = false;
     const int collisionCount = RigidBody.GetCollisionCount();
@@ -128,5 +130,6 @@ void c_adv::CollectibleItem::collidingWithPlayerCheck() {
 
     if (collidingWithPlayer) {
         m_collectionTimer.trigger();
+        m_world->getEngine().PlayAudio(m_audio);
     }
 }

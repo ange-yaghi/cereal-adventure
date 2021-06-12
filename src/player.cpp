@@ -28,7 +28,11 @@ dbasic::AudioAsset
     *c_adv::Player::AudioFootstep02 = nullptr, 
     *c_adv::Player::AudioFootstep03 = nullptr, 
     *c_adv::Player::AudioFootstep04 = nullptr,
-    *c_adv::Player::DamageImpact = nullptr;
+    *c_adv::Player::AudioJump01 = nullptr,
+    *c_adv::Player::AudioJump02 = nullptr,
+    *c_adv::Player::DamageImpact = nullptr,
+    *c_adv::Player::AudioDamage01 = nullptr,
+    *c_adv::Player::AudioDamage02 = nullptr;
 
 dbasic::SceneObjectAsset *c_adv::Player::CharacterRoot = nullptr;
 dbasic::ModelAsset *c_adv::Player::Sphere = nullptr;
@@ -43,7 +47,7 @@ c_adv::Player::Player() {
     m_ledge = nullptr;
 
     m_health = 20.0f;
-    m_ledgeGraspDistance = 0.7f;
+    m_ledgeGraspDistance = 0.4f;
     m_graspReady = false;
     m_launching = false;
 
@@ -56,6 +60,7 @@ c_adv::Player::Player() {
     m_terminalFallVelocity = 15.0f;
     m_fallDamageThreshold = 13.0f;
     m_fallDamageMultiplier = 0.3f;
+    m_landingVelocityThreshold = 2.0f;
 
     m_lastMissReason = "";
 
@@ -133,6 +138,7 @@ void c_adv::Player::initialize() {
 
     m_gripCooldown.setCooldownPeriod(0.0f);
     m_movementCooldown.setCooldownPeriod(4.0f);
+    m_footstepCooldown.setCooldownPeriod(0.5f);
 }
 
 void c_adv::Player::process(float dt) {
@@ -166,6 +172,7 @@ void c_adv::Player::process(float dt) {
 
     m_gripCooldown.update(dt);
     m_movementCooldown.update(dt);
+    m_footstepCooldown.update(dt);
 
     if (m_world->getEngine().ProcessKeyDown(ysKey::Code::F1)) {
         m_world->getEngine().GetConsole()->Clear();
@@ -176,6 +183,8 @@ void c_adv::Player::process(float dt) {
     updateCollisionBounds();
 
     m_world->getUi().setPlayerHealth(m_health / 20.0f);
+
+    m_ledgeGraspDistance = max(std::abs(ysMath::GetY(RigidBody.GetVelocity()) * 0.4f), 0.4f);
 }
 
 void c_adv::Player::render() {
@@ -194,8 +203,9 @@ void c_adv::Player::render() {
 
     const ysMatrix mat = ysMath::TranslationTransform(getGripLocationWorld());
     m_world->getShaders().SetObjectTransform(mat);
-    m_world->getShaders().SetScale(m_ledgeGraspDistance, m_ledgeGraspDistance, m_ledgeGraspDistance);
-    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), Sphere);
+    m_world->getShaders().SetScale(1, 1, 1);
+    bool ready;
+    //if (findGrip(ready) != nullptr) m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), Sphere);
     
     if (m_consoleEnabled) {
         dbasic::Console *console = m_world->getEngine().GetConsole();
@@ -335,7 +345,7 @@ c_adv::GameObject *c_adv::Player::findGrip(bool &ready) {
 
             if (ly < gy) {
                 const float d = distance(gripLocation, ledgePosition);
-                if (d < closestLedgeDistance && d < m_ledgeGraspDistance) {
+                if (d < closestLedgeDistance && d < m_ledgeGraspDistance && d > m_ledgeGraspDistance * 0.2f) {
                     ready = (std::abs(gx - lx) < 0.1f);
                     closestLedge = ledge;
                     closestLedgeDistance = d;
@@ -380,7 +390,8 @@ void c_adv::Player::processImpactDamage() {
         if (!col->m_sensor && !col->IsGhost()) {
             if (std::abs(ysMath::GetY(col->m_normal)) < VerticalThreshold) continue;
 
-            dphysics::RigidBody &other = getCollidingObject(col)->RigidBody;
+            GameObject *object = getCollidingObject(col);
+            dphysics::RigidBody &other = object->RigidBody;
 
             const ysVector closingVelocity = col->GetContactVelocityWorld();
             const float mag = (&RigidBody == col->m_body1)
@@ -390,6 +401,10 @@ void c_adv::Player::processImpactDamage() {
             if (mag < -m_fallDamageThreshold && other.GetInverseMass() < RigidBody.GetInverseMass()) {
                 takeDamage(abs(mag) - m_fallDamageThreshold);
                 m_movementCooldown.trigger();
+            }
+
+            if (mag < -m_landingVelocityThreshold && !object->hasTag(GameObject::Tag::Ledge)) {
+                onLand();
             }
         }
     }
@@ -433,6 +448,14 @@ void c_adv::Player::takeDamage(float damage) {
 
     releaseGrip();
     m_health -= damage;
+
+    dbasic::AudioAsset *const DamageEffects[] = {
+        AudioDamage01,
+        AudioDamage02
+    };
+
+    const int randomIndex = ysMath::UniformRandomInt(2);
+    m_world->getEngine().PlayAudio(DamageEffects[randomIndex]);
 }
 
 ysAnimationActionBinding *c_adv::Player::getArmsAction(PlayerArmsFsm::State state) {
@@ -501,6 +524,7 @@ void c_adv::Player::updateMotion(float dt) {
         if (m_walkComponent.isOnSurface()) {
             if (m_movementCooldown.ready()) {
                 if (engine.ProcessKeyDown(ysKey::Code::Space)) {
+                    onJump();
                     if (engine.IsKeyDown(ysKey::Code::Control)) {
                         RigidBody.AddImpulseWorldSpace(
                             ysMath::LoadVector(0.0f, 8.0f, 0.0f), 
@@ -516,6 +540,7 @@ void c_adv::Player::updateMotion(float dt) {
         }
         else if (isHanging()) {
             if (engine.ProcessKeyDown(ysKey::Code::Space)) {
+                onJump();
                 RigidBody.AddImpulseWorldSpace(
                     ysMath::LoadVector(0.0f, 10.0f, 0.0f), 
                     RigidBody.Transform.GetWorldPosition());
@@ -647,24 +672,48 @@ void c_adv::Player::updateSoundEffects() {
             playFootstep = true;
         }
 
-        dbasic::AudioAsset *const FootstepEffects[] = { 
-            AudioFootstep01, 
-            AudioFootstep02, 
-            AudioFootstep03, 
-            AudioFootstep04 
-        };
-        dbasic::AudioAsset *randomFootstep = nullptr;
         if (playFootstep) {
-            const int randomIndex = ysMath::UniformRandomInt(4);
-            randomFootstep = FootstepEffects[randomIndex];
-
-            m_world->getEngine().PlayAudio(randomFootstep);
+            playFootstepSound();
         }
 
         m_lastRunPlayhead = playhead;
     }
     else {
         m_lastRunPlayhead = 0.0f;
+    }
+}
+
+void c_adv::Player::onJump() {
+    if (ysMath::UniformRandom() < 0.75f) return;
+
+    dbasic::AudioAsset *const JumpEffects[] = {
+        AudioJump01,
+        AudioJump02
+    };
+
+    const int randomIndex = ysMath::UniformRandomInt(sizeof(JumpEffects) / sizeof(dbasic::AudioAsset *));
+    m_world->getEngine().PlayAudio(JumpEffects[randomIndex]);
+}
+
+void c_adv::Player::onLand() {
+    playFootstepSound();
+}
+
+void c_adv::Player::playFootstepSound() {
+    if (m_footstepCooldown.ready()) {
+        m_footstepCooldown.trigger();
+
+        dbasic::AudioAsset *const FootstepEffects[] = {
+            AudioFootstep01,
+            AudioFootstep02,
+            AudioFootstep03,
+            AudioFootstep04
+        };
+
+        const int randomIndex = ysMath::UniformRandomInt(4);
+        dbasic::AudioAsset *randomFootstep = FootstepEffects[randomIndex];
+
+        m_world->getEngine().PlayAudio(randomFootstep);
     }
 }
 
@@ -706,6 +755,10 @@ void c_adv::Player::getAssets(dbasic::AssetManager *am) {
     AudioFootstep02 = am->GetAudioAsset("CerealBox::Footstep02");
     AudioFootstep03 = am->GetAudioAsset("CerealBox::Footstep03");
     AudioFootstep04 = am->GetAudioAsset("CerealBox::Footstep04");
+    AudioJump01 = am->GetAudioAsset("CerealBox::Jump01");
+    AudioJump02 = am->GetAudioAsset("CerealBox::Jump02");
+    AudioDamage01 = am->GetAudioAsset("CerealBox::Damage01");
+    AudioDamage02 = am->GetAudioAsset("CerealBox::Damage02");
     DamageImpact = am->GetAudioAsset("CerealBox::DamageImpact");
 
     Sphere = am->GetModelAsset("Sphere");

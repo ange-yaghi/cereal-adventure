@@ -4,6 +4,7 @@
 #include "game_object.h"
 
 #include "clock.h"
+#include "cooldown_timer.h"
 
 namespace c_adv {
 
@@ -22,6 +23,7 @@ namespace c_adv {
 
     protected:
         Clock m_clock;
+        CooldownTimer m_warmupTimer;
 
         // Assets ----
     public:
@@ -29,6 +31,7 @@ namespace c_adv {
 
     protected:
         static dbasic::ModelAsset *m_toasterAsset;
+        static dbasic::AudioAsset *m_launchAudio;
     };
 
 } /* namespace c_adv */
