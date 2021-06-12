@@ -93,6 +93,11 @@ void c_adv::AssetLoader::createAllMaterials(dbasic::AssetManager *am) {
     toastMaterial->SetName("Toast");
     toastMaterial->SetDiffuseColor(White);
     toastMaterial->SetDiffuseMap(am->GetTexture("Toast_Diffuse")->GetTexture());
+
+    dbasic::Material *intelMaterial = am->NewMaterial();
+    intelMaterial->SetName("Intel");
+    intelMaterial->SetDiffuseColor(White);
+    intelMaterial->SetDiffuseMap(am->GetTexture("Intel_Diffuse")->GetTexture());
 }
 
 void c_adv::AssetLoader::loadAllTextures(const dbasic::Path &assetPath, dbasic::AssetManager *am) {
@@ -117,6 +122,8 @@ void c_adv::AssetLoader::loadAllTextures(const dbasic::Path &assetPath, dbasic::
     am->LoadTexture(getPath("textures/Toast_Diffuse_64.png", assetPath).c_str(), "Toast_Diffuse");
 
     am->LoadTexture(getPath("cereal-box/PlayerTexture_128x128_v2.png", assetPath).c_str(), "PlayerDiffuse");
+
+    am->LoadTexture(getPath("textures/Intel_Diffuse.png", assetPath).c_str(), "Intel_Diffuse");
 
     am->LoadTexture(getPath("textures/SkyBox_Diffuse.png", assetPath).c_str(), "SkyBox_Diffuse");
     am->LoadTexture(getPath("post-processing/health_overlay_v2.png", assetPath).c_str(), "Health_Overlay");
@@ -145,8 +152,12 @@ void c_adv::AssetLoader::loadAllAudioAssets(const dbasic::Path &assetPath, dbasi
 
     am->LoadAudioFile(getPath("audio/cereal_box_damage_impact.wav", assetPath).c_str(), "CerealBox::DamageImpact");
 
-    am->LoadAudioFile(getPath("audio/cereal_box_Jump_01.wav", assetPath).c_str(), "CerealBox::Jump01");
-    am->LoadAudioFile(getPath("audio/cereal_box_Jump_02.wav", assetPath).c_str(), "CerealBox::Jump02");
+    am->LoadAudioFile(getPath("audio/cereal_box_JumpVocal_01.wav", assetPath).c_str(), "CerealBox::JumpVocal01");
+    am->LoadAudioFile(getPath("audio/cereal_box_JumpVocal_02.wav", assetPath).c_str(), "CerealBox::JumpVocal02");
+
+    am->LoadAudioFile(getPath("audio/cereal_box_Shake_01.wav", assetPath).c_str(), "CerealBox::Shake01");
+    am->LoadAudioFile(getPath("audio/cereal_box_Shake_02.wav", assetPath).c_str(), "CerealBox::Shake02");
+    am->LoadAudioFile(getPath("audio/cereal_box_Shake_03.wav", assetPath).c_str(), "CerealBox::Shake03");
 
     am->LoadAudioFile(getPath("audio/cereal_box_Damage_01.wav", assetPath).c_str(), "CerealBox::Damage01");
     am->LoadAudioFile(getPath("audio/cereal_box_Damage_02.wav", assetPath).c_str(), "CerealBox::Damage02");

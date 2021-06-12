@@ -28,8 +28,11 @@ dbasic::AudioAsset
     *c_adv::Player::AudioFootstep02 = nullptr, 
     *c_adv::Player::AudioFootstep03 = nullptr, 
     *c_adv::Player::AudioFootstep04 = nullptr,
-    *c_adv::Player::AudioJump01 = nullptr,
-    *c_adv::Player::AudioJump02 = nullptr,
+    *c_adv::Player::AudioJumpVocal01 = nullptr,
+    *c_adv::Player::AudioJumpVocal02 = nullptr,
+    *c_adv::Player::AudioShake01 = nullptr,
+    *c_adv::Player::AudioShake02 = nullptr,
+    *c_adv::Player::AudioShake03 = nullptr,
     *c_adv::Player::DamageImpact = nullptr,
     *c_adv::Player::AudioDamage01 = nullptr,
     *c_adv::Player::AudioDamage02 = nullptr;
@@ -138,7 +141,8 @@ void c_adv::Player::initialize() {
 
     m_gripCooldown.setCooldownPeriod(0.0f);
     m_movementCooldown.setCooldownPeriod(4.0f);
-    m_footstepCooldown.setCooldownPeriod(0.5f);
+    m_footstepCooldown.setCooldownPeriod(0.25f);
+    m_shakeCooldown.setCooldownPeriod(1.0f);
 }
 
 void c_adv::Player::process(float dt) {
@@ -173,6 +177,7 @@ void c_adv::Player::process(float dt) {
     m_gripCooldown.update(dt);
     m_movementCooldown.update(dt);
     m_footstepCooldown.update(dt);
+    m_shakeCooldown.update(dt);
 
     if (m_world->getEngine().ProcessKeyDown(ysKey::Code::F1)) {
         m_world->getEngine().GetConsole()->Clear();
@@ -401,10 +406,15 @@ void c_adv::Player::processImpactDamage() {
             if (mag < -m_fallDamageThreshold && other.GetInverseMass() < RigidBody.GetInverseMass()) {
                 takeDamage(abs(mag) - m_fallDamageThreshold);
                 m_movementCooldown.trigger();
+
+                playShakeSound();
             }
 
-            if (mag < -m_landingVelocityThreshold && !object->hasTag(GameObject::Tag::Ledge)) {
-                onLand();
+            if (mag < -m_landingVelocityThreshold) {
+                playShakeSound();
+                if (!object->hasTag(GameObject::Tag::Ledge)) {
+                    onLand();
+                }
             }
         }
     }
@@ -620,6 +630,8 @@ void c_adv::Player::rotationAnimationFsm() {
             m_direction = Direction::Forward;
             m_rotationChannel->AddSegment(&m_animLegsTurnForward, settings);
         }
+
+        playShakeSound();
     }
 }
 
@@ -684,15 +696,17 @@ void c_adv::Player::updateSoundEffects() {
 }
 
 void c_adv::Player::onJump() {
-    if (ysMath::UniformRandom() < 0.75f) return;
+    playShakeSound();
 
-    dbasic::AudioAsset *const JumpEffects[] = {
-        AudioJump01,
-        AudioJump02
-    };
+    if (ysMath::UniformRandom() > 0.75f) {
+        dbasic::AudioAsset *const JumpEffects[] = {
+            AudioJumpVocal01,
+            AudioJumpVocal02
+        };
 
-    const int randomIndex = ysMath::UniformRandomInt(sizeof(JumpEffects) / sizeof(dbasic::AudioAsset *));
-    m_world->getEngine().PlayAudio(JumpEffects[randomIndex]);
+        const int randomIndex = ysMath::UniformRandomInt(sizeof(JumpEffects) / sizeof(dbasic::AudioAsset *));
+        m_world->getEngine().PlayAudio(JumpEffects[randomIndex]);
+    }
 }
 
 void c_adv::Player::onLand() {
@@ -714,6 +728,23 @@ void c_adv::Player::playFootstepSound() {
         dbasic::AudioAsset *randomFootstep = FootstepEffects[randomIndex];
 
         m_world->getEngine().PlayAudio(randomFootstep);
+    }
+}
+
+void c_adv::Player::playShakeSound() {
+    if (ysMath::UniformRandom() < 0.5f) return;
+
+    if (m_shakeCooldown.ready()) {
+        m_shakeCooldown.trigger();
+
+        dbasic::AudioAsset *const ShakeEffect[] = {
+            AudioShake01,
+            AudioShake02,
+            AudioShake03
+        };
+
+        const int randomIndex = ysMath::UniformRandomInt(3);
+        m_world->getEngine().PlayAudio(ShakeEffect[randomIndex]);
     }
 }
 
@@ -755,8 +786,11 @@ void c_adv::Player::getAssets(dbasic::AssetManager *am) {
     AudioFootstep02 = am->GetAudioAsset("CerealBox::Footstep02");
     AudioFootstep03 = am->GetAudioAsset("CerealBox::Footstep03");
     AudioFootstep04 = am->GetAudioAsset("CerealBox::Footstep04");
-    AudioJump01 = am->GetAudioAsset("CerealBox::Jump01");
-    AudioJump02 = am->GetAudioAsset("CerealBox::Jump02");
+    AudioJumpVocal01 = am->GetAudioAsset("CerealBox::JumpVocal01");
+    AudioJumpVocal02 = am->GetAudioAsset("CerealBox::JumpVocal02");
+    AudioShake01 = am->GetAudioAsset("CerealBox::Shake01");
+    AudioShake02 = am->GetAudioAsset("CerealBox::Shake02");
+    AudioShake03 = am->GetAudioAsset("CerealBox::Shake03");
     AudioDamage01 = am->GetAudioAsset("CerealBox::Damage01");
     AudioDamage02 = am->GetAudioAsset("CerealBox::Damage02");
     DamageImpact = am->GetAudioAsset("CerealBox::DamageImpact");

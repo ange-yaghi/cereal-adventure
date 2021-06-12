@@ -64,12 +64,12 @@ void c_adv::CollectibleItem::render() {
         ? m_collectionTimer.get()
         : 0.0f;
 
-    float glow = 0.5f * (m_floatWave.get() + 1);
-    glow += 1.0f * std::sin(collectionProgress * collectionProgress * ysMath::Constants::PI);
+    const float glow = 0.5f * (m_floatWave.get() + 1);
+    const float collectionGlow = std::sin(collectionProgress * collectionProgress * ysMath::Constants::PI);
 
     m_world->getShaders().SetObjectTransform(renderTransform.GetWorldTransform());
-    m_world->getShaders().ConfigureModel(0.2f * (1 - collectionProgress * collectionProgress), m_asset);
-    m_world->getShaders().SetEmission(ysMath::LoadScalar(glow));
+    m_world->getShaders().ConfigureModel(0.5f * (1 - collectionProgress * collectionProgress), m_asset);
+    m_world->getShaders().SetEmission(ysMath::LoadScalar(collectionGlow));
 
     m_world->getEngine().DrawModel(
         m_world->getShaders().GetRegularFlags(),
@@ -78,7 +78,7 @@ void c_adv::CollectibleItem::render() {
     Light glowLamp{};
     glowLamp.Active = 1;
     glowLamp.FalloffEnabled = 1;
-    glowLamp.Color = ysVector4(glow, glow, glow);
+    glowLamp.Color = ysVector4(glow + collectionGlow, glow + collectionGlow, glow + collectionGlow); glowLamp.Color.Scale(2.0f);
     glowLamp.Position = ysMath::GetVector4(renderTransform.GetWorldPosition());
 
     m_world->getShaders().AddLight(glowLamp);

@@ -75,6 +75,7 @@ namespace c_adv {
         void onLand();
 
         void playFootstepSound();
+        void playShakeSound();
 
         void processImpactDamage();
         void updateCollisionBounds();
@@ -127,6 +128,7 @@ namespace c_adv {
         // Sound effect internals
         float m_lastRunPlayhead;
         CooldownTimer m_footstepCooldown;
+        CooldownTimer m_shakeCooldown;
 
         // Components
     public:
@@ -176,8 +178,11 @@ namespace c_adv {
             *AudioFootstep02,
             *AudioFootstep03,
             *AudioFootstep04,
-            *AudioJump01,
-            *AudioJump02,
+            *AudioJumpVocal01,
+            *AudioJumpVocal02,
+            *AudioShake01,
+            *AudioShake02,
+            *AudioShake03,
             *AudioDamage01,
             *AudioDamage02,
             *DamageImpact;

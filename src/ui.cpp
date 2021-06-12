@@ -63,8 +63,12 @@ void c_adv::Ui::process(float dt) {
 }
 
 void c_adv::Ui::triggerDamage(float amount) {
-    if (m_damageTimer.active()) return;
-
-    m_damageTimer.setCooldownPeriod(amount * 10.0f + 0.1f);
-    m_damageTimer.trigger();
+    const float baseLength = amount * 10.0f + 0.1f;
+    if (m_damageTimer.active()) {
+        m_damageTimer.setCooldownPeriod(baseLength + m_damageTimer.getCooldownPeriod());
+    }
+    else {
+        m_damageTimer.setCooldownPeriod(baseLength);
+        m_damageTimer.trigger();
+    }
 }

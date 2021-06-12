@@ -253,9 +253,13 @@ void c_adv::World::process() {
 
 void c_adv::World::generateLevel(dbasic::RenderSkeleton *hierarchy) {
     // TEMP
-    CollectibleItem *item = m_mainRealm->spawn<CollectibleItem>();
-    item->RigidBody.Transform.SetPosition(ysMath::LoadVector(3, 2, 0));
-    item->setAsset(m_assetManager.GetModelAsset("Cabinet"));
+    CollectibleItem *item1 = m_mainRealm->spawn<CollectibleItem>();
+    item1->RigidBody.Transform.SetPosition(hierarchy->FindNode("L1_Intel_0")->Transform.GetWorldPosition());
+    item1->setAsset(m_assetManager.GetModelAsset("Intel"));
+
+    CollectibleItem *item2 = m_mainRealm->spawn<CollectibleItem>();
+    item2->RigidBody.Transform.SetPosition(hierarchy->FindNode("L1_Intel_1")->Transform.GetWorldPosition());
+    item2->setAsset(m_assetManager.GetModelAsset("Intel"));
     // END TEMP
 
     for (int i = 0; i < hierarchy->GetNodeCount(); ++i) {
@@ -355,6 +359,8 @@ void c_adv::World::generateLevel(dbasic::RenderSkeleton *hierarchy) {
             table->RigidBody.Transform.SetPosition(position);
         }
         else if (sceneAsset->GetType() == ysObjectData::ObjectType::Instance) {
+            if (node->GetModelAsset() == nullptr) continue;
+
             ysVector position = node->Transform.GetWorldPosition();
             ysQuaternion orientation = node->Transform.GetWorldOrientation();
 
