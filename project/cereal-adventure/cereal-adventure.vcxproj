@@ -53,6 +53,7 @@
     <ClCompile Include="..\..\src\single_shelf.cpp" />
     <ClCompile Include="..\..\src\sink.cpp" />
     <ClCompile Include="..\..\src\spring_connector.cpp" />
+    <ClCompile Include="..\..\src\ssao.cpp" />
     <ClCompile Include="..\..\src\static_art.cpp" />
     <ClCompile Include="..\..\src\stool_1.cpp" />
     <ClCompile Include="..\..\src\stove_hood.cpp" />
@@ -106,6 +107,7 @@
     <ClInclude Include="..\..\include\player.h" />
     <ClInclude Include="..\..\include\realm.h" />
     <ClInclude Include="..\..\include\shelves.h" />
+    <ClInclude Include="..\..\include\ssao.h" />
     <ClInclude Include="..\..\include\static_art.h" />
     <ClInclude Include="..\..\include\stool_1.h" />
     <ClInclude Include="..\..\include\stove_hood.h" />

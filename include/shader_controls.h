@@ -56,7 +56,9 @@ namespace c_adv {
         float FogNear = 10.0f;
         float FogFar = 100.0f;
 
-        int Padding[2];
+        int SsaoEnable = 1;
+
+        int Padding[1];
     };
 
     struct Light {
@@ -79,6 +81,14 @@ namespace c_adv {
 
         Light Lights[MaxLights];
         ysVector4 AmbientLighting;
+    };
+    
+    struct SsaoControls {
+        static constexpr int MaxKernelSize = 128;
+
+        ysMatrix Projection;
+        ysVector4 Kernel[MaxKernelSize];
+        float SampleRadius;
     };
 
 } /* namespace c_adv */

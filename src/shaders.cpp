@@ -1,5 +1,7 @@
 #include "../include/shaders.h"
 
+#include "../include/ssao.h"
+
 #include <sstream>
 
 c_adv::Shaders::Shaders() {
@@ -32,6 +34,8 @@ c_adv::Shaders::Shaders() {
 
     m_device = nullptr;
 
+    m_ssao = nullptr;
+
     m_aoTexture = 0;
     m_mainStageDiffuseTexture = 0;
 
@@ -50,6 +54,18 @@ c_adv::Shaders::~Shaders() {
 ysError c_adv::Shaders::Initialize(const Context &context) {
     YDS_ERROR_DECLARE("Initialize");
 
+    YDS_NESTED_ERROR_CALL(context.Device->CreateOffScreenRenderTarget(&m_depthBuffer, 2048, 2048, ysRenderTarget::Format::R32_FLOAT, false, true));
+
+    m_ssao = new Ssao();
+
+    m_shadowMapStages = new dbasic::ShaderStage *[MaxShadowMaps];
+    for (int i = 0; i < MaxShadowMaps; ++i) {
+        std::stringstream ss; ss << "ShadowMap::" << i;
+        YDS_NESTED_ERROR_CALL(context.ShaderSet->NewStage(ss.str(), &m_shadowMapStages[i]));
+    }
+    
+    YDS_NESTED_ERROR_CALL(context.ShaderSet->NewStage("ShaderStage::Depth", &m_depthPass));
+    YDS_NESTED_ERROR_CALL(m_ssao->Initialize(context, m_depthBuffer));
     YDS_NESTED_ERROR_CALL(context.ShaderSet->NewStage("ShaderStage::Main", &m_mainStage));
     YDS_NESTED_ERROR_CALL(context.ShaderSet->NewStage("ShaderStage::UI", &m_uiStage));
 
@@ -57,7 +73,7 @@ ysError c_adv::Shaders::Initialize(const Context &context) {
         /* void */
     }
     else if (context.Device->GetAPI() == ysDevice::DeviceAPI::OpenGL4_0) {
-        const std::string shadowVertexShaderPath = context.ShaderPath + "/glsl/shadow.vert";
+        const std::string shadowVertexShaderPath = context.ShaderPath + "/glsl/depth_only.vert";
         const std::string vertexShaderPath = context.ShaderPath + "/glsl/main.vert";
         const std::string fragmentShaderPath = context.ShaderPath + "/glsl/main.frag";
 
@@ -69,20 +85,29 @@ ysError c_adv::Shaders::Initialize(const Context &context) {
     // Shadow maps
     m_shadowMapScreenVariables = new AllShadowMapScreenVariables;
     m_shadowMapObjectVariables = new ShadowMapObjectVariables[MaxShadowMaps];
-    m_shadowMapStages = new dbasic::ShaderStage *[MaxShadowMaps];
     m_shadowMaps = new ysRenderTarget *[MaxShadowMaps];
 
+    YDS_NESTED_ERROR_CALL(context.Device->CreateInputLayout(&m_shadowInputLayout, m_shadowVertexShader, context.GeometryFormat));
+
+    YDS_NESTED_ERROR_CALL(context.Device->CreateShaderProgram(&m_shadowMapShaderProgram));
+    YDS_NESTED_ERROR_CALL(context.Device->AttachShader(m_shadowMapShaderProgram, m_shadowVertexShader));
+    YDS_NESTED_ERROR_CALL(context.Device->LinkProgram(m_shadowMapShaderProgram));
+
+    // Main depth pass
+    YDS_NESTED_ERROR_CALL(m_depthPass->NewConstantBuffer<ShadowMapScreenVariables>(
+        "Buffer::ScreenData", 0, dbasic::ShaderStage::ConstantBufferBinding::BufferType::SceneData, &m_depthPassScreenVariables));
+    YDS_NESTED_ERROR_CALL(m_depthPass->NewConstantBuffer<ShadowMapObjectVariables>(
+        "Buffer::ObjectData", 1, dbasic::ShaderStage::ConstantBufferBinding::BufferType::ObjectData, &m_depthPassObjectVariables));
+
+    m_depthPass->SetInputLayout(m_shadowInputLayout);
+    m_depthPass->SetRenderTarget(m_depthBuffer);
+    m_depthPass->SetShaderProgram(m_shadowMapShaderProgram);
+    m_depthPass->SetType(dbasic::ShaderStage::Type::FullPass);
+    m_depthPass->SetCullMode(ysDevice::CullMode::Back);
+
+    // Shadow map passes
     for (int i = 0; i < MaxShadowMaps; ++i) {
-        std::stringstream ss; ss << "ShadowMap::" << i;
-        YDS_NESTED_ERROR_CALL(context.ShaderSet->NewStage(ss.str(), &m_shadowMapStages[i]));
-
         YDS_NESTED_ERROR_CALL(context.Device->CreateOffScreenRenderTarget(&m_shadowMaps[i], 4096, 4096, ysRenderTarget::Format::R32_FLOAT, false, true));
-
-        YDS_NESTED_ERROR_CALL(context.Device->CreateInputLayout(&m_shadowInputLayout, m_shadowVertexShader, context.GeometryFormat));
-
-        YDS_NESTED_ERROR_CALL(context.Device->CreateShaderProgram(&m_shadowMapShaderProgram));
-        YDS_NESTED_ERROR_CALL(context.Device->AttachShader(m_shadowMapShaderProgram, m_shadowVertexShader));
-        YDS_NESTED_ERROR_CALL(context.Device->LinkProgram(m_shadowMapShaderProgram));
 
         YDS_NESTED_ERROR_CALL(m_shadowMapStages[i]->NewConstantBuffer<ShadowMapScreenVariables>(
             "Buffer::ScreenData", 0, dbasic::ShaderStage::ConstantBufferBinding::BufferType::SceneData, &m_shadowMapScreenVariables->ScreenVariables[i]));
@@ -120,9 +145,10 @@ ysError c_adv::Shaders::Initialize(const Context &context) {
 
     m_mainStage->AddTextureInput(0, &m_mainStageDiffuseTexture);
     m_mainStage->AddTextureInput(1, &m_aoTexture);
+    m_mainStage->AddInput(m_ssao->GetOutput(), 2);
 
     for (int i = 0; i < MaxShadowMaps; ++i) {
-        m_mainStage->AddInput(m_shadowMaps[i], 2 + i);
+        m_mainStage->AddInput(m_shadowMaps[i], 3 + i);
     }
 
     m_uiStage->SetClearColor(ysMath::Constants::Zero);
@@ -154,6 +180,8 @@ ysError c_adv::Shaders::Initialize(const Context &context) {
 ysError c_adv::Shaders::Destroy() {
     YDS_ERROR_DECLARE("Destroy");
 
+    YDS_NESTED_ERROR_CALL(m_ssao->Destroy());
+
     YDS_NESTED_ERROR_CALL(m_device->DestroyShader(m_vertexShader));
     YDS_NESTED_ERROR_CALL(m_device->DestroyShader(m_fragmentShader));
 
@@ -162,6 +190,10 @@ ysError c_adv::Shaders::Destroy() {
     YDS_NESTED_ERROR_CALL(m_device->DestroyInputLayout(m_inputLayout));
 
     return YDS_ERROR_RETURN(ysError::None);
+}
+
+void c_adv::Shaders::OnResize(int width, int height) {
+    m_ssao->OnResize(width, height);
 }
 
 ysError c_adv::Shaders::UseMaterial(dbasic::Material *material) {
@@ -237,6 +269,10 @@ void c_adv::Shaders::SetScale(float x, float y, float z) {
         m_shadowMapObjectVariables[i].Scale[1] = y;
         m_shadowMapObjectVariables[i].Scale[2] = z;
     }
+
+    m_depthPassObjectVariables.Scale[0] = x;
+    m_depthPassObjectVariables.Scale[1] = y;
+    m_depthPassObjectVariables.Scale[2] = z;
 }
 
 void c_adv::Shaders::SetTexOffset(float u, float v) {
@@ -305,12 +341,22 @@ void c_adv::Shaders::SetFogColor(const ysVector &color) {
     m_shaderScreenVariables.FogColor = ysMath::GetVector4(color);
 }
 
+void c_adv::Shaders::SetSsaoEnable(bool enable) {
+    m_shaderScreenVariables.SsaoEnable = enable ? 1 : 0;
+}
+
+bool c_adv::Shaders::GetSsaoEnable() const {
+    return m_shaderScreenVariables.SsaoEnable == 1;
+}
+
 void c_adv::Shaders::SetObjectTransform(const ysMatrix &mat) {
     m_shaderObjectVariables.Transform = mat;
 
     for (int i = 0; i < MaxShadowMaps; ++i) {
         m_shadowMapObjectVariables[i].Transform = mat;
     }
+
+    m_depthPassObjectVariables.Transform = mat;
 }
 
 void c_adv::Shaders::SetPositionOffset(const ysVector &position) {
@@ -320,10 +366,13 @@ void c_adv::Shaders::SetPositionOffset(const ysVector &position) {
 
 void c_adv::Shaders::SetProjection(const ysMatrix &mat) {
     m_shaderScreenVariables.Projection = mat;
+    m_depthPassScreenVariables.Projection = mat;
+    m_ssao->SetProjection(mat);
 }
 
 void c_adv::Shaders::SetCameraView(const ysMatrix &mat) {
     m_shaderScreenVariables.CameraView = mat;
+    m_depthPassScreenVariables.CameraView = mat;
 }
 
 void c_adv::Shaders::SetEye(const ysVector &vec) {

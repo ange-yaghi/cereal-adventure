@@ -12,6 +12,7 @@ layout(location=2) in vec4 in_Normal;
 out vec4 ex_Pos;
 out vec4 ex_ShadowMapPos[8];
 out vec2 ex_Tex;
+out vec4 ex_ScreenSpace;
 out vec3 ex_Normal;
 
 layout (binding = 0) uniform ScreenVariables {
@@ -26,6 +27,8 @@ layout (binding = 0) uniform ScreenVariables {
 	vec4 FogColor;
 	float FogNear;
 	float FogFar;
+
+	int SsaoEnable;
 };
 
 layout (binding = 1) uniform ObjectVariables {
@@ -71,7 +74,8 @@ void main(void) {
 	vec4 finalNormal = vec4(in_Normal.xyz, 0.0);
 	ex_Normal = vec3(finalNormal * Transform);
 
-	gl_Position = vec4(inputPos.xyzw);
+	gl_Position = inputPos;
+	ex_ScreenSpace = inputPos;
 
 	ex_Tex = in_Tex;
 }

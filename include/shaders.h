@@ -7,6 +7,8 @@
 
 namespace c_adv {
 
+    class Ssao;
+
     class Shaders : public dbasic::ShaderBase {
     public:
         enum class CameraMode {
@@ -16,6 +18,7 @@ namespace c_adv {
 
         struct Context {
             ysDevice *Device;
+            dbasic::DeltaEngine *Engine;
             dbasic::ShaderSet *ShaderSet;
             ysRenderTarget *RenderTarget;
             ysRenderTarget *UiRenderTarget;
@@ -31,6 +34,8 @@ namespace c_adv {
 
         ysError Initialize(const Context &context);
         ysError Destroy();
+
+        void OnResize(int width, int height);
 
         virtual ysError UseMaterial(dbasic::Material *material);
         void Update();
@@ -57,6 +62,9 @@ namespace c_adv {
         void SetFogNear(float fogNear);
         void SetFogFar(float fogFar);
         void SetFogColor(const ysVector &color);
+
+        void SetSsaoEnable(bool enable);
+        bool GetSsaoEnable() const;
 
         virtual void SetObjectTransform(const ysMatrix &mat);
         void SetPositionOffset(const ysVector &position);
@@ -147,6 +155,9 @@ namespace c_adv {
     protected:
         AllShadowMapScreenVariables *m_shadowMapScreenVariables;
         ShadowMapObjectVariables *m_shadowMapObjectVariables;
+
+        ShadowMapScreenVariables m_depthPassScreenVariables;
+        ShadowMapObjectVariables m_depthPassObjectVariables;
         int m_shadowMapCount;
 
         ShaderScreenVariables m_uiShaderScreenVariables;
@@ -179,6 +190,8 @@ namespace c_adv {
         dbasic::TextureHandle m_mainStageDiffuseTexture;
         dbasic::TextureHandle m_aoTexture;
 
+        Ssao *m_ssao;
+
         ysShader *m_shadowVertexShader;
         ysShader *m_vertexShader;
         ysShader *m_fragmentShader;
@@ -191,10 +204,12 @@ namespace c_adv {
         ysDevice *m_device;
 
     protected:
+        dbasic::ShaderStage *m_depthPass;
         dbasic::ShaderStage *m_mainStage;
         dbasic::ShaderStage *m_uiStage;
         dbasic::ShaderStage **m_shadowMapStages;
 
+        ysRenderTarget *m_depthBuffer;
         ysRenderTarget **m_shadowMaps;
     };
 

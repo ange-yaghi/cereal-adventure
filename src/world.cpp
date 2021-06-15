@@ -93,6 +93,7 @@ void c_adv::World::initialize(void *instance, ysContextObject::DeviceAPI api) {
     shaderContext.UiRenderTarget = m_guiRenderTarget;
     shaderContext.ShaderPath = assetPath + "/shaders/";
     shaderContext.ShaderSet = &m_shaderSet;
+    shaderContext.Engine = &m_engine;
 
     m_engine.InitializeShaderSet(&m_shaderSet);
     m_shaders.Initialize(shaderContext);

@@ -190,6 +190,10 @@ void c_adv::Player::process(float dt) {
     m_world->getUi().setPlayerHealth(m_health / 20.0f);
 
     m_ledgeGraspDistance = max(std::abs(ysMath::GetY(RigidBody.GetVelocity()) * 0.4f), 0.4f);
+
+    if (m_world->getEngine().ProcessKeyDown(ysKey::Code::N1)) {
+        m_world->getShaders().SetSsaoEnable(!m_world->getShaders().GetSsaoEnable());
+    }
 }
 
 void c_adv::Player::render() {

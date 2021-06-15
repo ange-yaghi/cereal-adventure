@@ -2,12 +2,14 @@
 
 layout(binding = 0) uniform sampler2D diffuseTex;
 layout(binding = 1) uniform sampler2D aoTex;
-layout(binding = 2) uniform sampler2DShadow shadowMaps[8];
+layout(binding = 2) uniform sampler2D ssao;
+layout(binding = 3) uniform sampler2D shadowMaps[8];
 
 out vec4 out_Color;
 
 in vec4 ex_Pos;
 in vec4 ex_ShadowMapPos[8];
+in vec4 ex_ScreenSpace;
 in vec2 ex_Tex;
 in vec3 ex_Normal;
 
@@ -36,6 +38,8 @@ layout (binding = 0) uniform ScreenVariables {
 	vec4 FogColor;
 	float FogNear;
 	float FogFar;
+
+	int SsaoEnable;
 };
 
 layout (binding = 1) uniform ObjectVariables {
@@ -184,7 +188,11 @@ void main(void) {
 		
 		if (shadowMapUV.x > 1.0 || shadowMapUV.x < 0.0) shadowMapValues[i] = 0.0;
 		else if (shadowMapUV.y > 1.0 || shadowMapUV.y < 0.0) shadowMapValues[i] = 0.0;
-		else shadowMapValues[i] = texture(shadowMaps[i], shadowMapUV);
+		else {
+			const float depth = texture(shadowMaps[i], shadowMapUV.xy).r;
+			if (depth < shadowMapUV.z) shadowMapValues[i] = 0;
+			else shadowMapValues[i] = 1;
+		}
 	}
 
 	const float FullSpecular = 1 / 0.08;
@@ -205,6 +213,9 @@ void main(void) {
 	}
 
 	totalLighting = baseColor.rgb;
+
+	const vec2 ss_uv = 0.5 * (ex_ScreenSpace.xy / ex_ScreenSpace.w + vec2(1, 1));
+	const float ssao_f = mix(0.25, 1.0, clamp(4 * texture(ssao, ss_uv).x, 0, 1));
 
 	if (Lit == 1) {
 		vec3 o = normalize(CameraEye.xyz - ex_Pos.xyz);
@@ -279,6 +290,12 @@ void main(void) {
 
 			totalLighting += falloff * bsdf * spotAttenuation * spotAttenuation * spotAttenuation;
 		}
+
+		if (SsaoEnable == 1) {
+			totalLighting *= mix(0.25, 1.0, ssao_f);
+		}
+		//out_Color = vec4(ssao_f, ssao_f, ssao_f, 1.0);
+		//return;
 	}
 
 	const float distanceToCamera = length(CameraEye.xyz - ex_Pos.xyz);
