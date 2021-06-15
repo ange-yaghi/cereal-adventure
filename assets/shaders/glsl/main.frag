@@ -215,7 +215,7 @@ void main(void) {
 	totalLighting = baseColor.rgb;
 
 	const vec2 ss_uv = 0.5 * (ex_ScreenSpace.xy / ex_ScreenSpace.w + vec2(1, 1));
-	const float ssao_f = mix(0.25, 1.0, clamp(4 * texture(ssao, ss_uv).x, 0, 1));
+	const float ssao_f = mix(0.75, 1.0, clamp(4 * texture(ssao, ss_uv).x, 0, 1));
 
 	if (Lit == 1) {
 		vec3 o = normalize(CameraEye.xyz - ex_Pos.xyz);
@@ -292,7 +292,7 @@ void main(void) {
 		}
 
 		if (SsaoEnable == 1) {
-			totalLighting *= mix(0.25, 1.0, ssao_f);
+			totalLighting *= ssao_f;
 		}
 		//out_Color = vec4(ssao_f, ssao_f, ssao_f, 1.0);
 		//return;

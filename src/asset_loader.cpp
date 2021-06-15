@@ -99,6 +99,11 @@ void c_adv::AssetLoader::createAllMaterials(dbasic::AssetManager *am) {
     intelMaterial->SetDiffuseColor(White);
     intelMaterial->SetDiffuseMap(am->GetTexture("Intel_Diffuse")->GetTexture());
 
+    dbasic::Material *shelfMaterial = am->NewMaterial();
+    shelfMaterial->SetName("Shelf");
+    shelfMaterial->SetDiffuseColor(White);
+    shelfMaterial->SetDiffuseMap(am->GetTexture("Shelf_Diffuse")->GetTexture());
+
     dbasic::Material *wallMaterial = am->NewMaterial();
     wallMaterial->SetName("Level1Wall");
     wallMaterial->SetDiffuseColor(ysColor::srgbiToLinear(0x00, 0x00, 0x00));
@@ -128,6 +133,8 @@ void c_adv::AssetLoader::loadAllTextures(const dbasic::Path &assetPath, dbasic::
     am->LoadTexture(getPath("cereal-box/PlayerTexture_128x128_v2.png", assetPath).c_str(), "PlayerDiffuse");
 
     am->LoadTexture(getPath("textures/Intel_Diffuse.png", assetPath).c_str(), "Intel_Diffuse");
+
+    am->LoadTexture(getPath("textures/Shelf_256.png", assetPath).c_str(), "Shelf_Diffuse");
 
     am->LoadTexture(getPath("textures/SkyBox_Diffuse.png", assetPath).c_str(), "SkyBox_Diffuse");
     am->LoadTexture(getPath("post-processing/health_overlay_v2.png", assetPath).c_str(), "Health_Overlay");
