@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\asset_loader.cpp" />
+    <ClCompile Include="..\..\src\blur_stage.cpp" />
     <ClCompile Include="..\..\src\cabinet.cpp" />
     <ClCompile Include="..\..\src\ceiling_light_source.cpp" />
     <ClCompile Include="..\..\src\clock.cpp" />
@@ -72,6 +73,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\include\aabb.h" />
     <ClInclude Include="..\..\include\asset_loader.h" />
+    <ClInclude Include="..\..\include\blur_stage.h" />
     <ClInclude Include="..\..\include\cabinet.h" />
     <ClInclude Include="..\..\include\ceiling_light_source.h" />
     <ClInclude Include="..\..\include\clock.h" />

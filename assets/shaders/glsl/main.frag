@@ -5,12 +5,13 @@ layout(binding = 1) uniform sampler2D aoTex;
 layout(binding = 2) uniform sampler2D ssao;
 layout(binding = 3) uniform sampler2D shadowMaps[8];
 
-out vec4 out_Color;
+layout (location = 0) out vec4 out_Color;
+layout (location = 1) out vec4 out_BrightColor;
 
 in vec4 ex_Pos;
 in vec4 ex_ShadowMapPos[8];
-in vec4 ex_ScreenSpace;
 in vec2 ex_Tex;
+in vec4 ex_ScreenSpace;
 in vec3 ex_Normal;
 
 struct Light {
@@ -109,17 +110,6 @@ float f_specular_ambient(vec3 o, vec3 normal, float F0, float power) {
 	return clamp(F * power, 0.0, 1.0);
 }
 
-float linearToSrgb(float u) {
-	const float MinSrgbPower = 0.0031308;
-
-	if (u < MinSrgbPower) {
-		return 12.92 * u;
-	}
-	else {
-		return 1.055 * pow(u, 1 / 2.4) - 0.055;
-	}
-}
-
 float srgbToLinear(float u) {
 	const float MinSrgbPower = 0.04045;
 
@@ -131,40 +121,12 @@ float srgbToLinear(float u) {
     }
 }
 
-vec3 linearToSrgb(vec3 v) {
-	return vec3(
-		linearToSrgb(v.r),
-		linearToSrgb(v.g),
-		linearToSrgb(v.b)
-	);
-}
-
 vec3 srgbToLinear(vec3 v) {
 	return vec3(
 		srgbToLinear(v.r),
 		srgbToLinear(v.g),
 		srgbToLinear(v.b)
 	);
-}
-
-vec3 hableTonemapPartial(vec3 s) {
-	const float A = 0.15f;
-	const float B = 0.50f;
-	const float C = 0.10f;
-	const float D = 0.20f;
-	const float E = 0.02f;
-	const float F = 0.30f;
-
-	return ((s * (A * s + C * B) + D * E) / (s * (A * s + B) + D * F)) - E/F;
-}
-
-vec3 hableTonemap(vec3 input) {
-	const float exposureBias = 2.0f;
-	const vec3 mapped = hableTonemapPartial(exposureBias * input);
-
-	const vec3 W = vec3(11.3f);
-	const vec3 whiteScale = vec3(1.0f) / hableTonemapPartial(W);
-	return mapped * whiteScale;
 }
 
 vec3 aces_approx(vec3 v) {
@@ -294,8 +256,6 @@ void main(void) {
 		if (SsaoEnable == 1) {
 			totalLighting *= ssao_f;
 		}
-		//out_Color = vec4(ssao_f, ssao_f, ssao_f, 1.0);
-		//return;
 	}
 
 	const float distanceToCamera = length(CameraEye.xyz - ex_Pos.xyz);
@@ -307,11 +267,14 @@ void main(void) {
 		ao = texture(aoTex, ex_Tex).r;
 	}
 
+	const float brightness = dot(totalLighting.rgb, vec3(0.2126, 0.7152, 0.0722));
+	if (brightness > 1.0) {
+		out_BrightColor = vec4(totalLighting.rgb * (brightness - 1), 1.0);
+	}
+	else {
+		out_BrightColor = vec4(0.0, 0.0, 0.0, 1.0);
+	}
+
 	out_Color = vec4(
-		linearToSrgb(
-			hableTonemap(
-				mix(
-					totalLighting.rgb * ao,
-					FogColor.rgb,
-					fogAttenuation * FogEffect))), baseColor.a);
+		mix(totalLighting.rgb * ao, FogColor.rgb, fogAttenuation * FogEffect), baseColor.a);
 }

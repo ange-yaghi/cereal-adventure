@@ -1,6 +1,7 @@
 #include "../include/shaders.h"
 
 #include "../include/ssao.h"
+#include "../include/blur_stage.h"
 
 #include <sstream>
 
@@ -23,6 +24,7 @@ c_adv::Shaders::Shaders() {
     m_shadowDepth = 200.0f;
 
     m_mainStage = nullptr;
+    m_blurStage = nullptr;
 
     m_shadowVertexShader = nullptr;
     m_vertexShader = nullptr;
@@ -31,6 +33,9 @@ c_adv::Shaders::Shaders() {
     m_inputLayout = nullptr;
     m_mainShaderProgram = nullptr;
     m_shadowMapShaderProgram = nullptr;
+    m_bloomShaderProgram = nullptr;
+    m_bloomShader = nullptr;
+    m_bloomStage = nullptr;
 
     m_device = nullptr;
 
@@ -45,6 +50,9 @@ c_adv::Shaders::Shaders() {
 
     m_shadowMapObjectVariables = nullptr;
     m_shadowMapScreenVariables = nullptr;
+
+    m_mainBuffer = nullptr;
+    m_depthBuffer = nullptr;
 }
 
 c_adv::Shaders::~Shaders() {
@@ -54,7 +62,21 @@ c_adv::Shaders::~Shaders() {
 ysError c_adv::Shaders::Initialize(const Context &context) {
     YDS_ERROR_DECLARE("Initialize");
 
-    YDS_NESTED_ERROR_CALL(context.Device->CreateOffScreenRenderTarget(&m_depthBuffer, 2048, 2048, ysRenderTarget::Format::R32_FLOAT, false, true));
+    YDS_NESTED_ERROR_CALL(context.Device->CreateOffScreenRenderTarget(
+        &m_depthBuffer,
+        512,
+        240,
+        ysRenderTarget::Format::R32_DEPTH_COMPONENT,
+        false,
+        true));
+
+    YDS_NESTED_ERROR_CALL(context.Device->CreateOffScreenRenderTarget(
+        &m_mainBuffer,
+        512,
+        240,
+        ysRenderTarget::Format::R32G32B32_FLOAT,
+        true,
+        true));
 
     m_ssao = new Ssao();
 
@@ -67,7 +89,11 @@ ysError c_adv::Shaders::Initialize(const Context &context) {
     YDS_NESTED_ERROR_CALL(context.ShaderSet->NewStage("ShaderStage::Depth", &m_depthPass));
     YDS_NESTED_ERROR_CALL(m_ssao->Initialize(context, m_depthBuffer));
     YDS_NESTED_ERROR_CALL(context.ShaderSet->NewStage("ShaderStage::Main", &m_mainStage));
+    YDS_NESTED_ERROR_CALL(context.ShaderSet->NewStage<BlurStage>("ShaderStage::BloomBlur", &m_blurStage));
+    YDS_NESTED_ERROR_CALL(context.ShaderSet->NewStage("ShaderStage::Bloom", &m_bloomStage));
     YDS_NESTED_ERROR_CALL(context.ShaderSet->NewStage("ShaderStage::UI", &m_uiStage));
+
+    YDS_NESTED_ERROR_CALL(m_blurStage->Create(context));
 
     if (context.Device->GetAPI() == ysDevice::DeviceAPI::DirectX11) {
         /* void */
@@ -76,10 +102,12 @@ ysError c_adv::Shaders::Initialize(const Context &context) {
         const std::string shadowVertexShaderPath = context.ShaderPath + "/glsl/depth_only.vert";
         const std::string vertexShaderPath = context.ShaderPath + "/glsl/main.vert";
         const std::string fragmentShaderPath = context.ShaderPath + "/glsl/main.frag";
+        const std::string bloomShaderPath = context.ShaderPath + "/glsl/bloom/bloom.frag";
 
         YDS_NESTED_ERROR_CALL(context.Device->CreateVertexShader(&m_shadowVertexShader, shadowVertexShaderPath.c_str(), "VS"));
         YDS_NESTED_ERROR_CALL(context.Device->CreateVertexShader(&m_vertexShader, vertexShaderPath.c_str(), "VS"));
         YDS_NESTED_ERROR_CALL(context.Device->CreatePixelShader(&m_fragmentShader, fragmentShaderPath.c_str(), "PS"));
+        YDS_NESTED_ERROR_CALL(context.Device->CreatePixelShader(&m_bloomShader, bloomShaderPath.c_str(), "PS"));
     }
 
     // Shadow maps
@@ -107,7 +135,13 @@ ysError c_adv::Shaders::Initialize(const Context &context) {
 
     // Shadow map passes
     for (int i = 0; i < MaxShadowMaps; ++i) {
-        YDS_NESTED_ERROR_CALL(context.Device->CreateOffScreenRenderTarget(&m_shadowMaps[i], 4096, 4096, ysRenderTarget::Format::R32_FLOAT, false, true));
+        YDS_NESTED_ERROR_CALL(context.Device->CreateOffScreenRenderTarget(
+            &m_shadowMaps[i],
+            4096,
+            4096,
+            ysRenderTarget::Format::R32_DEPTH_COMPONENT,
+            false,
+            true));
 
         YDS_NESTED_ERROR_CALL(m_shadowMapStages[i]->NewConstantBuffer<ShadowMapScreenVariables>(
             "Buffer::ScreenData", 0, dbasic::ShaderStage::ConstantBufferBinding::BufferType::SceneData, &m_shadowMapScreenVariables->ScreenVariables[i]));
@@ -129,8 +163,20 @@ ysError c_adv::Shaders::Initialize(const Context &context) {
     YDS_NESTED_ERROR_CALL(context.Device->AttachShader(m_mainShaderProgram, m_fragmentShader));
     YDS_NESTED_ERROR_CALL(context.Device->LinkProgram(m_mainShaderProgram));
 
+    YDS_NESTED_ERROR_CALL(context.Device->CreateOffScreenRenderTarget(
+        &m_brightTarget,
+        512,
+        240,
+        ysRenderTarget::Format::R32G32B32_FLOAT,
+        true,
+        false));
+
+    m_blurStage->SetInput(m_brightTarget);
+    m_blurStage->SetOutput(m_brightTarget);
+
     m_mainStage->SetInputLayout(m_inputLayout);
-    m_mainStage->SetRenderTarget(context.RenderTarget);
+    m_mainStage->SetRenderTarget(m_mainBuffer, 0);
+    m_mainStage->SetRenderTarget(m_brightTarget, 1);
     m_mainStage->SetShaderProgram(m_mainShaderProgram);
     m_mainStage->SetType(dbasic::ShaderStage::Type::FullPass);
 
@@ -151,6 +197,21 @@ ysError c_adv::Shaders::Initialize(const Context &context) {
         m_mainStage->AddInput(m_shadowMaps[i], 3 + i);
     }
 
+    // Bloom stage
+    YDS_NESTED_ERROR_CALL(context.Device->CreateShaderProgram(&m_bloomShaderProgram));
+    YDS_NESTED_ERROR_CALL(context.Device->AttachShader(m_bloomShaderProgram, context.Engine->GetSaqVertexShader()));
+    YDS_NESTED_ERROR_CALL(context.Device->AttachShader(m_bloomShaderProgram, m_bloomShader));
+    YDS_NESTED_ERROR_CALL(context.Device->LinkProgram(m_bloomShaderProgram));
+
+    m_bloomStage->SetClearColor(ysMath::Constants::Zero);
+    m_bloomStage->SetInputLayout(context.Engine->GetSaqInputLayout());
+    m_bloomStage->SetType(dbasic::ShaderStage::Type::PostProcessing);
+    m_bloomStage->SetRenderTarget(context.RenderTarget);
+    m_bloomStage->AddInput(m_mainBuffer, 0);
+    m_bloomStage->AddInput(m_brightTarget, 1);
+    m_bloomStage->SetShaderProgram(m_bloomShaderProgram);
+
+    // UI stage
     m_uiStage->SetClearColor(ysMath::Constants::Zero);
     m_uiStage->SetInputLayout(m_inputLayout);
     m_uiStage->SetRenderTarget(context.UiRenderTarget);
@@ -225,6 +286,13 @@ ysError c_adv::Shaders::UseMaterial(dbasic::Material *material) {
         else {
             SetAoMap(false);
         }
+
+        m_shaderObjectVariables.DiffuseMix = material->GetDiffuseMix();
+        m_shaderObjectVariables.DiffuseRoughness = material->GetDiffuseRoughness();
+        m_shaderObjectVariables.IncidentSpecular = material->GetIncidentSpecular();
+        m_shaderObjectVariables.Metallic = material->GetMetallic();
+        m_shaderObjectVariables.SpecularMix = material->GetSpecularMix();
+        m_shaderObjectVariables.SpecularPower = material->GetSpecularPower();
     }
 
     return YDS_ERROR_RETURN(ysError::None);

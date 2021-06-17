@@ -8,6 +8,7 @@
 namespace c_adv {
 
     class Ssao;
+    class BlurStage;
 
     class Shaders : public dbasic::ShaderBase {
     public:
@@ -195,8 +196,10 @@ namespace c_adv {
         ysShader *m_shadowVertexShader;
         ysShader *m_vertexShader;
         ysShader *m_fragmentShader;
+        ysShader *m_bloomShader;
         ysShaderProgram *m_mainShaderProgram;
         ysShaderProgram *m_shadowMapShaderProgram;
+        ysShaderProgram *m_bloomShaderProgram;
 
         ysInputLayout *m_shadowInputLayout;
         ysInputLayout *m_inputLayout;
@@ -208,8 +211,12 @@ namespace c_adv {
         dbasic::ShaderStage *m_mainStage;
         dbasic::ShaderStage *m_uiStage;
         dbasic::ShaderStage **m_shadowMapStages;
+        dbasic::ShaderStage *m_bloomStage;
+        BlurStage *m_blurStage;
 
+        ysRenderTarget *m_mainBuffer;
         ysRenderTarget *m_depthBuffer;
+        ysRenderTarget *m_brightTarget;
         ysRenderTarget **m_shadowMaps;
     };
 

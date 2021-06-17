@@ -219,6 +219,9 @@
     <ClCompile Include="..\..\src\ssao.cpp">
       <Filter>Source Files\shaders</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\blur_stage.cpp">
+      <Filter>Source Files\shaders</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\delta.h">
@@ -375,6 +378,9 @@
       <Filter>Header Files\ui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\ssao.h">
+      <Filter>Header Files\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\blur_stage.h">
       <Filter>Header Files\shaders</Filter>
     </ClInclude>
   </ItemGroup>

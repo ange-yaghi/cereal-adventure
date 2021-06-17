@@ -50,10 +50,23 @@ ysError c_adv::Ssao::Initialize(const Shaders::Context &context, ysRenderTarget 
         "SsaoControls", 1, dbasic::ShaderStage::ConstantBufferBinding::BufferType::SceneData, &m_controls));
 
     for (int i = 0; i < m_controls.MaxKernelSize; ++i) {
-        m_controls.Kernel[i] = ysVector3(
-            ysMath::UniformRandom(2.0f) - 1.0f,
-            ysMath::UniformRandom(2.0f) - 1.0f,
-            ysMath::UniformRandom(2.0f) - 1.0f);
+        bool found = false;
+        while (!found) {
+            ysVector uniform = ysMath::LoadVector(
+                ysMath::UniformRandom(2.0f) - 1.0f,
+                ysMath::UniformRandom(2.0f) - 1.0f,
+                ysMath::UniformRandom(2.0f) - 1.0f
+            );
+
+            if (ysMath::GetScalar(ysMath::MagnitudeSquared3(uniform)) > 1.0f) {
+                continue;
+            }
+            else {
+                found = true;
+            }
+
+            m_controls.Kernel[i] = ysMath::GetVector3(uniform);
+        }
     }
 
     m_controls.SampleRadius = 0.4f;

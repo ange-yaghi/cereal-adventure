@@ -91,6 +91,11 @@ namespace c_adv {
         float SampleRadius;
     };
 
+    struct BlurControls {
+        int Horizontal;
+        int Padding[3];
+    };
+
 } /* namespace c_adv */
 
 #endif /* CEREAL_ADVENTURE_SHADER_CONTROLS_H */
