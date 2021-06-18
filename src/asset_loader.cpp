@@ -204,6 +204,16 @@ void c_adv::AssetLoader::createAllMaterials(dbasic::AssetManager *am) {
     curtainsMaterial->SetName("Curtains");
     curtainsMaterial->SetDiffuseColor(White);
     curtainsMaterial->SetDiffuseMap(am->GetTexture("Curtains_Diffuse")->GetTexture());
+
+    dbasic::Material *neon0 = am->NewMaterial();
+    neon0->SetName("Neon0");
+    neon0->SetDiffuseColor(ysMath::Mul(ysColor::srgbiToLinear(0xE7D575), ysMath::LoadScalar(2.5f)));
+    neon0->SetLit(false);
+
+    dbasic::Material *neon1 = am->NewMaterial();
+    neon1->SetName("Neon1");
+    neon1->SetDiffuseColor(ysMath::Mul(ysColor::srgbiToLinear(0x93278F), ysMath::LoadScalar(2.5f)));
+    neon1->SetLit(false);
 }
 
 void c_adv::AssetLoader::loadAllTextures(const dbasic::Path &assetPath, dbasic::AssetManager *am) {
@@ -263,8 +273,8 @@ void c_adv::AssetLoader::loadAllAssets(const dbasic::Path &assetPath, dbasic::As
     createAllMaterials(am);
 
     /* Load all model and animation assets here */
-    am->CompileInterchangeFile(getPath("cereal-box/cereal_box", assetPath).c_str(), 1.0f, true);
-    am->LoadSceneFile(getPath("cereal-box/cereal_box", assetPath).c_str());
+    am->CompileInterchangeFile(getPath("cereal-box/cereal_box_light_test", assetPath).c_str(), 1.0f, true);
+    am->LoadSceneFile(getPath("cereal-box/cereal_box_light_test", assetPath).c_str());
 
     am->LoadAnimationFile(getPath("cereal-box/cereal_box_new_run.dimo", assetPath).c_str());
 

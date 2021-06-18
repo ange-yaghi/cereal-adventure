@@ -37,6 +37,7 @@
     <ClCompile Include="..\..\src\game_object.cpp" />
     <ClCompile Include="..\..\src\jitter_filter.cpp" />
     <ClCompile Include="..\..\src\ledge.cpp" />
+    <ClCompile Include="..\..\src\light_object.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\math_utilities.cpp" />
     <ClCompile Include="..\..\src\microwave.cpp" />
@@ -86,6 +87,7 @@
     <ClInclude Include="..\..\include\fruit_bowl.h" />
     <ClInclude Include="..\..\include\fruit_projectile.h" />
     <ClInclude Include="..\..\include\game_objects.h" />
+    <ClInclude Include="..\..\include\light_object.h" />
     <ClInclude Include="..\..\include\microwave.h" />
     <ClInclude Include="..\..\include\milk_carton.h" />
     <ClInclude Include="..\..\include\oven.h" />

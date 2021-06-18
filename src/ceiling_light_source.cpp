@@ -21,6 +21,7 @@ void c_adv::CeilingLightSource::initialize() {
 void c_adv::CeilingLightSource::render() {
     const ysVector position = RigidBody.Transform.GetWorldPosition();
 
+    /*
     int shadowMap = -1;
     if (ysMath::GetX(position) < 40) {
         shadowMap = m_world->getShaders().AddPerspectiveShadowMap(
@@ -45,5 +46,5 @@ void c_adv::CeilingLightSource::render() {
 
     light.ShadowMap = shadowMap;
 
-    m_world->getShaders().AddLight(light); 
+    m_world->getShaders().AddLight(light);*/
 }

@@ -496,6 +496,8 @@ int c_adv::Shaders::AddOrthographicShadowMap(
     float nearClip,
     float farClip)
 {
+    if (m_shadowMapCount >= MaxShadowMaps) return -1;
+
     m_shadowMapScreenVariables->ScreenVariables[m_shadowMapCount].Projection =
         ysMath::Transpose(ysMath::OrthographicProjection(width, height, nearClip, farClip));
     m_shadowMapScreenVariables->ScreenVariables[m_shadowMapCount].CameraView =

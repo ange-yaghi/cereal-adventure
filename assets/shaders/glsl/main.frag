@@ -141,20 +141,37 @@ vec3 aces_approx(vec3 v) {
 
 void main(void) {
 	float shadowMapValues[8];
+	for (int i = 0; i < 8; ++i) shadowMapValues[i] = 0;
 	for (int i = 0; i < 8; ++i) {
 		float calculatedDepth = ex_ShadowMapPos[i].z / ex_ShadowMapPos[i].w;
 		vec3 shadowMapUV = ex_ShadowMapPos[i].xyz / ex_ShadowMapPos[i].w;
 		shadowMapUV += vec3(1.0, 1.0, 1.0);
 		shadowMapUV *= 0.5;
 		shadowMapUV.z -= 0.001;
+
+		const vec3 samples[9] = {
+			vec3(1.0, 1.0, 0.0),
+			vec3(0.0, 1.0, 0.0),
+			vec3(-1.0, 1.0, 0.0),
+			vec3(1.0, -1.0, 0.0),
+			vec3(0.0, -1.0, 0.0),
+			vec3(-1.0, -1.0, 0.0),
+			vec3(1.0, 0.0, 0.0),
+			vec3(0.0, 0.0, 0.0),
+			vec3(-1.0, 0.0, 0.0)
+		};
 		
-		if (shadowMapUV.x > 1.0 || shadowMapUV.x < 0.0) shadowMapValues[i] = 0.0;
-		else if (shadowMapUV.y > 1.0 || shadowMapUV.y < 0.0) shadowMapValues[i] = 0.0;
-		else {
-			const float depth = texture(shadowMaps[i], shadowMapUV.xy).r;
-			if (depth < shadowMapUV.z) shadowMapValues[i] = 0;
-			else shadowMapValues[i] = 1;
+		for (int j = 0; j < 9; ++j) {
+			if (shadowMapUV.x > 1.0 || shadowMapUV.x < 0.0) shadowMapValues[i] += 0.0;
+			else if (shadowMapUV.y > 1.0 || shadowMapUV.y < 0.0) shadowMapValues[i] += 0.0;
+			else {
+				const float depth = texture(shadowMaps[i], shadowMapUV.xy + samples[j].xy * 0.001).r;
+				if (depth < shadowMapUV.z) shadowMapValues[i] += 0;
+				else shadowMapValues[i] += 1;
+			}
 		}
+
+		shadowMapValues[i] /= 9;
 	}
 
 	const float FullSpecular = 1 / 0.08;
@@ -237,14 +254,11 @@ void main(void) {
 
 			float falloff = 1.0;
 			if (Lights[li].FalloffEnabled == 1) {
-				const float invFalloffDist = 1 / max((dist - Lights[li].FalloffStart) / Lights[li].FalloffScale  + 1.0, 1.0);
+				const float invFalloffDist = 1 / max((dist - Lights[li].FalloffStart) / Lights[li].FalloffScale + 1.0, 1.0);
 				falloff = (invFalloffDist * invFalloffDist);
 			}
 
-			vec3 bsdf = mix(
-				diffuse + specular,
-				metallic,
-				Metallic);
+			vec3 bsdf = mix(diffuse + specular, metallic, Metallic);
 
 			if (Lights[li].ShadowMap != -1) {
 				falloff *= shadowMapValues[Lights[li].ShadowMap];
@@ -264,12 +278,12 @@ void main(void) {
 
 	float ao = 1.0;
 	if (AoMap == 1) {
-		ao = texture(aoTex, ex_Tex).r;
+		ao = mix(texture(aoTex, ex_Tex).r, 1.0, 0.5);
 	}
 
 	const float brightness = dot(totalLighting.rgb, vec3(0.2126, 0.7152, 0.0722));
-	if (brightness > 1.0) {
-		out_BrightColor = vec4(totalLighting.rgb * (brightness - 1), 1.0);
+	if (brightness > 1.8) {
+		out_BrightColor = vec4(totalLighting.rgb * (brightness - 1.8) * 0.1, 1.0);
 	}
 	else {
 		out_BrightColor = vec4(0.0, 0.0, 0.0, 1.0);

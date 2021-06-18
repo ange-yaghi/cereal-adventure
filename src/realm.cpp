@@ -63,9 +63,10 @@ void c_adv::Realm::process(float dt) {
  
 void c_adv::Realm::render() {
     ysVector4 ambient = WallColor;
-    ambient.Scale(1.0f);
+    ambient.Scale(0.01f);
     m_world->getShaders().SetAmbientLight(ambient);
 
+    /*
     const int shadowMap = m_world->getShaders().AddPerspectiveShadowMap(
         ysMath::LoadVector(-5.0f, 0.0f, 10.0f),
         ysMath::Constants::Zero,
@@ -107,7 +108,7 @@ void c_adv::Realm::render() {
     sun.Position = ysMath::GetVector4(ysMath::LoadVector(-1.43702f, 9.70642f, -5.5321f));
     sun.ShadowMap = exteriorShadowMap;
 
-    m_world->getShaders().AddLight(sun);
+    m_world->getShaders().AddLight(sun);*/
 
     AABB cameraExtents = m_world->getCameraExtents();
     int visibleObjects = 0;

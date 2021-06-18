@@ -70,6 +70,12 @@
     <Filter Include="Source Files\ui">
       <UniqueIdentifier>{f4476796-70fa-42f4-9a59-e20a79b24e3c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\game-objects\lighting">
+      <UniqueIdentifier>{cda06ae4-3572-455a-ae4b-e23b99acbb48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\light">
+      <UniqueIdentifier>{2882d5a8-155e-4636-9d70-762b0bd2de36}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -221,6 +227,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\blur_stage.cpp">
       <Filter>Source Files\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\light_object.cpp">
+      <Filter>Source Files\light</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -382,6 +391,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\blur_stage.h">
       <Filter>Header Files\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\light_object.h">
+      <Filter>Header Files\game-objects\lighting</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

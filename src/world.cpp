@@ -180,7 +180,7 @@ void c_adv::World::render() {
     }
 
     const ysVector focusPosition = m_focus->RigidBody.Transform.GetWorldPosition();
-    m_smoothCamera.setTarget(focusPosition);
+    m_smoothCamera.setTarget(ysMath::Add(focusPosition, ysMath::LoadVector(0.0f, 0.0f, 0.0f)));
     m_smoothTarget.setTarget(ysMath::Add(focusPosition, ysMath::LoadVector(offset_x, offset_y, 0.0f)));
 
     const ysVector cameraTarget = m_smoothCamera.getPosition();
@@ -360,6 +360,13 @@ void c_adv::World::generateLevel(dbasic::RenderSkeleton *hierarchy) {
             table->RigidBody.Transform.SetPosition(position);
         }
         else if (sceneAsset->GetType() == ysObjectData::ObjectType::Instance) {
+            if (node->GetSceneAsset()->GetInstance()->GetType() == ysObjectData::ObjectType::Light) {
+                LightObject *light = m_mainRealm->spawn<LightObject>();
+                light->setAsset(node->GetSceneAsset()->GetInstance());
+                light->RigidBody.Transform.SetPosition(node->Transform.GetWorldPosition());
+                light->RigidBody.Transform.SetOrientation(node->Transform.GetWorldOrientation());
+            }
+
             if (node->GetModelAsset() == nullptr) continue;
 
             ysVector position = node->Transform.GetWorldPosition();
