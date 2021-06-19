@@ -26,6 +26,9 @@ namespace c_adv {
         void setLifespan(float lifespan) { m_lifespan = lifespan; }
         float getLifespan() const { return m_lifespan; }
 
+        void setAsset(dbasic::ModelAsset *asset) { m_asset = asset; }
+        dbasic::ModelAsset *getAsset() const { return m_asset; }
+
         virtual bool isDangerous() { return true; }
 
     protected:
@@ -41,6 +44,8 @@ namespace c_adv {
         float m_radius;
         float m_age;
         float m_lifespan;
+
+        dbasic::ModelAsset *m_asset;
 
         // Assets ----
     public:

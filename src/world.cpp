@@ -4,8 +4,10 @@
 #include "../include/realm.h"
 #include "../include/player.h"
 #include "../include/test_obstacle.h"
-
 #include "../include/game_objects.h"
+
+#include <map>
+#include <stack>
 
 const float c_adv::World::DefaultCameraDistance = 10.0f;
 const std::string c_adv::World::PhysicsTimer = "Physics";
@@ -83,7 +85,7 @@ void c_adv::World::initialize(void *instance, ysContextObject::DeviceAPI api) {
     // PS1 - 512x240
     // PS2 - 720x480
     ysDevice *device = m_engine.GetDevice();
-    device->CreateOffScreenRenderTarget(&m_intermediateRenderTarget, 512, 240, ysRenderTarget::Format::R8G8B8A8_UNORM);
+    device->CreateOffScreenRenderTarget(&m_intermediateRenderTarget, 1920, 1080, ysRenderTarget::Format::R8G8B8A8_UNORM);
     device->CreateOffScreenRenderTarget(&m_guiRenderTarget, 512, 240, ysRenderTarget::Format::R8G8B8A8_UNORM, true, false);
 
     Shaders::Context shaderContext{};
@@ -130,7 +132,8 @@ void c_adv::World::initialSpawn() {
     m_mainRealm->setIndoor(false);
 
     ysTransform root;
-    dbasic::RenderSkeleton *level1 = m_assetManager.BuildRenderSkeleton(&root, m_assetManager.GetSceneObject("Level 1"));
+    dbasic::RenderSkeleton *level1 = m_assetManager.BuildRenderSkeleton(
+        &root, m_assetManager.GetSceneObject("Level 1", ysObjectData::ObjectType::Instance));
     generateLevel(level1);
 
     m_focus = m_mainRealm->spawn<Player>();
@@ -207,6 +210,8 @@ void c_adv::World::render() {
             m_engine.GetScreenHeight(),
             m_engine.GetScreenWidth(),
             m_engine.GetScreenHeight());
+
+        m_shaders.OnResize(m_engine.GetScreenWidth(), m_engine.GetScreenHeight());
     }
 
     m_shaders.ResetLights();
@@ -263,111 +268,273 @@ void c_adv::World::generateLevel(dbasic::RenderSkeleton *hierarchy) {
     item2->setAsset(m_assetManager.GetModelAsset("Intel"));
     // END TEMP
 
+    std::map<dbasic::RenderNode *, std::vector<dbasic::RenderNode *>> tree;
+    for (int i = 0; i < hierarchy->GetNodeCount(); ++i) {
+        dbasic::RenderNode *node = hierarchy->GetNode(i);
+        if (node->GetParent() == nullptr) {
+            if (tree.count(node) == 0) {
+                tree[node] = std::vector<dbasic::RenderNode *>();
+            }
+        }
+        else {
+            if (tree.count(node->GetParent()) == 0) {
+                tree[node->GetParent()] = { node };
+            }
+            else {
+                tree[node->GetParent()].push_back(node);
+            }
+        }
+    }
+
+    dbasic::RenderNode *root = hierarchy->GetRoot();
+
+    std::stack<dbasic::RenderNode *> s;
+    s.push(root);
+
+    while (!s.empty()) {
+        dbasic::RenderNode *node = s.top(); s.pop();
+
+        dbasic::SceneObjectAsset *sceneAsset = node->GetSceneAsset();
+        dbasic::SceneObjectAsset *instance = sceneAsset->GetInstance();
+
+        bool branchTerminate = true;
+
+        if (instance != nullptr) {
+            if (strcmp(instance->GetName(), "Ledge") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Ledge *newLedge = m_mainRealm->spawn<Ledge>();
+                newLedge->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "Counter_1") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Counter *newCounter = m_mainRealm->spawn<Counter>();
+                newCounter->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "Toaster") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Toaster *newToaster = m_mainRealm->spawn<Toaster>();
+                newToaster->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "Shelves") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Shelves *newShelves = m_mainRealm->spawn<Shelves>();
+                newShelves->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "Fridge") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Fridge *newFridge = m_mainRealm->spawn<Fridge>();
+                newFridge->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "Stool_1") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Stool_1 *newStool = m_mainRealm->spawn<Stool_1>();
+                newStool->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "Microwave") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Microwave *newMicrowave = m_mainRealm->spawn<Microwave>();
+                newMicrowave->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "Oven") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Oven *newOven = m_mainRealm->spawn<Oven>();
+                newOven->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "SingleShelf") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                SingleShelf *newOven = m_mainRealm->spawn<SingleShelf>();
+                newOven->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "Vase") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Vase *newVase = m_mainRealm->spawn<Vase>();
+                newVase->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "Cabinet") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Cabinet *newCabinet = m_mainRealm->spawn<Cabinet>();
+                newCabinet->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "Sink") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Sink *newSink = m_mainRealm->spawn<Sink>();
+                newSink->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "PlayerStart") == 0) {
+                m_respawnPosition = node->Transform.GetWorldPosition();
+            }
+            else if (strcmp(instance->GetName(), "LightSource::Ceiling") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                CeilingLightSource *newLight = m_mainRealm->spawn<CeilingLightSource>();
+                newLight->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "LightSource::Window") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                WindowLightSource *newLight = m_mainRealm->spawn<WindowLightSource>();
+                newLight->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "StoveHood") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                StoveHood *stoveHood = m_mainRealm->spawn<StoveHood>();
+                stoveHood->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "FruitBowl") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                FruitBowl *fruitBowl = m_mainRealm->spawn<FruitBowl>();
+                fruitBowl->RigidBody.Transform.SetPosition(position);
+                fruitBowl->setOrientation(node->Transform.GetWorldOrientation());
+            }
+            else if (strcmp(instance->GetName(), "Fan") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Fan *fan = m_mainRealm->spawn<Fan>();
+                fan->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "Table") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Table *table = m_mainRealm->spawn<Table>();
+                table->RigidBody.Transform.SetPosition(position);
+            }
+            else {
+                branchTerminate = false;
+            }
+        }
+        else if (node->GetSceneAsset()->GetType() == ysObjectData::ObjectType::Light) {
+            LightObject *light = m_mainRealm->spawn<LightObject>();
+            light->setAsset(node->GetSceneAsset());
+            light->RigidBody.Transform.SetPosition(node->Transform.GetWorldPosition());
+            light->RigidBody.Transform.SetOrientation(node->Transform.GetWorldOrientation());
+        }
+        else if (node->GetSceneAsset()->GetType() == ysObjectData::ObjectType::Geometry) {
+            ysVector position = node->Transform.GetWorldPosition();
+            ysQuaternion orientation = node->Transform.GetWorldOrientation();
+
+            StaticArt *newStaticArt = m_mainRealm->spawn<StaticArt>();
+            newStaticArt->setAsset(node->GetModelAsset());
+            newStaticArt->RigidBody.Transform.SetPosition(position);
+            newStaticArt->RigidBody.Transform.SetOrientation(orientation);
+        }
+        else {
+            branchTerminate = false;
+        }
+
+        if (!branchTerminate) {
+            for (dbasic::RenderNode *child : tree[node]) {
+                s.push(child);
+            }
+        }
+    }
+
+    /*
     for (int i = 0; i < hierarchy->GetNodeCount(); ++i) {
         dbasic::RenderNode *node = hierarchy->GetNode(i);
         dbasic::SceneObjectAsset *sceneAsset = node->GetSceneAsset();
-        if (strcmp(sceneAsset->GetName(), "Ledge") == 0) {
-            ysVector position = node->Transform.GetWorldPosition();
-            Ledge *newLedge = m_mainRealm->spawn<Ledge>();
-            newLedge->RigidBody.Transform.SetPosition(position);
-        }
-        else if (strcmp(sceneAsset->GetName(), "Counter_1") == 0) {
-            ysVector position = node->Transform.GetWorldPosition();
-            Counter *newCounter = m_mainRealm->spawn<Counter>();
-            newCounter->RigidBody.Transform.SetPosition(position);
-        }
-        else if (strcmp(sceneAsset->GetName(), "Toaster") == 0) { 
-            ysVector position = node->Transform.GetWorldPosition();
-            Toaster *newToaster = m_mainRealm->spawn<Toaster>();
-            newToaster->RigidBody.Transform.SetPosition(position);
-        }
-        else if (strcmp(sceneAsset->GetName(), "Shelves") == 0) {
-            ysVector position = node->Transform.GetWorldPosition();
-            Shelves *newShelves = m_mainRealm->spawn<Shelves>();
-            newShelves->RigidBody.Transform.SetPosition(position);
-        }
-        else if (strcmp(sceneAsset->GetName(), "Fridge") == 0) {
-            ysVector position = node->Transform.GetWorldPosition();
-            Fridge *newFridge = m_mainRealm->spawn<Fridge>();
-            newFridge->RigidBody.Transform.SetPosition(position);
-        }
-        else if (strcmp(sceneAsset->GetName(), "Stool_1") == 0) {
-            ysVector position = node->Transform.GetWorldPosition();
-            Stool_1 *newStool = m_mainRealm->spawn<Stool_1>();
-            newStool->RigidBody.Transform.SetPosition(position);
-        }
-        else if (strcmp(sceneAsset->GetName(), "Microwave") == 0) {
-            ysVector position = node->Transform.GetWorldPosition();
-            Microwave *newMicrowave = m_mainRealm->spawn<Microwave>();
-            newMicrowave->RigidBody.Transform.SetPosition(position);
-        }
-        else if (strcmp(sceneAsset->GetName(), "Oven") == 0) {
-            ysVector position = node->Transform.GetWorldPosition();
-            Oven *newOven = m_mainRealm->spawn<Oven>();
-            newOven->RigidBody.Transform.SetPosition(position);
-        }
-        else if (strcmp(sceneAsset->GetName(), "SingleShelf") == 0) {
-            ysVector position = node->Transform.GetWorldPosition();
-            SingleShelf *newOven = m_mainRealm->spawn<SingleShelf>();
-            newOven->RigidBody.Transform.SetPosition(position);
-        }
-        else if (strcmp(sceneAsset->GetName(), "Vase") == 0) {
-            ysVector position = node->Transform.GetWorldPosition();
-            Vase *newVase = m_mainRealm->spawn<Vase>();
-            newVase->RigidBody.Transform.SetPosition(position);
-        }
-        else if (strcmp(sceneAsset->GetName(), "Cabinet") == 0) {
-            ysVector position = node->Transform.GetWorldPosition();
-            Cabinet *newCabinet = m_mainRealm->spawn<Cabinet>();
-            newCabinet->RigidBody.Transform.SetPosition(position);
-        }
-        else if (strcmp(sceneAsset->GetName(), "Sink") == 0) {
-            ysVector position = node->Transform.GetWorldPosition();
-            Sink *newSink = m_mainRealm->spawn<Sink>();
-            newSink->RigidBody.Transform.SetPosition(position);
-        }
-        else if (strcmp(sceneAsset->GetName(), "PlayerStart") == 0) {
-            m_respawnPosition = node->Transform.GetWorldPosition();
-        }
-        else if (strcmp(sceneAsset->GetName(), "LightSource::Ceiling") == 0) {
-            ysVector position = node->Transform.GetWorldPosition();
-            CeilingLightSource *newLight = m_mainRealm->spawn<CeilingLightSource>();
-            newLight->RigidBody.Transform.SetPosition(position);
-        }
-        else if (strcmp(sceneAsset->GetName(), "LightSource::Window") == 0) {
-            ysVector position = node->Transform.GetWorldPosition();
-            WindowLightSource *newLight = m_mainRealm->spawn<WindowLightSource>();
-            newLight->RigidBody.Transform.SetPosition(position);
-        }
-        else if (strcmp(sceneAsset->GetName(), "StoveHood") == 0) {
-            ysVector position = node->Transform.GetWorldPosition();
-            StoveHood *stoveHood = m_mainRealm->spawn<StoveHood>();
-            stoveHood->RigidBody.Transform.SetPosition(position);
-        }
-        else if (strcmp(sceneAsset->GetName(), "FruitBowl") == 0) {
-            ysVector position = node->Transform.GetWorldPosition();
-            FruitBowl *fruitBowl = m_mainRealm->spawn<FruitBowl>();
-            fruitBowl->RigidBody.Transform.SetPosition(position);
-        }
-        else if (strcmp(sceneAsset->GetName(), "Fan") == 0) {
-            ysVector position = node->Transform.GetWorldPosition();
-            Fan *fan = m_mainRealm->spawn<Fan>();
-            fan->RigidBody.Transform.SetPosition(position);
-        }
-        else if (strcmp(sceneAsset->GetName(), "Table") == 0) {
-            ysVector position = node->Transform.GetWorldPosition();
-            Table *table = m_mainRealm->spawn<Table>();
-            table->RigidBody.Transform.SetPosition(position);
-        }
-        else if (sceneAsset->GetType() == ysObjectData::ObjectType::Instance) {
-            if (node->GetSceneAsset()->GetInstance()->GetType() == ysObjectData::ObjectType::Light) {
-                LightObject *light = m_mainRealm->spawn<LightObject>();
-                light->setAsset(node->GetSceneAsset()->GetInstance());
-                light->RigidBody.Transform.SetPosition(node->Transform.GetWorldPosition());
-                light->RigidBody.Transform.SetOrientation(node->Transform.GetWorldOrientation());
-            }
+        dbasic::SceneObjectAsset *instance = sceneAsset->GetInstance();
 
+        if (instance != nullptr) {
+            if (strcmp(instance->GetName(), "Ledge") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Ledge *newLedge = m_mainRealm->spawn<Ledge>();
+                newLedge->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "Counter_1") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Counter *newCounter = m_mainRealm->spawn<Counter>();
+                newCounter->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "Toaster") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Toaster *newToaster = m_mainRealm->spawn<Toaster>();
+                newToaster->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "Shelves") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Shelves *newShelves = m_mainRealm->spawn<Shelves>();
+                newShelves->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "Fridge") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Fridge *newFridge = m_mainRealm->spawn<Fridge>();
+                newFridge->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "Stool_1") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Stool_1 *newStool = m_mainRealm->spawn<Stool_1>();
+                newStool->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "Microwave") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Microwave *newMicrowave = m_mainRealm->spawn<Microwave>();
+                newMicrowave->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "Oven") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Oven *newOven = m_mainRealm->spawn<Oven>();
+                newOven->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "SingleShelf") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                SingleShelf *newOven = m_mainRealm->spawn<SingleShelf>();
+                newOven->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "Vase") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Vase *newVase = m_mainRealm->spawn<Vase>();
+                newVase->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "Cabinet") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Cabinet *newCabinet = m_mainRealm->spawn<Cabinet>();
+                newCabinet->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "Sink") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Sink *newSink = m_mainRealm->spawn<Sink>();
+                newSink->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "PlayerStart") == 0) {
+                m_respawnPosition = node->Transform.GetWorldPosition();
+            }
+            else if (strcmp(instance->GetName(), "LightSource::Ceiling") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                CeilingLightSource *newLight = m_mainRealm->spawn<CeilingLightSource>();
+                newLight->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "LightSource::Window") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                WindowLightSource *newLight = m_mainRealm->spawn<WindowLightSource>();
+                newLight->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "StoveHood") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                StoveHood *stoveHood = m_mainRealm->spawn<StoveHood>();
+                stoveHood->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "FruitBowl") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                FruitBowl *fruitBowl = m_mainRealm->spawn<FruitBowl>();
+                fruitBowl->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "Fan") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Fan *fan = m_mainRealm->spawn<Fan>();
+                fan->RigidBody.Transform.SetPosition(position);
+            }
+            else if (strcmp(instance->GetName(), "Table") == 0) {
+                ysVector position = node->Transform.GetWorldPosition();
+                Table *table = m_mainRealm->spawn<Table>();
+                table->RigidBody.Transform.SetPosition(position);
+            }
+        }
+        else if (node->GetSceneAsset()->GetType() == ysObjectData::ObjectType::Light) {
+            LightObject *light = m_mainRealm->spawn<LightObject>();
+            light->setAsset(node->GetSceneAsset());
+            light->RigidBody.Transform.SetPosition(node->Transform.GetWorldPosition());
+            light->RigidBody.Transform.SetOrientation(node->Transform.GetWorldOrientation());
+        }
+        else if (node->GetSceneAsset()->GetType() == ysObjectData::ObjectType::Geometry) {
             if (node->GetModelAsset() == nullptr) continue;
+            if (node->GetParent() == nullptr) continue;
+            if (node->GetParent()->GetParent() != hierarchy->GetNode("Level_1")) continue;
 
             ysVector position = node->Transform.GetWorldPosition();
             ysQuaternion orientation = node->Transform.GetWorldOrientation();
@@ -377,7 +544,7 @@ void c_adv::World::generateLevel(dbasic::RenderSkeleton *hierarchy) {
             newStaticArt->RigidBody.Transform.SetPosition(position);
             newStaticArt->RigidBody.Transform.SetOrientation(orientation);
         }
-    }
+    }*/
 }
 
 void c_adv::World::renderUi() {

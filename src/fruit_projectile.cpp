@@ -9,6 +9,7 @@ c_adv::FruitProjectile::FruitProjectile() {
     m_radius = 0.57f / 2;
     m_age = 0.0f;
     m_lifespan = 10.0f;
+    m_asset = nullptr;
 }
 
 c_adv::FruitProjectile::~FruitProjectile() {
@@ -46,8 +47,8 @@ void c_adv::FruitProjectile::render() {
     m_world->getShaders().SetBaseColor(Black);
 
     m_world->getShaders().SetObjectTransform(m_renderTransform.GetWorldTransform());
-    m_world->getShaders().ConfigureModel(1.0f, m_fruitAsset);
-    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_fruitAsset);
+    m_world->getShaders().ConfigureModel(1.0f, m_asset);
+    m_world->getEngine().DrawModel(m_world->getShaders().GetRegularFlags(), m_asset);
 }
 
 void c_adv::FruitProjectile::process(float dt) {

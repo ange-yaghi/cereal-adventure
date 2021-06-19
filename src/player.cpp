@@ -784,7 +784,7 @@ void c_adv::Player::getAssets(dbasic::AssetManager *am) {
     AnimArmsDie->SetLength(340.0f);
     AnimLegsDie->SetLength(340.0f);
 
-    CharacterRoot = am->GetSceneObject("CerealArmature");
+    CharacterRoot = am->GetSceneObject("CerealArmature", ysObjectData::ObjectType::Empty);
 
     AudioFootstep01 = am->GetAudioAsset("CerealBox::Footstep01");
     AudioFootstep02 = am->GetAudioAsset("CerealBox::Footstep02");

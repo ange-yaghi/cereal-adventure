@@ -2,6 +2,7 @@
 
 layout(binding = 0) uniform sampler2D Input;
 layout(binding = 1) uniform sampler2D InputBloom;
+layout(binding = 2) uniform sampler2D Dither;
 
 out vec4 out_Color;
 
@@ -47,9 +48,26 @@ vec3 hableTonemap(vec3 input) {
 	return mapped * whiteScale;
 }
 
+vec3 orderedDither(vec3 c) {
+	const int x = int(gl_FragCoord.x);
+	const int y = int(gl_FragCoord.y);
+
+	const int size = textureSize(Dither, 0).x;
+
+	const float M = texture(Dither, vec2(mod(x, size) / size, mod(y, size) / size)).r;
+
+	const float dither = 0.05 * (M - 0.5);
+	return c + vec3(dither, dither, dither);
+}
+
 void main(void) {
-    vec3 input = texture(Input, ex_Tex).rgb;
-    vec3 bloom = texture(InputBloom, ex_Tex).rgb;
+    const vec3 input = texture(Input, ex_Tex).rgb;
+    const vec3 bloom = texture(InputBloom, ex_Tex).rgb;
+
+	const vec3 final = input + bloom;
+	const vec3 tonemapped = hableTonemap(final);
+	const vec3 srgb = linearToSrgb(tonemapped);
+	const vec3 dithered = orderedDither(srgb);
     
-    out_Color = vec4(linearToSrgb(hableTonemap((input + bloom).rgb)), 1.0);	
+    out_Color = vec4(dithered, 1.0);	
 }

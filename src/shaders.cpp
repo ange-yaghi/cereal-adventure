@@ -36,6 +36,7 @@ c_adv::Shaders::Shaders() {
     m_bloomShaderProgram = nullptr;
     m_bloomShader = nullptr;
     m_bloomStage = nullptr;
+    m_ditherTexture = nullptr;
 
     m_device = nullptr;
 
@@ -203,6 +204,17 @@ ysError c_adv::Shaders::Initialize(const Context &context) {
     YDS_NESTED_ERROR_CALL(context.Device->AttachShader(m_bloomShaderProgram, m_bloomShader));
     YDS_NESTED_ERROR_CALL(context.Device->LinkProgram(m_bloomShaderProgram));
 
+    const int N = 16;
+    uint8_t buffer[N * N];
+    GenerateOrderedDither(N, buffer);
+
+    YDS_NESTED_ERROR_CALL(context.Device->CreateAlphaTexture(&m_ditherTexture, N, N, buffer));
+
+    dbasic::TextureHandle handle;
+
+    m_bloomStage->AddTextureInput(2, &handle);
+    m_bloomStage->BindTexture(m_ditherTexture, handle);
+
     m_bloomStage->SetClearColor(ysMath::Constants::Zero);
     m_bloomStage->SetInputLayout(context.Engine->GetSaqInputLayout());
     m_bloomStage->SetType(dbasic::ShaderStage::Type::PostProcessing);
@@ -255,6 +267,10 @@ ysError c_adv::Shaders::Destroy() {
 
 void c_adv::Shaders::OnResize(int width, int height) {
     m_ssao->OnResize(width, height);
+    m_blurStage->OnResize(width, height);
+    m_device->ResizeRenderTarget(m_mainBuffer, width, height, width, height);
+    m_device->ResizeRenderTarget(m_depthBuffer, width, height, width, height);
+    m_device->ResizeRenderTarget(m_brightTarget, width, height, width, height);
 }
 
 ysError c_adv::Shaders::UseMaterial(dbasic::Material *material) {
@@ -660,4 +676,16 @@ void c_adv::Shaders::SetDiffuseTexture(ysTexture *texture) {
 
 void c_adv::Shaders::SetAoTexture(ysTexture *texture) {
     m_mainStage->BindTexture(texture, m_aoTexture);
+}
+
+void c_adv::Shaders::GenerateOrderedDither(int N, unsigned char *output) {
+    int bits = 0;
+    for (int i = N * N - 1; i != 0; i >>= 1, ++bits);
+
+    for (uint64_t i = 0; i < N; ++i) {
+        for (uint64_t j = 0; j < N; ++j) {
+            uint64_t value = bitwiseReverse(bitwiseInterleave(i ^ j, i), bits);
+            output[j * N + i] = (unsigned char)(((float)value / (N * N)) * 255);
+        }
+    }
 }

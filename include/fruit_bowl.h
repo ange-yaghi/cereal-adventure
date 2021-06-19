@@ -17,7 +17,10 @@ namespace c_adv {
         virtual void render();
         virtual void process(float dt);
 
+        void setOrientation(const ysQuaternion &quaternion) { m_renderTransform.SetOrientation(quaternion); }
+
     protected:
+        ysTransform m_renderTransform;
         Clock m_clock;
 
         // Assets ----
@@ -25,7 +28,10 @@ namespace c_adv {
         void getAssets(dbasic::AssetManager *am);
 
     protected:
-        static dbasic::ModelAsset *m_fruitBowl;
+        static dbasic::RenderSkeleton *s_fruitBowl;
+        static dbasic::ModelAsset *s_apple;
+        static dbasic::ModelAsset *s_banana;
+        static dbasic::ModelAsset *s_pear;
     };
 
 } /* namespace c_adv */

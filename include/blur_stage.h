@@ -23,6 +23,8 @@ namespace c_adv {
         ysRenderTarget *GetOutput() const { return m_output; }
         void SetOutput(ysRenderTarget *output) { m_output = output; }
 
+        void OnResize(int width, int height);
+
     protected:
         void SetHorizontal(bool horizontal);
 
@@ -34,6 +36,8 @@ namespace c_adv {
 
             ysRenderTarget *m_buffers[2];
         };
+
+        ysDevice *m_device;
 
         ysRenderTarget *m_input;
         ysRenderTarget *m_output;

@@ -1,6 +1,8 @@
 #include "../include/blur_stage.h"
 
 c_adv::BlurStage::BlurStage() {
+    m_device = nullptr;
+
     m_buffer0 = nullptr;
     m_buffer1 = nullptr;
 
@@ -66,6 +68,8 @@ ysError c_adv::BlurStage::Create(const Shaders::Context &context) {
     SetType(dbasic::ShaderStage::Type::PostProcessing);
     SetPasses(10);
 
+    m_device = context.Device;
+
     return YDS_ERROR_RETURN(ysError::None);
 }
 
@@ -96,6 +100,11 @@ void c_adv::BlurStage::OnPass(int pass) {
 
 void c_adv::BlurStage::OnEnd() {
     /* void */
+}
+
+void c_adv::BlurStage::OnResize(int width, int height) {
+    m_device->ResizeRenderTarget(m_buffer0, width, height, width, height);
+    m_device->ResizeRenderTarget(m_buffer1, width, height, width, height);
 }
 
 void c_adv::BlurStage::SetHorizontal(bool horizontal) {

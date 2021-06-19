@@ -31,6 +31,9 @@ void c_adv::AssetLoader::createAllMaterials(dbasic::AssetManager *am) {
     playerMaterial->SetName("PlayerMaterial");
     playerMaterial->SetDiffuseColor(White);
     playerMaterial->SetDiffuseMap(am->GetTexture("PlayerDiffuse")->GetTexture());
+    playerMaterial->SetSpecularMix(0.5f);
+    playerMaterial->SetIncidentSpecular(0.0f);
+    playerMaterial->SetSpecularPower(0.5f);
 
     dbasic::Material *counterMaterial = am->NewMaterial();
     counterMaterial->SetName("CounterMaterial");
@@ -123,7 +126,7 @@ void c_adv::AssetLoader::createAllMaterials(dbasic::AssetManager *am) {
     bigPlant0Material->SetName("BigPlant0");
     bigPlant0Material->SetDiffuseColor(White);
     bigPlant0Material->SetDiffuseMap(am->GetTexture("BigPlant0_Diffuse")->GetTexture());
-    bigPlant0Material->SetSpecularMix(0.5f);
+    bigPlant0Material->SetSpecularMix(0.8f);
 
     dbasic::Material *books0Material = am->NewMaterial();
     books0Material->SetName("Books0");
@@ -214,6 +217,22 @@ void c_adv::AssetLoader::createAllMaterials(dbasic::AssetManager *am) {
     neon1->SetName("Neon1");
     neon1->SetDiffuseColor(ysMath::Mul(ysColor::srgbiToLinear(0x93278F), ysMath::LoadScalar(2.5f)));
     neon1->SetLit(false);
+
+    dbasic::Material *pear = am->NewMaterial();
+    pear->SetName("Pear");
+    pear->SetDiffuseMap(am->GetTexture("Pear_Diffuse")->GetTexture());
+
+    dbasic::Material *apple = am->NewMaterial();
+    apple->SetName("Apple");
+    apple->SetDiffuseMap(am->GetTexture("Apple_Diffuse")->GetTexture());
+
+    dbasic::Material *banana = am->NewMaterial();
+    banana->SetName("Banana");
+    banana->SetDiffuseMap(am->GetTexture("Banana_Diffuse")->GetTexture());
+
+    dbasic::Material *bowl = am->NewMaterial();
+    bowl->SetName("FruitBowl");
+    bowl->SetDiffuseMap(am->GetTexture("FruitBowl_Diffuse")->GetTexture());
 }
 
 void c_adv::AssetLoader::loadAllTextures(const dbasic::Path &assetPath, dbasic::AssetManager *am) {
@@ -265,6 +284,11 @@ void c_adv::AssetLoader::loadAllTextures(const dbasic::Path &assetPath, dbasic::
     am->LoadTexture(getPath("textures/TunaCan_Diffuse.001.png", assetPath).c_str(), "TunaCan_Diffuse");
     am->LoadTexture(getPath("textures/Vase_Diffuse.png", assetPath).c_str(), "Vase_Diffuse");
     am->LoadTexture(getPath("textures/WineBottle0_Diffuse.png", assetPath).c_str(), "WineBottle0_Diffuse");
+
+    am->LoadTexture(getPath("textures/Apple.png", assetPath).c_str(), "Apple_Diffuse");
+    am->LoadTexture(getPath("textures/Banana.png", assetPath).c_str(), "Banana_Diffuse");
+    am->LoadTexture(getPath("textures/Pear.png", assetPath).c_str(), "Pear_Diffuse");
+    am->LoadTexture(getPath("textures/FruitBowl.png", assetPath).c_str(), "FruitBowl_Diffuse");
 }
 
 void c_adv::AssetLoader::loadAllAssets(const dbasic::Path &assetPath, dbasic::AssetManager *am) {

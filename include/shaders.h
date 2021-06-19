@@ -4,6 +4,7 @@
 #include "delta.h"
 
 #include "shader_controls.h"
+#include "math_utilities.h"
 
 namespace c_adv {
 
@@ -153,6 +154,8 @@ namespace c_adv {
 
         ShaderScreenVariables &uiShaderScreenVariables() { return m_uiShaderScreenVariables; }
 
+        static void GenerateOrderedDither(int N, unsigned char *output);
+
     protected:
         AllShadowMapScreenVariables *m_shadowMapScreenVariables;
         ShadowMapObjectVariables *m_shadowMapObjectVariables;
@@ -218,6 +221,8 @@ namespace c_adv {
         ysRenderTarget *m_depthBuffer;
         ysRenderTarget *m_brightTarget;
         ysRenderTarget **m_shadowMaps;
+
+        ysTexture *m_ditherTexture;
     };
 
 } /* namespace dbasic */

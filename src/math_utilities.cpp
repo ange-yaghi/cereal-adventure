@@ -36,3 +36,29 @@ bool c_adv::getDirection(const ysVector &pos, const ysVector &target, ysVector *
         return true;
     }
 }
+
+uint64_t c_adv::bitwiseInterleaveWithZeros(uint32_t input) {
+    uint64_t word = input;
+    word = (word ^ (word << 16)) & 0x0000ffff0000ffff;
+    word = (word ^ (word << 8)) & 0x00ff00ff00ff00ff;
+    word = (word ^ (word << 4)) & 0x0f0f0f0f0f0f0f0f;
+    word = (word ^ (word << 2)) & 0x3333333333333333;
+    word = (word ^ (word << 1)) & 0x5555555555555555;
+    return word;
+}
+
+uint64_t c_adv::bitwiseInterleave(uint32_t x, uint32_t y) {
+    return bitwiseInterleaveWithZeros(x) | (bitwiseInterleaveWithZeros(y) << 1);
+}
+
+uint64_t c_adv::bitwiseReverse(uint64_t input, int bits) {
+    uint64_t result = 0;
+    for (int i = 0; i < bits; ++i) {
+        const uint64_t bit = input & 0x1;
+        result |= bit << (bits - i - 1);
+
+        input >>= 1;
+    }
+
+    return result;
+}
