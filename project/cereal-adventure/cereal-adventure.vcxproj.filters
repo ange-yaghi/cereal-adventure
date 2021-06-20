@@ -76,6 +76,30 @@
     <Filter Include="Source Files\light">
       <UniqueIdentifier>{2882d5a8-155e-4636-9d70-762b0bd2de36}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\game-objects\scene">
+      <UniqueIdentifier>{8cc043a3-3175-48e2-a00a-af8e51539b28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\game-objects\scene\camera-controllers">
+      <UniqueIdentifier>{53331e8b-8550-4b6b-a8b0-9b30b56c68c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\game-objects\scene\lighting">
+      <UniqueIdentifier>{f9ead019-86d9-4cfb-a59b-8a994b05d72b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\game-objects\scene">
+      <UniqueIdentifier>{9572d34a-fad1-4ccf-8f08-c7b0ee193fb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\game-objects\scene\camera-controllers">
+      <UniqueIdentifier>{4c6aa0cc-6201-4900-b995-642d1924a616}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\game-objects\scene\lighting">
+      <UniqueIdentifier>{658c098f-fec0-4a4c-8d8c-5bcd4e1d8cab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\game-objects\demo">
+      <UniqueIdentifier>{30083147-097b-4315-8f3b-6b3495fc4206}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\game-objects\demo">
+      <UniqueIdentifier>{28992417-448f-4437-8019-38f3e94625b4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\main.cpp">
@@ -230,6 +254,21 @@
     </ClCompile>
     <ClCompile Include="..\..\src\light_object.cpp">
       <Filter>Source Files\light</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\turn_table_camera.cpp">
+      <Filter>Source Files\game-objects\demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\debug_camera_controller.cpp">
+      <Filter>Source Files\game-objects\scene\camera-controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\scene_lighting_controller.cpp">
+      <Filter>Source Files\game-objects\scene\lighting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\demo_lighting_controller.cpp">
+      <Filter>Source Files\game-objects\demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\demo_shader_controls.cpp">
+      <Filter>Source Files\game-objects\demo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -394,6 +433,21 @@
     </ClInclude>
     <ClInclude Include="..\..\include\light_object.h">
       <Filter>Header Files\game-objects\lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\turn_table_camera.h">
+      <Filter>Header Files\game-objects\demo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\debug_camera_controller.h">
+      <Filter>Header Files\game-objects\scene\camera-controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\scene_lighting_controller.h">
+      <Filter>Header Files\game-objects\scene\lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\demo_lighting_controller.h">
+      <Filter>Header Files\game-objects\demo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\demo_shader_controls.h">
+      <Filter>Header Files\game-objects\demo</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

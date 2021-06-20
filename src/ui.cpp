@@ -4,6 +4,7 @@
 
 c_adv::Ui::Ui() {
     m_world = nullptr;
+    m_playerHealth = 1.0f;
 
     initialize();
 }

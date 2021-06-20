@@ -223,6 +223,9 @@ ysError c_adv::Shaders::Initialize(const Context &context) {
     m_bloomStage->AddInput(m_brightTarget, 1);
     m_bloomStage->SetShaderProgram(m_bloomShaderProgram);
 
+    YDS_NESTED_ERROR_CALL(m_bloomStage->NewConstantBuffer<BloomControls>(
+        "Buffer::BloomControls", 1, dbasic::ShaderStage::ConstantBufferBinding::BufferType::SceneData, &m_bloomControls));
+
     // UI stage
     m_uiStage->SetClearColor(ysMath::Constants::Zero);
     m_uiStage->SetInputLayout(m_inputLayout);
@@ -332,7 +335,7 @@ void c_adv::Shaders::ResetBrdfParameters() {
     m_shaderObjectVariables.Metallic = defaults.Metallic;
     m_shaderObjectVariables.SpecularMix = defaults.SpecularMix;
     m_shaderObjectVariables.SpecularPower = defaults.SpecularPower;
-    m_shaderObjectVariables.FogEffect = 0.0f;
+    m_shaderObjectVariables.FogEffect = defaults.FogEffect;
 }
 
 void c_adv::Shaders::SetBaseColor(const ysVector &color) {
@@ -425,12 +428,56 @@ void c_adv::Shaders::SetFogColor(const ysVector &color) {
     m_shaderScreenVariables.FogColor = ysMath::GetVector4(color);
 }
 
-void c_adv::Shaders::SetSsaoEnable(bool enable) {
-    m_shaderScreenVariables.SsaoEnable = enable ? 1 : 0;
+void c_adv::Shaders::SetClearColor(const ysVector &color) {
+    m_mainStage->SetClearColor(color);
 }
 
-bool c_adv::Shaders::GetSsaoEnable() const {
-    return m_shaderScreenVariables.SsaoEnable == 1;
+void c_adv::Shaders::SetAmbientDiffuseAmount(float amount) {
+    m_shaderScreenVariables.AmbientDiffuseAmount = amount;
+}
+
+void c_adv::Shaders::SetAmbientSpecularAmount(float amount) {
+    m_shaderScreenVariables.AmbientSpecularAmount = amount;
+}
+
+void c_adv::Shaders::SetSsaoAmount(float amount) {
+    m_shaderScreenVariables.SsaoAmount = amount;
+}
+
+void c_adv::Shaders::SetBakedAoAmount(float amount) {
+    m_shaderScreenVariables.BakedAoAmount = amount;
+}
+
+void c_adv::Shaders::SetDiffuseAmount(float amount) {
+    m_shaderScreenVariables.DiffuseAmount = amount;
+}
+
+void c_adv::Shaders::SetSpecularAmount(float amount) {
+    m_shaderScreenVariables.SpecularAmount = amount;
+}
+
+void c_adv::Shaders::SetShadowAmount(float amount) {
+    m_shaderScreenVariables.ShadowAmount = amount;
+}
+
+void c_adv::Shaders::SetDebugSsao(float amount) {
+    m_shaderScreenVariables.DebugSsao = amount;
+}
+
+void c_adv::Shaders::SetDebugBloom(float amount) {
+    m_shaderScreenVariables.DebugBloom = amount;
+}
+
+void c_adv::Shaders::SetBloomAmount(float amount) {
+    m_bloomControls.BloomAmount = amount;
+}
+
+void c_adv::Shaders::SetDitherAmount(float amount) {
+    m_bloomControls.DitherAmount = amount;
+}
+
+void c_adv::Shaders::SetDebugBlackAndWhite(float amount) {
+    m_bloomControls.DebugBlackAndWhite = amount;
 }
 
 void c_adv::Shaders::SetObjectTransform(const ysMatrix &mat) {

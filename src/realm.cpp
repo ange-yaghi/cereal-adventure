@@ -62,54 +62,6 @@ void c_adv::Realm::process(float dt) {
 }
  
 void c_adv::Realm::render() {
-    ysVector4 ambient = WallColor;
-    ambient.Scale(0.01f);
-    m_world->getShaders().SetAmbientLight(ambient);
-
-    /*
-    const int shadowMap = m_world->getShaders().AddPerspectiveShadowMap(
-        ysMath::LoadVector(-5.0f, 0.0f, 10.0f),
-        ysMath::Constants::Zero,
-        ysMath::Constants::YAxis,
-        ysMath::Constants::PI / 3,
-        1.0f, 2.0f, 400.0f);
-    
-    Light light{};
-    light.Active = 1;
-    light.Color = ysColor::srgbiToLinear(255, 197, 143);
-    light.Color.Scale(1.0f);
-
-    light.Attenuation0 = -1.0f;
-    light.Attenuation1 = 0.4f;
-    light.Direction = ysVector4(0.0f, 0.0f, 1.0f, 0.0f);
-    light.FalloffEnabled = 1;
-    light.FalloffStart = 2.0f;
-    light.FalloffScale = 5.0f;
-    light.Position = ysMath::GetVector4(ysMath::LoadVector(-5.0f, 0.0f, 10.0f));
-    light.ShadowMap = shadowMap;
-
-    m_world->getShaders().AddLight(light);
-
-    const int exteriorShadowMap = m_world->getShaders().AddOrthographicShadowMap(
-        ysMath::LoadVector(-1.43702f, 9.70642f, -5.5321f),
-        ysMath::LoadVector(5.01104f, 2.80569f, 0.285909f),
-        ysMath::Constants::YAxis,
-        5.0f, 5.0f, 2.0f, 400.0f);
-
-    Light sun{};
-    sun.Active = 1;
-    sun.Color = ysColor::srgbiToLinear(255, 255, 255);
-    sun.Color.Scale(1.0f);
-
-    sun.Attenuation0 = -1.0f;
-    sun.Attenuation1 = 0.4f;
-    sun.Direction = ysVector4(0.0f, 0.0f, 1.0f, 0.0f);
-    sun.FalloffEnabled = 0;
-    sun.Position = ysMath::GetVector4(ysMath::LoadVector(-1.43702f, 9.70642f, -5.5321f));
-    sun.ShadowMap = exteriorShadowMap;
-
-    m_world->getShaders().AddLight(sun);*/
-
     AABB cameraExtents = m_world->getCameraExtents();
     int visibleObjects = 0;
     for (GameObject *g : m_gameObjects) {

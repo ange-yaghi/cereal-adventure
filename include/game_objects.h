@@ -27,5 +27,10 @@
 #include "../include/table.h"
 #include "../include/collectible_item.h"
 #include "../include/light_object.h"
+#include "../include/turn_table_camera.h"
+#include "../include/debug_camera_controller.h"
+#include "../include/demo_lighting_controller.h"
+#include "../include/scene_lighting_controller.h"
+#include "../include/demo_shader_controls.h"
 
 #endif /* CEREAL_ADVENTURE_GAME_OBJECTS_H */

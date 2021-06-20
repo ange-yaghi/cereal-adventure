@@ -6,7 +6,6 @@ c_adv::SpringConnector::SpringConnector() {
     m_position = ysMath::Constants::Zero;
     m_target = ysMath::Constants::Zero;
 
-    m_force = ysMath::Constants::Zero;
     m_acceleration = ysMath::Constants::Zero;
     m_velocity = ysMath::Constants::Zero;
 }
@@ -16,13 +15,10 @@ c_adv::SpringConnector::~SpringConnector() {
 }
 
 void c_adv::SpringConnector::update(float dt) {
-    // d = (target - pos)
-    ysVector d = ysMath::Sub(m_target, m_position);
-    ysVector f = ysMath::Mul(d, m_stiffnessTensor);
+    const ysVector d = ysMath::Sub(m_target, m_position);
+    const ysVector f = ysMath::Mul(d, m_stiffnessTensor);
+    const ysVector dt_v = ysMath::LoadScalar(dt);
 
-    ysVector dt_v = ysMath::LoadScalar(dt);
-
-    m_force = f;
     m_acceleration = f;
 
     m_velocity = ysMath::Add(m_velocity, ysMath::Mul(dt_v, m_acceleration));

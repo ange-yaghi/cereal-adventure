@@ -64,9 +64,21 @@ namespace c_adv {
         void SetFogNear(float fogNear);
         void SetFogFar(float fogFar);
         void SetFogColor(const ysVector &color);
+        void SetClearColor(const ysVector &color);
 
-        void SetSsaoEnable(bool enable);
-        bool GetSsaoEnable() const;
+        void SetAmbientDiffuseAmount(float amount);
+        void SetAmbientSpecularAmount(float amount);
+        void SetSsaoAmount(float amount);
+        void SetBakedAoAmount(float amount);
+        void SetDiffuseAmount(float amount);
+        void SetSpecularAmount(float amount);
+        void SetShadowAmount(float amount);
+        void SetDebugSsao(float amount);
+        void SetDebugBloom(float amount);
+
+        void SetBloomAmount(float amount);
+        void SetDitherAmount(float amount);
+        void SetDebugBlackAndWhite(float amount);
 
         virtual void SetObjectTransform(const ysMatrix &mat);
         void SetPositionOffset(const ysVector &position);
@@ -157,6 +169,7 @@ namespace c_adv {
         static void GenerateOrderedDither(int N, unsigned char *output);
 
     protected:
+        BloomControls m_bloomControls;
         AllShadowMapScreenVariables *m_shadowMapScreenVariables;
         ShadowMapObjectVariables *m_shadowMapObjectVariables;
 

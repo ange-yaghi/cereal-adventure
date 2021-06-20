@@ -40,7 +40,15 @@ layout (binding = 0) uniform ScreenVariables {
 	float FogNear;
 	float FogFar;
 
-	int SsaoEnable;
+	float AmbientDiffuseAmount;
+	float AmbientSpecularAmount;
+	float SsaoAmount;
+	float BakedAoAmount;
+	float DiffuseAmount;
+	float SpecularAmount;
+	float ShadowAmount;
+	float DebugSsao;
+	float DebugBloom;
 };
 
 layout (binding = 1) uniform ObjectVariables {
@@ -201,16 +209,18 @@ void main(void) {
 		float cos_theta_o = dot(o, normal);
 
 		vec3 ambientSpecular = 
-			f_specular_ambient(o, normal, IncidentSpecular, SpecularMix) * AmbientLighting.rgb;
+			f_specular_ambient(o, normal, IncidentSpecular, SpecularMix) * AmbientLighting.rgb * AmbientSpecularAmount;
 		vec3 ambientDiffuse = 
-			f_diffuse(o, o, o, normal, DiffuseMix, DiffuseRoughness) * AmbientLighting.rgb * baseColor.rgb;
+			f_diffuse(o, o, o, normal, DiffuseMix, DiffuseRoughness) * AmbientLighting.rgb * baseColor.rgb * AmbientDiffuseAmount;
 		vec3 ambientMetallic = 
-			f_specular_ambient(o, normal, FullSpecular, 1.0) * AmbientLighting.rgb * baseColor.rgb;
+			f_specular_ambient(o, normal, FullSpecular, 1.0) * AmbientLighting.rgb * baseColor.rgb * AmbientSpecularAmount;
 
-		totalLighting = mix(
+		vec3 totalAmbient = mix(
 			ambientSpecular + ambientDiffuse,
 			ambientMetallic,
 			Metallic);
+		
+		totalLighting = totalAmbient;
 		totalLighting += Emission.rgb;
 
 		for (int li = 0; li < 32; ++li) {
@@ -258,18 +268,16 @@ void main(void) {
 				falloff = (invFalloffDist * invFalloffDist);
 			}
 
-			vec3 bsdf = mix(diffuse + specular, metallic, Metallic);
+			vec3 bsdf = mix(diffuse * DiffuseAmount + specular * SpecularAmount, metallic * SpecularAmount, Metallic);
 
 			if (Lights[li].ShadowMap != -1) {
-				falloff *= shadowMapValues[Lights[li].ShadowMap];
+				falloff *= mix(1.0, shadowMapValues[Lights[li].ShadowMap], ShadowAmount);
 			}
 
 			totalLighting += falloff * bsdf * spotAttenuation * spotAttenuation * spotAttenuation;
 		}
 
-		if (SsaoEnable == 1) {
-			totalLighting *= ssao_f;
-		}
+		totalLighting *= mix(1.0, ssao_f, SsaoAmount);
 	}
 
 	const float distanceToCamera = length(CameraEye.xyz - ex_Pos.xyz);
@@ -278,7 +286,7 @@ void main(void) {
 
 	float ao = 1.0;
 	if (AoMap == 1) {
-		ao = mix(texture(aoTex, ex_Tex).r, 1.0, 0.5);
+		ao = mix(1.0, mix(texture(aoTex, ex_Tex).r, 1.0, 0.5), BakedAoAmount);
 	}
 
 	const float brightness = dot(totalLighting.rgb, vec3(0.2126, 0.7152, 0.0722));
@@ -289,6 +297,14 @@ void main(void) {
 		out_BrightColor = vec4(0.0, 0.0, 0.0, 1.0);
 	}
 
-	out_Color = vec4(
-		mix(totalLighting.rgb * ao, FogColor.rgb, fogAttenuation * FogEffect), baseColor.a);
+	out_Color = mix(
+		vec4(mix(totalLighting.rgb * ao, FogColor.rgb, fogAttenuation * FogEffect), baseColor.a),
+		vec4(ssao_f, ssao_f, ssao_f, 1.0f),
+		DebugSsao);
+
+	out_Color = mix(
+		out_Color,
+		out_BrightColor,
+		DebugBloom
+	);
 }

@@ -32,7 +32,6 @@ namespace c_adv {
 
         // Internals
     protected:
-        ysVector m_force;
         ysVector m_acceleration;
         ysVector m_velocity;
     };

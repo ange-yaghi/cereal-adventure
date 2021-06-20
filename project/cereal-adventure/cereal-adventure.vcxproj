@@ -29,6 +29,9 @@
     <ClCompile Include="..\..\src\cooldown_timer.cpp" />
     <ClCompile Include="..\..\src\counter.cpp" />
     <ClCompile Include="..\..\src\death_component.cpp" />
+    <ClCompile Include="..\..\src\debug_camera_controller.cpp" />
+    <ClCompile Include="..\..\src\demo_lighting_controller.cpp" />
+    <ClCompile Include="..\..\src\demo_shader_controls.cpp" />
     <ClCompile Include="..\..\src\fan.cpp" />
     <ClCompile Include="..\..\src\fire_damage_component.cpp" />
     <ClCompile Include="..\..\src\fridge.cpp" />
@@ -50,6 +53,7 @@
     <ClCompile Include="..\..\src\player_legs_fsm.cpp" />
     <ClCompile Include="..\..\src\projectile_damage_component.cpp" />
     <ClCompile Include="..\..\src\realm.cpp" />
+    <ClCompile Include="..\..\src\scene_lighting_controller.cpp" />
     <ClCompile Include="..\..\src\shaders.cpp" />
     <ClCompile Include="..\..\src\shelves.cpp" />
     <ClCompile Include="..\..\src\single_shelf.cpp" />
@@ -63,6 +67,7 @@
     <ClCompile Include="..\..\src\test_obstacle.cpp" />
     <ClCompile Include="..\..\src\toaster.cpp" />
     <ClCompile Include="..\..\src\toast_projectile.cpp" />
+    <ClCompile Include="..\..\src\turn_table_camera.cpp" />
     <ClCompile Include="..\..\src\ui.cpp" />
     <ClCompile Include="..\..\src\vase.cpp" />
     <ClCompile Include="..\..\src\walk_component.cpp" />
@@ -81,6 +86,9 @@
     <ClInclude Include="..\..\include\collectible_item.h" />
     <ClInclude Include="..\..\include\colors.h" />
     <ClInclude Include="..\..\include\death_component.h" />
+    <ClInclude Include="..\..\include\debug_camera_controller.h" />
+    <ClInclude Include="..\..\include\demo_lighting_controller.h" />
+    <ClInclude Include="..\..\include\demo_shader_controls.h" />
     <ClInclude Include="..\..\include\fan.h" />
     <ClInclude Include="..\..\include\fire_damage_component.h" />
     <ClInclude Include="..\..\include\fridge.h" />
@@ -94,6 +102,7 @@
     <ClInclude Include="..\..\include\player_arms_fsm.h" />
     <ClInclude Include="..\..\include\player_legs_fsm.h" />
     <ClInclude Include="..\..\include\projectile_damage_component.h" />
+    <ClInclude Include="..\..\include\scene_lighting_controller.h" />
     <ClInclude Include="..\..\include\shaders.h" />
     <ClInclude Include="..\..\include\shader_controls.h" />
     <ClInclude Include="..\..\include\single_shelf.h" />
@@ -119,6 +128,7 @@
     <ClInclude Include="..\..\include\test_obstacle.h" />
     <ClInclude Include="..\..\include\toaster.h" />
     <ClInclude Include="..\..\include\toast_projectile.h" />
+    <ClInclude Include="..\..\include\turn_table_camera.h" />
     <ClInclude Include="..\..\include\ui.h" />
     <ClInclude Include="..\..\include\vase.h" />
     <ClInclude Include="..\..\include\walk_component.h" />

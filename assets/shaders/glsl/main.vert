@@ -28,7 +28,15 @@ layout (binding = 0) uniform ScreenVariables {
 	float FogNear;
 	float FogFar;
 
-	int SsaoEnable;
+	float AmbientDiffuseAmount;
+	float AmbientSpecularAmount;
+	float SsaoAmount;
+	float BakedAoAmount;
+	float DiffuseAmount;
+	float SpecularAmount;
+	float ShadowAmount;
+	float DebugSsao;
+	float DebugBloom;
 };
 
 layout (binding = 1) uniform ObjectVariables {

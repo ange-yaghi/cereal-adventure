@@ -34,7 +34,7 @@ namespace c_adv {
         float DiffuseRoughness = 0.5f;
         float SpecularPower = 4.0f;
         float IncidentSpecular = 1.0f;
-        float FogEffect = 0.0f;
+        float FogEffect = 1.0f;
 
         int ColorReplace = 0;
         int AoMap = 0;
@@ -56,9 +56,17 @@ namespace c_adv {
         float FogNear = 10.0f;
         float FogFar = 100.0f;
 
-        int SsaoEnable = 1;
+        float AmbientDiffuseAmount = 1.0f;
+        float AmbientSpecularAmount = 1.0f;
+        float SsaoAmount = 1.0f;
+        float BakedAoAmount = 1.0f;
+        float DiffuseAmount = 1.0f;
+        float SpecularAmount = 1.0f;
+        float ShadowAmount = 1.0f;
+        float DebugSsao = 0.0f;
+        float DebugBloom = 0.0f;
 
-        int Padding[1];
+        int Padding[2];
     };
 
     struct Light {
@@ -94,6 +102,12 @@ namespace c_adv {
     struct BlurControls {
         int Horizontal;
         int Padding[3];
+    };
+
+    struct BloomControls {
+        float BloomAmount = 1.0f;
+        float DitherAmount = 1.0f;
+        float DebugBlackAndWhite = 0.0f;
     };
 
 } /* namespace c_adv */

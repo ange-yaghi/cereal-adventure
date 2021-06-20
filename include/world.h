@@ -16,7 +16,6 @@ namespace c_adv {
 
     class World {
     public:
-        static const float DefaultCameraDistance;
         static const std::string PhysicsTimer;
 
     public:
@@ -54,6 +53,8 @@ namespace c_adv {
 
         dbasic::StageEnableFlags getUiStageFlags() const { return m_uiStageFlags; }
 
+        GameObject *getFocus() const { return m_focus; }
+
     protected:
         void renderUi();
         void updateRealms();
@@ -63,14 +64,12 @@ namespace c_adv {
         Realm *m_mainRealm;
         GameObject *m_focus;
 
-        SpringConnector m_smoothCamera;
-        SpringConnector m_smoothTarget;
-
         ysVector m_respawnPosition;
-        float m_cameraDistance;
 
         ysRenderTarget *m_intermediateRenderTarget;
         ysRenderTarget *m_guiRenderTarget;
+        
+        bool m_demo;
 
         Ui m_ui;
 

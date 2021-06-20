@@ -9,6 +9,13 @@ out vec4 out_Color;
 in vec4 ex_Pos;
 in vec2 ex_Tex;
 
+layout (binding = 1) uniform BloomSettings {
+	float BloomAmount;
+	float DitherAmount;
+	float DebugBlackAndWhite;
+};
+
+
 float linearToSrgb(float u) {
 	const float MinSrgbPower = 0.0031308;
 
@@ -56,18 +63,25 @@ vec3 orderedDither(vec3 c) {
 
 	const float M = texture(Dither, vec2(mod(x, size) / size, mod(y, size) / size)).r;
 
-	const float dither = 0.05 * (M - 0.5);
+	const float dither = mix(0.05, 2.0, DebugBlackAndWhite) * (M - 0.5);
 	return c + vec3(dither, dither, dither);
+}
+
+vec3 toBlackAndWhite(vec3 c) {
+	const float brightness = dot(c.rgb, vec3(0.2126, 0.7152, 0.0722));
+	const float bw = round(brightness);
+	return vec3(bw, bw, bw);
 }
 
 void main(void) {
     const vec3 input = texture(Input, ex_Tex).rgb;
     const vec3 bloom = texture(InputBloom, ex_Tex).rgb;
 
-	const vec3 final = input + bloom;
+	const vec3 final = input + bloom * BloomAmount;
 	const vec3 tonemapped = hableTonemap(final);
 	const vec3 srgb = linearToSrgb(tonemapped);
-	const vec3 dithered = orderedDither(srgb);
+	const vec3 dithered = mix(srgb, orderedDither(srgb), DitherAmount);
+	const vec3 filtered = mix(dithered, toBlackAndWhite(dithered), DebugBlackAndWhite);
     
-    out_Color = vec4(dithered, 1.0);	
+    out_Color = vec4(filtered, 1.0);	
 }
