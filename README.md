@@ -16,4 +16,4 @@ This project is featured in a devlog series on my [YouTube channel](https://www.
 
 ## Building the Code
 
-As this codebase is currently not ready for release, I can't make any guarantees about whether it will build for you. I have recently migrated this project to CMake and this previous build steps are no longer applicable. I will update these steps soon!
+As this codebase is currently not ready for release, I can't make any guarantees about whether it will build for you. I have recently migrated this project to CMake and the previous build steps are no longer applicable. I will update this section soon!
