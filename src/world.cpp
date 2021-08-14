@@ -28,9 +28,9 @@ void c_adv::World::initialize(void *instance, ysContextObject::DeviceAPI api) {
     dbasic::Path modulePath = dbasic::GetModulePath();
     dbasic::Path confPath = modulePath.Append("delta.conf");
 
-    std::string enginePath = "../../dependencies/delta/engines/basic";
-    std::string assetPath = "../../assets";
-    std::string loggingPath = "../../workspace";
+    std::string enginePath = "../dependencies/submodules/delta-studio/engines/basic";
+    std::string assetPath = "../assets";
+    std::string loggingPath = "../workspace";
     std::string shaderPath;
     if (confPath.Exists()) {
         std::fstream confFile(confPath.ToString(), std::ios::in);
