@@ -350,3 +350,7 @@ ASALocalRun/
 
 # Ignore user's workspace
 workspace/
+
+# clangd cache and code completion files
+.cache
+compile_commands.json

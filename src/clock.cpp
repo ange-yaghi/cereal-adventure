@@ -32,5 +32,7 @@ void c_adv::Clock::update(float dt) {
     else if (m_t >= m_lT) {
         m_state = true;
     }
-    else m_state = false;
+    else {
+        m_state = false;
+    }
 }
