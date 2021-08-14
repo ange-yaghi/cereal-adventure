@@ -17,7 +17,7 @@ c_adv::World::World() {
     m_respawnPosition = ysMath::Constants::Zero;
     m_intermediateRenderTarget = nullptr;
     m_uiStageFlags = 0x0;
-    m_demo = true;
+    m_demo = false;
 }
 
 c_adv::World::~World() {

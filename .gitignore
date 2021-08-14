@@ -350,6 +350,3 @@ ASALocalRun/
 
 # Ignore user's workspace
 workspace/
-
-# Submodules
-dependencies/submodules/

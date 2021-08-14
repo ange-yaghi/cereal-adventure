@@ -297,8 +297,8 @@ void c_adv::AssetLoader::loadAllAssets(const dbasic::Path &assetPath, dbasic::As
     createAllMaterials(am);
 
     /* Load all model and animation assets here */
-    am->CompileInterchangeFile(getPath("cereal-box/cereal_box_light_test", assetPath).c_str(), 1.0f, true);
-    am->LoadSceneFile(getPath("cereal-box/cereal_box_light_test", assetPath).c_str());
+    am->CompileInterchangeFile(getPath("cereal-box/cereal_box", assetPath).c_str(), 1.0f, true);
+    am->LoadSceneFile(getPath("cereal-box/cereal_box", assetPath).c_str());
 
     am->LoadAnimationFile(getPath("cereal-box/cereal_box_new_run.dimo", assetPath).c_str());
 
