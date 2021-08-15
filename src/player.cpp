@@ -255,7 +255,9 @@ bool c_adv::Player::isHanging() {
 
         if (!col->m_sensor && !col->IsGhost()) {
             ysVector normal = col->m_normal;
-            if (std::abs(ysMath::GetScalar(ysMath::Dot(normal, ysMath::Constants::YAxis))) > 0.5f) {
+            if (std::abs(
+                ysMath::GetScalar(ysMath::Dot(normal, ysMath::Constants::YAxis))) > 0.5f)
+            {
                 return true;
             }
         }
