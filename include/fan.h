@@ -11,7 +11,7 @@ namespace c_adv {
     class Fan : public GameObject {
     public:
         Fan();
-        ~Fan();
+        virtual ~Fan();
 
         virtual void initialize();
 

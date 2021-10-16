@@ -12,7 +12,7 @@ This project is featured in a devlog series on my [YouTube channel](https://www.
 
 ## Current Progress
 
-![Alt text](docs/public/screenshots/game_screenshot_jan_30_2021.png?raw=true)
+![Alt text](docs/public/screenshots/game_screenshot_oct_16_2021.PNG?raw=true)
 
 ## Building the Code
 
