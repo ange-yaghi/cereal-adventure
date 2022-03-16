@@ -164,7 +164,7 @@ void c_adv::Realm::cleanObjectList() {
         }
     }
 
-    int N_unloaded = (int)m_unloadQueue.size();
+    const int N_unloaded = (int)m_unloadQueue.size();
     for (int i = 0; i < N_unloaded; ++i) {
         GameObject *u = m_unloadQueue.front(); m_unloadQueue.pop();
         unregisterGameObject(u);
