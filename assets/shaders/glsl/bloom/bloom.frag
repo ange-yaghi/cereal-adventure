@@ -46,9 +46,9 @@ vec3 hableTonemapPartial(vec3 s) {
 	return ((s * (A * s + C * B) + D * E) / (s * (A * s + B) + D * F)) - E/F;
 }
 
-vec3 hableTonemap(vec3 input) {
+vec3 hableTonemap(vec3 colorInput) {
 	const float exposureBias = 2.0f;
-	const vec3 mapped = hableTonemapPartial(exposureBias * input);
+	const vec3 mapped = hableTonemapPartial(exposureBias * colorInput);
 
 	const vec3 W = vec3(11.3f);
 	const vec3 whiteScale = vec3(1.0f) / hableTonemapPartial(W);
@@ -74,14 +74,14 @@ vec3 toBlackAndWhite(vec3 c) {
 }
 
 void main(void) {
-    const vec3 input = texture(Input, ex_Tex).rgb;
+    const vec3 baseColor  = texture(Input, ex_Tex).rgb;
     const vec3 bloom = texture(InputBloom, ex_Tex).rgb;
 
-	const vec3 final = input + bloom * BloomAmount;
+	const vec3 final = baseColor  + bloom * BloomAmount;
 	const vec3 tonemapped = hableTonemap(final);
 	const vec3 srgb = linearToSrgb(tonemapped);
 	const vec3 dithered = mix(srgb, orderedDither(srgb), DitherAmount);
 	const vec3 filtered = mix(dithered, toBlackAndWhite(dithered), DebugBlackAndWhite);
-    
-    out_Color = vec4(filtered, 1.0);	
+
+    out_Color = vec4(filtered, 1.0);
 }
